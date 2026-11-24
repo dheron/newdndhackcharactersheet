@@ -32,6 +32,8 @@ Top to bottom:
 4. **Melee weapons (4 rows):** Name, Hit Bns, Base, STR, Mag, Damage, Type (1 character), Note.
 5. **Ranged weapons (3 rows):** Name, Range (fits NNN/NNN), Hit Bns, Base, DEX, Mag, Damage, Type, Note.
 6. **Bottom (three columns):** "Abilities / Languages" over the first column; "Inventory / Notes" spanning the other two, which are separate columns (inventory, then notes). The inventory starts with the starting equipment and gold. Each weapon gets one row however many the character has.
+   - An improved ability replaces its older line (Backstab x2 becomes x3); Extra Attack twice shows "Extra Attack (x2)"; both Aura of Protection lines stay.
+   - A multiclass character's XP box shows each class's share: 1500/1500, or 1000/1000/1000.
    - Abilities lists only abilities. Rules (Expertise, bonus Experiences, ability score picks, cantrip counts, multiclass restrictions and the like) are left off; save bonus traits and the Human XP bonus stay; the list is in `decisions.json` (`notOnAbilityList`). Thieves' Cant is shown under Languages.
 
 ## Page 2 (spellcasters only)
@@ -75,11 +77,16 @@ One page per casting class. Same structure for all:
 - Multiclass restrictions (Classes v4): the armour can be worn, and while it is, the affected abilities are greyed with the reason, the AC row's Note box says what is switched off (printed too), and on screen a casting class's page 2 says "No spellcasting" (David).
 - XP and Current HP start blank; the player writes them.
 
+## Coins and buying
+
+- The top of the Inventory column has Platinum, Gold, Silver and Copper. Starting gold goes in Gold.
+- Buy equipment (on screen) lists the weapons and armour from the Weapons and Armour sheet with their cost; buying pays from the coins (standard 5e rates, David; smallest coins first, with change) and adds the item to the inventory.
+
 ## Levelling up
 
 - The toolbar has an Add XP box. XP earned gets the race's XP bonus (Human +20%) and is added to the XP total; a multiclass character's XP is divided equally between the classes.
 - When a class reaches its next XP Required, a Level up button appears. The level-up panel shows the HP for the level, what is new (abilities, Attack Bonus, spell slots) and asks for any picks: new cantrips, a Wizard's new spell, Thief Expertise, Bard Magical Secrets.
-- HP: levels 2 to 10 roll the class hit die (Roll button, or type a roll made with real dice) plus that class's CON bonus; from 11th the HP column's flat step with no CON. Multiclass divides by the number of classes, never below 1. Current HP goes up by the same amount.
+- HP: levels 2 to 10 roll the class hit die (Roll button, or type a roll made with real dice; a first roll of 1 is rerolled once, David) plus that class's CON bonus; from 11th the HP column's flat step with no CON. Multiclass divides by the number of classes, never below 1. Current HP goes up by the same amount.
 - Each level gained is recorded with its roll and picks, so Undo last level takes it back exactly.
 - New Experiences are gained by DM fiat (David): the player writes them on the spare Experience lines.
 - Magical Secrets: any spell from any class's list, any level (David).

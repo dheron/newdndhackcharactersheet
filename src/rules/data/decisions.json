@@ -46,11 +46,21 @@
   },
   "levelling": {
     "xp": "XP earned is added with an Add XP box; the race's XP bonus (Human +20%) is added to it. A multiclass character's XP is divided equally between the classes (Classes v4).",
-    "hpRoll": "Levels 2 to 10: roll the class hit die (in the app or with real dice) and add that class's CON bonus; multiclass divides by the number of classes, never less than 1.",
+    "hpRoll": "Levels 2 to 10: roll the class hit die (in the app or with real dice; a first roll of 1 is rerolled once and the second roll stands) and add that class's CON bonus; multiclass divides by the number of classes, never less than 1.",
     "hpFlat": "From 11th level the HP column adds a flat amount (e.g. +3 Fighter): only that amount, no CON; multiclass divides it by the number of classes, never less than 1.",
     "choices": "New cantrips, a Wizard's new known spell, Thief Expertise (two Experiences doubled to +4, at 1st, 6th and 16th) and Bard Magical Secrets are picked when the level is gained. Natural Explorer's terrain is written next to the ability.",
     "magicalSecretsLevels": "Magical Secrets: any spell from any class's list, of any level (David).",
     "experiences": "New Experiences are gained by DM fiat (David); the player writes them on the spare Experience lines."
+  },
+  "coins": {
+    "rule": "Coins are Platinum, Gold, Silver and Copper. Exchange rates are the standard 5e ones (David); they are not in the docs and were written from memory: 1 pp = 10 gp, 1 gp = 10 sp, 1 sp = 10 cp. Buying pays with the smallest coins first and gives change.",
+    "valueInCopper": { "pp": 1000, "gp": 100, "sp": 10, "cp": 1 }
+  },
+  "abilityUpgrades": {
+    "rule": "When a class ability improves at a later level, the sheet shows only the newest line (David). Extra Attack, gained twice with the same text, shows once as 'Extra Attack (x2)'; both Aura of Protection lines stay because they do different things; Magical Secrets shows once (the spells are listed on page 2). Wild Shape Swim and Fly are additions, not upgrades.",
+    "replace": ["Backstab", "Cleave", "Brutal Critical", "Wild Shape - CR", "Expertise"],
+    "count": ["Extra Attack"],
+    "once": ["Magical Secrets"]
   },
   "notOnAbilityList": {
     "rule": "Class abilities and race traits that are rules rather than abilities are left off the Abilities list (David): Expertise, bonus Experiences, multiclass restrictions, and (applying the same idea) ability score picks, cantrip counts (shown on page 2), and Barbarian's doubled CON and DEX (already in HP and AC). Save bonus traits and the Human XP bonus stay on the list (David). Thieves' Cant is a language.",

@@ -197,7 +197,9 @@
 }
 
 .pg .hdr .thick,
-.pg .hdr .num {
+.pg .hdr .num,
+.pg .hdr .center,
+.pg .hdr .xp-split {
   justify-content: center;
   text-align: center;
 }
@@ -870,6 +872,83 @@
   font-style: italic;
 }
 
+.pg .coins {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 8px;
+  border-bottom: 1px solid #777;
+  padding: 2px 2px 3px;
+}
+
+.pg .coin {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  height: 20px;
+}
+
+.pg .coin span {
+  width: 50px;
+  color: #444;
+}
+
+.pg .coin .in {
+  border: 0;
+  border-bottom: 1px solid #999;
+  height: 18px;
+  width: 100%;
+  min-width: 0;
+  font-size: 12px;
+  padding: 0;
+}
+
+.pg .buy-btn {
+  grid-column: 1 / -1;
+  min-height: 0;
+  height: 22px;
+  padding: 0 8px;
+  font-size: 11px;
+  margin-top: 3px;
+  justify-self: start;
+}
+
+.buy-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  max-height: 55vh;
+  overflow-y: auto;
+  border-top: 1px solid #ddd;
+}
+
+.buy-list li {
+  display: grid;
+  grid-template-columns: 9rem 1fr 4rem auto;
+  gap: 8px;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.buy-name {
+  font-weight: bold;
+}
+
+.buy-detail {
+  color: #555;
+  font-size: 0.85rem;
+}
+
+.buy-cost {
+  text-align: right;
+}
+
+.pg .inventory > .no-print {
+  flex: 1;
+  background-image: repeating-linear-gradient(transparent, transparent 20px, #777 20px, #777 21px);
+}
+
 .pg .inv-row {
   display: flex;
   align-items: center;
@@ -1238,6 +1317,25 @@
 
   .touch .pg .inv-row {
     height: 34px;
+  }
+
+  .touch .pg .inventory > .no-print {
+    background-image: repeating-linear-gradient(transparent, transparent 33px, #777 33px, #777 34px);
+  }
+
+  .touch .pg .coin {
+    height: 30px;
+    font-size: 13px;
+  }
+
+  .touch .pg .coin .in {
+    height: 28px;
+    font-size: 16px;
+  }
+
+  .touch .pg .buy-btn {
+    height: 34px;
+    font-size: 14px;
   }
 
   .touch .pg .inv-row input.in.ln {

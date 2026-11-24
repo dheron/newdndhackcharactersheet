@@ -2,7 +2,11 @@
 // (design/wireframes/page1-print.dc.html). Worked-out values are plain text; things
 // that change in play are inputs.
 import type { JSX } from "preact";
+import { useState } from "preact/hooks";
 import type { SaveKey } from "../rules";
+import type { Coins } from "../engine/coins";
+import { BuyDialog } from "./Buy";
+import { classXp } from "../engine/levels";
 import { EXPERIENCE_LINES, type Character, type PlayState, type WeaponRow } from "../model/character";
 import { alignmentShort, classAndLevel, takesNote, equipBlocked, equippable, inventoryOf, isEquipped, toggleEquip, type SheetView, type WeaponRowView } from "./derived";
 
@@ -61,7 +65,7 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
         </div>
         <div>
           <div class="l">Race</div>
-          <Box>{c.race}</Box>
+          <Box class="center">{c.race}</Box>
         </div>
         <div>
           <div class="l">Class and level</div>
@@ -69,7 +73,11 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
         </div>
         <div>
           <div class="l">XP</div>
-          <NumInput label="XP" value={c.xp || null} onChange={(v) => update((ch) => ({ ...ch, xp: v ?? 0 }))} />
+          {c.classes.length > 1 ? (
+            <Box class="xp-split">{c.xp ? c.classes.map(() => classXp(c)).join("/") : ""}</Box>
+          ) : (
+            <NumInput label="XP" value={c.xp || null} onChange={(v) => update((ch) => ({ ...ch, xp: v ?? 0 }))} />
+          )}
         </div>
         <div>
           <div class="l">Align</div>
@@ -77,7 +85,7 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
         </div>
         <div>
           <div class="l">Move</div>
-          <Box>{view.move}</Box>
+          <Box class="center">{view.move}</Box>
         </div>
         <div>
           <div class="l">Atk Bns</div>
@@ -339,6 +347,7 @@ const INVENTORY_LINES = 9;
  * unequip them; equipped armour sets the AC row and equipped weapons fill the weapon rows.
  */
 function Inventory({ c, update }: { c: Character; update: Update }) {
+  const [buying, setBuying] = useState(false);
   const lines = [...c.play.inventory];
   const shown = Math.max(INVENTORY_LINES, lines.length + 1);
   const setLine = (i: number, text: string) =>
@@ -348,8 +357,40 @@ function Inventory({ c, update }: { c: Character; update: Update }) {
       while (next.length > 0 && next[next.length - 1]!.trim() === "") next.pop();
       return { ...ch, play: { ...ch.play, inventory: next.map((l) => l ?? "") } };
     });
+  const coin = (key: keyof Coins, label: string) => (
+    <label class="coin">
+      <span>{label}:</span>
+      <input
+        class="in num"
+        type="text"
+        inputMode="numeric"
+        aria-label={label}
+        value={c.play.coins[key] ? String(c.play.coins[key]) : ""}
+        onChange={(e) => {
+          const n = Number.parseInt((e.target as HTMLInputElement).value, 10);
+          update((ch) => ({ ...ch, play: { ...ch.play, coins: { ...ch.play.coins, [key]: Number.isNaN(n) ? 0 : Math.max(0, n) } } }));
+        }}
+      />
+    </label>
+  );
   return (
     <div class="lined inventory">
+      <div class="coins">
+        {coin("pp", "Platinum")}
+        {coin("gp", "Gold")}
+        {coin("sp", "Silver")}
+        {coin("cp", "Copper")}
+        <button type="button" class="buy-btn no-print" onClick={() => setBuying(true)}>
+          Buy equipment
+        </button>
+      </div>
+      {buying && (
+        <BuyDialog
+          c={c}
+          onClose={() => setBuying(false)}
+          onBuy={(next) => update(() => next)}
+        />
+      )}
       <div class="no-print">
         {Array.from({ length: shown }, (_, i) => {
           const line = lines[i] ?? "";

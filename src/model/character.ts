@@ -2,6 +2,7 @@
 // on the sheet is recalculated from the rules data, so a rules fix updates old characters.
 import type { ClassName, SaveKey, Stat } from "../rules";
 import type { StatRoll } from "../engine/abilities";
+import { noCoins, type Coins } from "../engine/coins";
 import { isRangedWeapon, weaponByName } from "../engine/equipment";
 
 const isRanged = (name: string) => isRangedWeapon(weaponByName(name));
@@ -43,6 +44,8 @@ export interface PlayState {
   languages: string;
   /** Inventory, one item per line ("2 x Dagger"). Armour, shields and weapons can be equipped from here. */
   inventory: string[];
+  /** Platinum, Gold, Silver and Copper carried. */
+  coins: Coins;
   notes: string;
   /** Spell slots spent, per spell level (index 0 = 1st level). */
   /** Spell tracking for each casting class. */
@@ -153,7 +156,7 @@ function counted(names: string[]): string[] {
 export function initialPlay(c: Pick<Character, "equipment" | "gold">): PlayState {
   const row = (name: string): WeaponRow => ({ name, magic: 0, note: "" });
   const distinct = [...new Set(c.equipment.weapons)];
-  const inventory = [...(c.equipment.armour ? [c.equipment.armour] : []), ...(c.equipment.shield ? ["Shield"] : []), ...counted(c.equipment.weapons), `Gold: ${c.gold} gp`];
+  const inventory = [...(c.equipment.armour ? [c.equipment.armour] : []), ...(c.equipment.shield ? ["Shield"] : []), ...counted(c.equipment.weapons)];
   return {
     hpCurrent: null,
     tempHp: null,
@@ -169,6 +172,7 @@ export function initialPlay(c: Pick<Character, "equipment" | "gold">): PlayState
     ranged: padRows(distinct.filter(isRanged).map(row), RANGED_ROWS),
     languages: "",
     inventory,
+    coins: { ...noCoins(), gp: c.gold },
     notes: "",
     casting: {},
   };
@@ -219,6 +223,12 @@ export function fromFileText(text: string): Character {
   const inv = old.inventory as unknown;
   if (typeof inv === "string") play.inventory = inv.split("\n").filter((l) => l.trim() !== "");
   play.inventory = play.inventory.map(renameLine);
+  // Gold used to be a line in the inventory ("Gold: 7 gp"); it now has its own box.
+  if (!old.coins) {
+    const goldLine = play.inventory.findIndex((l) => /^\s*Gold:\s*\d+\s*gp\s*$/i.test(l));
+    play.coins = { ...noCoins(), gp: goldLine >= 0 ? Number(/\d+/.exec(play.inventory[goldLine]!)![0]) : 0 };
+    if (goldLine >= 0) play.inventory = play.inventory.filter((_, i) => i !== goldLine);
+  }
   play.armour = play.armour ? rename(play.armour) : null;
   play.melee = play.melee.map((r) => ({ ...r, name: rename(r.name) }));
   play.ranged = play.ranged.map((r) => ({ ...r, name: rename(r.name) }));

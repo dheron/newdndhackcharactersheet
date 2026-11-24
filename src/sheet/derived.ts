@@ -108,6 +108,28 @@ export function allExperiences(c: Character): string[] {
   return [...experienceSlotsFor(c.classes, c.race).fixed, ...c.experiences, ...c.play.extraExperiences.filter((e) => e.trim() !== "")];
 }
 
+const UPGRADES = decisions.abilityUpgrades;
+const groupOf = (text: string, prefixes: string[]) => prefixes.find((p) => text.startsWith(p)) ?? null;
+
+/**
+ * A class's abilities as they stand now: an improved ability replaces its older line, a repeated
+ * one is counted ("Extra Attack (x2)"), and some are shown once (decisions.json, abilityUpgrades).
+ */
+export function currentAbilities(list: { cls: ClassName; text: string }[]): { cls: ClassName; text: string }[] {
+  const out: { cls: ClassName; text: string; key: string | null; count: number }[] = [];
+  for (const a of list) {
+    const replace = groupOf(a.text, UPGRADES.replace);
+    const count = groupOf(a.text, UPGRADES.count);
+    const once = groupOf(a.text, UPGRADES.once);
+    const key = replace ?? count ?? once;
+    const existing = key ? out.find((o) => o.cls === a.cls && o.key === key) : undefined;
+    if (!existing) out.push({ ...a, key, count: 1 });
+    else if (replace) existing.text = a.text;
+    else if (count) existing.count += 1;
+  }
+  return out.map((o) => ({ cls: o.cls, text: o.count > 1 ? `${o.text} (x${o.count})` : o.text }));
+}
+
 /** Abilities that ask the player to write a choice next to them (Natural Explorer: "Pick terrain"). */
 export const takesNote = (abilityText: string) => abilityText.startsWith("Natural Explorer");
 
@@ -138,7 +160,7 @@ export function sheetFor(c: Character) {
     ranged: rows(c.play.ranged),
     experiences: [...fixed, ...c.experiences],
     abilities: [
-      ...sheet.classAbilities.filter((a) => isAbility(a.text)).map((a) => ({ raw: a.text, text: multi ? `${a.cls}: ${a.text}` : a.text, off: abilityOff(restrictions, a.cls, a.text) })),
+      ...currentAbilities(sheet.classAbilities).filter((a) => isAbility(a.text)).map((a) => ({ raw: a.text, text: multi ? `${a.cls}: ${a.text}` : a.text, off: abilityOff(restrictions, a.cls, a.text) })),
       ...sheet.raceTraits.filter(isAbility).map((text) => ({ raw: text, text, off: null as string | null })),
     ],
     /** Short warnings for the AC row's Note box: what the worn armour switches off (multiclass restrictions). */

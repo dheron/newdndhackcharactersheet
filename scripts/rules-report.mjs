@@ -76,6 +76,8 @@ out(`- Class armour: ${decisions.classArmour.rule}`);
 out(`  - ${Object.entries(decisions.classArmour.allowed).map(([c, a]) => `${c}: ${[...(a.groups ?? []), ...(a.names ?? [])].join(", ") || "none"}${a.shield ? ", Shield" : ""}`).join("; ")}`);
 out(`- Multiclass restrictions on the sheet: ${decisions.multiclassRestrictions.rule}`);
 out(`  - ${Object.entries(decisions.multiclassRestrictions.classes).map(([c, r]) => `${c}: ${r.abilities === "all" ? "all class abilities" : [...r.abilities, ...(r.spellcasting ? ["spellcasting"] : [])].join(", ")} off in ${r.offIn.join(", ")} armour`).join("; ")}`);
+out(`- Coins: ${decisions.coins.rule}`);
+out(`- Ability upgrades: ${decisions.abilityUpgrades.rule}`);
 out(`- Not on the Abilities list: ${decisions.notOnAbilityList.rule}`);
 out(`  - Left off as rules: ${decisions.notOnAbilityList.rules.map((t) => `"${t}"`).join("; ")}`);
 out(`  - Shown as languages: ${decisions.notOnAbilityList.languages.map((t) => `"${t}"`).join("; ")}`);

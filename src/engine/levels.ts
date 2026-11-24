@@ -5,6 +5,7 @@
 // - New cantrips, a Wizard's new spell, Thief Expertise and Bard Magical Secrets are picked when levelling.
 import { CLASS_NAMES, abilitiesUpTo, cantripsKnown, classes, raceByName, spellSlots, spells, type ClassName } from "../rules";
 import { hpForClassLevel, type StatBonuses } from "./derive";
+import { defaultRng, rollDie, type Rng } from "./dice";
 import type { Character, LevelUp, SecretSpell } from "../model/character";
 
 export const MAX_LEVEL = 20;
@@ -49,6 +50,14 @@ export function hpStep(cls: ClassName, newLevel: number): HpStep {
   if (!prev || !next) throw new Error(`Cannot read the ${cls} HP column at level ${newLevel}`);
   if (Number(next[1]) > Number(prev[1])) return { kind: "roll", die: Number(next[2]) };
   return { kind: "flat", amount: Number(next[3] ?? 0) - Number(prev[3] ?? 0) };
+}
+
+/** A level-up hit die roll: a 1 is rerolled once and the second roll stands (David). */
+export function rollHitDie(die: number, rng: Rng = defaultRng): { rolls: number[]; result: number } {
+  const first = rollDie(die, rng);
+  if (first !== 1) return { rolls: [first], result: first };
+  const second = rollDie(die, rng);
+  return { rolls: [first, second], result: second };
 }
 
 /** HP gained for a level: a roll plus that class's CON (levels 2 to 10), or the flat amount (11+), shared between classes. */

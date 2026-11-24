@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { STATS } from "../src/rules";
 import type { StatRoll } from "../src/engine/abilities";
 import { statBonuses } from "../src/engine/derive";
+import { fixedRng } from "../src/engine/dice";
 import {
   addXp,
   applyLevelUp,
@@ -10,6 +11,7 @@ import {
   hpGain,
   hpStep,
   readyToLevel,
+  rollHitDie,
   secretOptions,
   undoLevelUp,
   wizardSpellOptions,
@@ -42,6 +44,12 @@ describe("XP", () => {
 });
 
 describe("HP for a level", () => {
+  it("rerolls a first roll of 1 once, and keeps the second roll even if it is 1", () => {
+    expect(rollHitDie(10, fixedRng([5], 10))).toEqual({ rolls: [5], result: 5 });
+    expect(rollHitDie(10, fixedRng([1, 7], 10))).toEqual({ rolls: [1, 7], result: 7 });
+    expect(rollHitDie(10, fixedRng([1, 1], 10))).toEqual({ rolls: [1, 1], result: 1 });
+  });
+
   it("rolls a hit die to 10th, then adds the flat step with no CON", () => {
     expect(hpStep("Fighter", 2)).toEqual({ kind: "roll", die: 10 });
     expect(hpStep("Fighter", 10)).toEqual({ kind: "roll", die: 10 });

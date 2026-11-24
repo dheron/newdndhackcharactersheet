@@ -5,7 +5,7 @@ import { multiclassOptions } from "../src/engine/multiclass";
 import type { StatRoll } from "../src/engine/abilities";
 import { emptyDraft, toCharacter, withClass, experienceSlots, type Draft } from "../src/creation/draft";
 import { fromFileText, initialPlay, toFileText, MELEE_ROWS, RANGED_ROWS } from "../src/model/character";
-import { alignmentShort, classAndLevel, equipBlocked, equippable, inventoryOf, isEquipped, sheetFor, slotTable, toggleEquip, turnUndeadColumn } from "../src/sheet/derived";
+import { currentAbilities, alignmentShort, classAndLevel, equipBlocked, equippable, inventoryOf, isEquipped, sheetFor, slotTable, toggleEquip, turnUndeadColumn } from "../src/sheet/derived";
 import { canWear, cannotWearReason, restrictionsFor } from "../src/engine/equipment";
 import { copyOf, libraryFileName } from "../src/library";
 
@@ -37,7 +37,8 @@ describe("the sheet from a saved character", () => {
     const play = initialPlay({ equipment: { armour: null, shield: false, weapons: ["Dagger", "Dagger", "Light Crossbow"] }, gold: 4 });
     expect(play.melee.map((r) => r.name)).toEqual(["Dagger", "", "", ""]);
     expect(play.ranged.map((r) => r.name)).toEqual(["Light Crossbow", "", ""]);
-    expect(play.inventory).toEqual(["2 x Dagger", "Light Crossbow", "Gold: 4 gp"]);
+    expect(play.inventory).toEqual(["2 x Dagger", "Light Crossbow"]);
+    expect(play.coins).toEqual({ pp: 0, gp: 4, sp: 0, cp: 0 });
   });
 
   it("keeps the Human XP bonus on the abilities list", () => {
@@ -65,7 +66,7 @@ describe("the sheet from a saved character", () => {
   it("opens a file saved before Alignment, play tracking and multiclassing existed", () => {
     const c = toCharacter(fighter());
     const { play: _play, alignment: _alignment, classes: _classes, levels: _levels, equipmentClass: _ec, cantrips: _cantrips, ...rest } = c;
-    const old = { ...rest, cls: "Fighter", level: 1, cantrips: [], play: { prepared: ["Bless"], slotsSpent: [1], spellAttackMisc: 0 } };
+    const old = { ...rest, cls: "Fighter", level: 1, cantrips: [], play: { prepared: ["Bless"], slotsSpent: [1], spellAttackMisc: 0, inventory: "Chain Shirt\nShield\nLong Sword\nLight Crossbow\nGold: 7 gp" } };
     const opened = fromFileText(JSON.stringify(old));
     expect(opened.classes).toEqual(["Fighter"]);
     expect(opened.levels).toEqual([1]);
@@ -75,7 +76,9 @@ describe("the sheet from a saved character", () => {
     expect(opened.alignment).toBe("");
     expect(opened.play.melee).toHaveLength(MELEE_ROWS);
     expect(opened.play.ranged).toHaveLength(RANGED_ROWS);
-    expect(opened.play.inventory).toEqual(["Chain Shirt", "Shield", "Long Sword", "Light Crossbow", "Gold: 7 gp"]);
+    // The old "Gold: 7 gp" line moves into the Gold box.
+    expect(opened.play.inventory).toEqual(["Chain Shirt", "Shield", "Long Sword", "Light Crossbow"]);
+    expect(opened.play.coins.gp).toBe(7);
   });
 
   it("keeps play changes through a save", () => {
@@ -99,6 +102,20 @@ describe("a multiclass sheet", () => {
 });
 
 describe("abilities list", () => {
+  it("shows only the newest line of an improved ability", () => {
+    const at = (cls: Parameters<typeof abilitiesUpTo>[0], level: number) => currentAbilities(abilitiesUpTo(cls, level).map((a) => ({ cls, text: a.text }))).map((a) => a.text);
+    const thief = at("Thief", 9);
+    expect(thief.filter((t) => t.startsWith("Backstab"))).toEqual(["Backstab (x4 damage)"]);
+    const fighter = at("Fighter", 12);
+    expect(fighter.filter((t) => t.startsWith("Cleave"))).toEqual(["Cleave: DL2 or less"]);
+    expect(fighter.filter((t) => t.startsWith("Extra Attack"))).toEqual(["Extra Attack (x2)"]);
+    expect(at("Fighter", 5).filter((t) => t.startsWith("Extra Attack"))).toEqual(["Extra Attack"]);
+    expect(at("Paladin", 10).filter((t) => t.startsWith("Aura of Protection"))).toHaveLength(2);
+    const druid = at("Druid", 8);
+    expect(druid.filter((t) => t.startsWith("Wild Shape"))).toEqual(["Wild Shape - CR Druid Level / 3 round down", "Wild Shape - Swim", "Wild Shape- Fly"]);
+    expect(at("Bard", 12).filter((t) => t.startsWith("Magical Secrets"))).toEqual(["Magical Secrets - pick spell from any list"]);
+  });
+
   it("leaves rules off and lists every rule text that exists in the data", () => {
     const texts = new Set([...CLASS_NAMES.flatMap((c) => abilitiesUpTo(c, 20).map((a) => a.text)), ...races.flatMap((r) => r.traits)]);
     for (const t of [...decisions.notOnAbilityList.rules, ...decisions.notOnAbilityList.languages]) expect(texts.has(t), t).toBe(true);

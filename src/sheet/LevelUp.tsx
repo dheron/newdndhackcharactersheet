@@ -2,7 +2,6 @@
 // HP roll and any picks (cantrips, a Wizard spell, Thief Expertise, Bard Magical Secrets).
 import { useState } from "preact/hooks";
 import { attackBonus, spellSlots, type ClassName } from "../rules";
-import { rollDie } from "../engine/dice";
 import { conHp, statBonuses } from "../engine/derive";
 import {
   applyLevelUp,
@@ -10,6 +9,7 @@ import {
   choicesFor,
   expertiseOptions,
   hpGain,
+  rollHitDie,
   secretOptions,
   wizardSpellOptions,
 } from "../engine/levels";
@@ -72,6 +72,7 @@ function LevelUpForm({ c, index, onApply, onCancel }: { c: Character; index: num
   const cls: ClassName = ch.cls;
   const bonuses = statBonuses(characterScores(c));
   const [rollText, setRollText] = useState("");
+  const [rollNote, setRollNote] = useState("");
   const [cantrips, setCantrips] = useState<string[]>([]);
   const [known, setKnown] = useState<string[]>([]);
   const [expertise, setExpertise] = useState<string[]>([]);
@@ -105,9 +106,19 @@ function LevelUpForm({ c, index, onApply, onCancel }: { c: Character; index: num
               aria-label={`d${ch.hp.die} roll`}
               placeholder={`d${ch.hp.die} roll`}
               value={rollText}
-              onInput={(e) => setRollText((e.target as HTMLInputElement).value.trim())}
+              onInput={(e) => {
+                setRollText((e.target as HTMLInputElement).value.trim());
+                setRollNote("");
+              }}
             />
-            <button type="button" onClick={() => setRollText(String(rollDie(ch.hp.kind === "roll" ? ch.hp.die : 1)))}>
+            <button
+              type="button"
+              onClick={() => {
+                const r = rollHitDie(ch.hp.kind === "roll" ? ch.hp.die : 1);
+                setRollText(String(r.result));
+                setRollNote(r.rolls.length > 1 ? `Rolled a 1, rerolled: ${r.result}.` : "");
+              }}
+            >
               Roll d{ch.hp.die}
             </button>
           </div>
@@ -115,8 +126,9 @@ function LevelUpForm({ c, index, onApply, onCancel }: { c: Character; index: num
           <p>The HP column adds {ch.hp.amount} at this level (no CON).</p>
         )}
         <p class="hint">
+          {rollNote && `${rollNote} `}
           {gain === null
-            ? `Roll, or type a roll from 1 to ${ch.hp.kind === "roll" ? ch.hp.die : ""}.`
+            ? `Roll, or type a roll from 1 to ${ch.hp.kind === "roll" ? ch.hp.die : ""}. A first roll of 1 is rerolled once.`
             : ch.hp.kind === "roll"
               ? `+${gain} HP: roll ${roll} + CON ${sign(conHp(cls, bonuses))}${share}, at least 1.`
               : `+${gain} HP${share}, at least 1.`}
