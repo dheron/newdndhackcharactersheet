@@ -27,7 +27,7 @@ Top to bottom:
      - CHA: empty (no effect in the docs)
    - **HP:** Max, Current, Temp HP, Hit dice (three lines).
    - **Experiences:** 13 lines.
-   - **Saving throws:** columns Type, Total, Base, BNS. BNS is every bonus that always applies (racial, and DEX on Blast / Barrage); Total = Base minus BNS, the number the d20 must reach. Rows in this order: Spell, Blast / Barrage, Petrification / Polymorph, Magic Item, Death / Paralyze. Each row has a blank note line under it for situational bonuses, plus two spare note lines at the bottom.
+   - **Saving throws** (David): each row is Save (the number from the class table for the level), then the save type in the middle, then Bonus (every bonus that always applies: racial, and DEX on Blast / Barrage; it is added to the d20 roll). There is no total. Rows in this order: Spell, Blast / Barrage, Petrification / Polymorph, Magic Item, Death / Paralyze. Each row has a blank note line under it for situational bonuses, plus two spare note lines at the bottom.
 3. **Armour class row:** AC (total, 2 digits) = Armour (name) + AC + Shield + DEX + Misc, then a Note box.
 4. **Melee weapons (4 rows):** Name, Hit Bns, Base, STR, Mag, Damage, Type (1 character), Note.
 5. **Ranged weapons (3 rows):** Name, Range (fits NNN/NNN), Hit Bns, Base, DEX, Mag, Damage, Type, Note.

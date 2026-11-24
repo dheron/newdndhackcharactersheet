@@ -368,7 +368,7 @@
 
 .pg .sg {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 28px 28px 28px;
+  grid-template-columns: 34px minmax(0, 1fr) 34px;
   gap: 4px;
   align-items: center;
   font: 400 11px/12px Arial, Helvetica, sans-serif;
@@ -376,6 +376,24 @@
 
 .pg .sg.head {
   padding: 3px 0 1px;
+}
+
+.pg .sg.head .l {
+  overflow: visible;
+}
+
+.pg .sg.head .l:first-child {
+  text-align: left;
+}
+
+.pg .sg.head .l:last-child {
+  text-align: right;
+  justify-self: end;
+  width: max-content;
+}
+
+.pg .sg .save-type {
+  text-align: center;
 }
 
 .pg .sg .b {
@@ -1262,11 +1280,29 @@
   }
 
   .touch .pg .sg {
-    grid-template-columns: minmax(0, 1fr) 34px 34px 34px;
+    grid-template-columns: 40px minmax(0, 1fr) 40px;
     font: 400 12px/14px Arial, Helvetica, sans-serif;
   }
 
-  .touch .pg .sg .b {
+  .touch .pg .sg.head .l {
+  overflow: visible;
+}
+
+.pg .sg.head .l:first-child {
+  text-align: left;
+}
+
+.pg .sg.head .l:last-child {
+  text-align: right;
+  justify-self: end;
+  width: max-content;
+}
+
+.pg .sg .save-type {
+  text-align: center;
+}
+
+.pg .sg .b {
     height: 36px;
     font-size: 15px;
   }

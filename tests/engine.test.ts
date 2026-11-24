@@ -154,10 +154,9 @@ describe("derived sheet values", () => {
     expect(sheet.ac.total).toBe(15);
     expect(sheet.weapons[0]).toMatchObject({ name: "Long Sword", hitBonus: 2, damage: "1d8/1d10 +2" });
     expect(sheet.weapons[1]).toMatchObject({ name: "Light Crossbow", ranged: true, hitBonus: 1, damage: "1d8" });
-    expect(sheet.saves.magicItem).toEqual({ total: 15, base: 17, bonus: 2, notes: [] });
-    // DEX always applies to Blast / Barrage, so it is in BNS and the total.
+    expect(sheet.saves.magicItem).toEqual({ base: 17, bonus: 2, notes: [] });
+    // DEX always applies to Blast / Barrage, so it is in the bonus.
     expect(sheet.saves.blastBarrage.bonus).toBe(sheet.bonuses.blastSave);
-    expect(sheet.saves.blastBarrage.total).toBe(sheet.saves.blastBarrage.base - sheet.bonuses.blastSave);
     expect(sheet.generalSaveNotes).toEqual(["+2 vs poison"]);
     expect(sheet.casters).toEqual([]);
   });

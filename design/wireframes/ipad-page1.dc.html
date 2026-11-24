@@ -27,7 +27,7 @@ a{color:#111}a:hover{color:#444}
 .bc .b{width:50px;height:34px}
 .sp{width:50px}
 .sv{flex:1;border-bottom:1px solid #bbb;display:flex;flex-direction:column;justify-content:center;gap:3px}
-.sg{display:grid;grid-template-columns:minmax(0,1fr) 34px 34px 34px;gap:4px;align-items:center;font:400 12px/14px Arial,Helvetica,sans-serif}
+.sg{display:grid;grid-template-columns:34px minmax(0,1fr) 34px;gap:4px;align-items:center;font:400 12px/14px Arial,Helvetica,sans-serif}
 .sg .b{height:36px}
 .nt{border-bottom:1px dotted #555;height:18px}
 </style>
@@ -81,12 +81,12 @@ a{color:#111}a:hover{color:#444}
 
 <div style="display:flex;flex-direction:column">
 <div class="sh">Saving throws</div>
-<div class="sg" style="padding:3px 0 1px"><div class="l" style="text-align:left">Type</div><div class="l">Total</div><div class="l">Base</div><div class="l">BNS</div></div>
-<div class="sv"><div class="sg"><div>Spell</div><div class="b" style="border-width:2.5px"></div><div class="b"></div><div class="b"></div></div><div class="nt"></div></div>
-<div class="sv"><div class="sg"><div>Blast / Barrage</div><div class="b" style="border-width:2.5px"></div><div class="b"></div><div class="b"></div></div><div class="nt"></div></div>
-<div class="sv"><div class="sg"><div>Petrification / Polymorph</div><div class="b" style="border-width:2.5px"></div><div class="b"></div><div class="b"></div></div><div class="nt"></div></div>
-<div class="sv"><div class="sg"><div>Magic Item</div><div class="b" style="border-width:2.5px"></div><div class="b"></div><div class="b"></div></div><div class="nt"></div></div>
-<div class="sv" style="border:0"><div class="sg"><div>Death / Paralyze</div><div class="b" style="border-width:2.5px"></div><div class="b"></div><div class="b"></div></div><div class="nt"></div></div>
+<div class="sg" style="padding:3px 0 1px"><div class="l" style="text-align:left">Save</div><div class="l">Type</div><div class="l" style="text-align:right">Bonus</div></div>
+<div class="sv"><div class="sg"><div class="b" style="border-width:2.5px"></div><div style="text-align:center">Spell</div><div class="b"></div></div><div class="nt"></div></div>
+<div class="sv"><div class="sg"><div class="b" style="border-width:2.5px"></div><div style="text-align:center">Blast / Barrage</div><div class="b"></div></div><div class="nt"></div></div>
+<div class="sv"><div class="sg"><div class="b" style="border-width:2.5px"></div><div style="text-align:center">Petrification / Polymorph</div><div class="b"></div></div><div class="nt"></div></div>
+<div class="sv"><div class="sg"><div class="b" style="border-width:2.5px"></div><div style="text-align:center">Magic Item</div><div class="b"></div></div><div class="nt"></div></div>
+<div class="sv" style="border:0"><div class="sg"><div class="b" style="border-width:2.5px"></div><div style="text-align:center">Death / Paralyze</div><div class="b"></div></div><div class="nt"></div></div>
 </div>
 </div>
 

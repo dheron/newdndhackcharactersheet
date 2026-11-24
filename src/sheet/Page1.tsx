@@ -175,19 +175,17 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
         <div class="col saves">
           <div class="sh">Saving throws</div>
           <div class="sg head">
-            <div class="l left">Type</div>
-            <div class="l">Total</div>
-            <div class="l">Base</div>
-            <div class="l">BNS</div>
+            <div class="l">Save</div>
+            <div class="l">Type</div>
+            <div class="l">Bonus</div>
           </div>
           {SAVE_ROWS.map(({ key, label }) => {
             const s = view.saves[key];
             return (
               <div key={key} class="sv">
                 <div class="sg">
-                  <div>{label}</div>
-                  <Box class="thick">{s.total}</Box>
-                  <Box>{s.base}</Box>
+                  <Box class="thick">{s.base}</Box>
+                  <div class="save-type">{label}</div>
                   <Box>{s.bonus ? sign(s.bonus) : ""}</Box>
                 </div>
                 <div class="nt">

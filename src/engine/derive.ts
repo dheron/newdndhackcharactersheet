@@ -67,8 +67,6 @@ export interface WeaponLine {
 }
 
 export interface SaveLine {
-  /** The number the d20 roll must reach: base minus every always-on bonus. */
-  total: number;
   base: number;
   /** Every always-on bonus (BNS): racial, plus DEX on Blast / Barrage. */
   bonus: number;
@@ -159,7 +157,7 @@ export function saves(race: string, classes: ClassLevel[], bonuses: StatBonuses)
     if (key === "spell" && bonuses.mindSpellSave !== 0) notes.unshift(`WIS ${bonuses.mindSpellSave > 0 ? "+" : ""}${bonuses.mindSpellSave} vs mind`);
     // DEX always applies to Blast / Barrage (Saving Throws doc), so it is part of BNS.
     const bonus = (r.saveBonus[key] ?? 0) + (key === "blastBarrage" ? bonuses.blastSave : 0);
-    out[key] = { total: targets[key] - bonus, base: targets[key], bonus, notes };
+    out[key] = { base: targets[key], bonus, notes };
   }
   return out;
 }
