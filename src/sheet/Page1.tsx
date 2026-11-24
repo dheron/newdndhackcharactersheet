@@ -4,7 +4,7 @@
 import type { JSX } from "preact";
 import type { SaveKey } from "../rules";
 import { EXPERIENCE_LINES, type Character, type PlayState, type WeaponRow } from "../model/character";
-import { alignmentShort, classAndLevel, equipBlocked, equippable, inventoryOf, isEquipped, toggleEquip, type SheetView, type WeaponRowView } from "./derived";
+import { alignmentShort, classAndLevel, takesNote, equipBlocked, equippable, inventoryOf, isEquipped, toggleEquip, type SheetView, type WeaponRowView } from "./derived";
 
 export type Update = (fn: (c: Character) => Character) => void;
 
@@ -144,11 +144,12 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
           {view.experiences.map((e) => (
             <div key={e} class="ln">
               {e}
+              {c.expertise.includes(e) && <span class="xp-mark"> +4</span>}
             </div>
           ))}
           {Array.from({ length: extraLines }, (_, i) => (
-            <TextInput
-              key={i}
+<div key={i} class="ln-wrap">
+              <TextInput
               class="ln"
               label={`Experience ${view.experiences.length + i + 1}`}
               value={c.play.extraExperiences[i] ?? ""}
@@ -158,6 +159,8 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
                 play({ extraExperiences: next });
               }}
             />
+              {(c.play.extraExperiences[i] ?? "") !== "" && c.expertise.includes(c.play.extraExperiences[i]!) && <span class="xp-mark">+4</span>}
+            </div>
           ))}
         </div>
 
@@ -298,6 +301,20 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
               <li key={a.text} class={a.off ? "off" : ""}>
                 {a.text}
                 {a.off && <span class="why"> ({a.off})</span>}
+                {takesNote(a.raw) && (
+                  <>
+                    {" "}
+                    <input
+                      class="in ability-note no-print"
+                      type="text"
+                      aria-label={`${a.raw.split(" - ")[0]} choice`}
+                      placeholder="Terrain"
+                      value={c.abilityNotes[a.raw] ?? ""}
+                      onInput={(e) => update((ch) => ({ ...ch, abilityNotes: { ...ch.abilityNotes, [a.raw]: (e.target as HTMLInputElement).value } }))}
+                    />
+                    <span class="print-only-inline">{c.abilityNotes[a.raw] ? `Terrain: ${c.abilityNotes[a.raw]}` : ""}</span>
+                  </>
+                )}
               </li>
             ))}
           </ul>

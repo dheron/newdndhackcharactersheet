@@ -1,7 +1,8 @@
 // Everything the sheet shows that is worked out from the saved character and the rules data.
 import { classes, decisions, isWarrior, raceByName, spellSlots, turnUndead, type ClassName, type Stat } from "../rules";
 import { finalScores, racialModifiers } from "../engine/abilities";
-import { armourClass, deriveSheet, weaponLine, type ClassLevel } from "../engine/derive";
+import { armourClass, deriveSheet, level1Hp, weaponLine, type ClassLevel } from "../engine/derive";
+import { totalHp } from "../engine/levels";
 import { classesLabel } from "../engine/multiclass";
 import { experienceSlotsFor } from "../creation/draft";
 import { parseItem, rolledScores, type Character, type WeaponRow } from "../model/character";
@@ -102,6 +103,14 @@ export function isAbility(text: string): boolean {
   return !RULES.has(text) && !LANGUAGES.has(text);
 }
 
+/** Every Experience the character has: from class and race, chosen at creation, and written in since. */
+export function allExperiences(c: Character): string[] {
+  return [...experienceSlotsFor(c.classes, c.race).fixed, ...c.experiences, ...c.play.extraExperiences.filter((e) => e.trim() !== "")];
+}
+
+/** Abilities that ask the player to write a choice next to them (Natural Explorer: "Pick terrain"). */
+export const takesNote = (abilityText: string) => abilityText.startsWith("Natural Explorer");
+
 export function sheetFor(c: Character) {
   const scores = characterScores(c);
   const fighter = c.classes.includes("Fighter");
@@ -121,6 +130,7 @@ export function sheetFor(c: Character) {
   return {
     scores,
     ...sheet,
+    hpMax: totalHp(level1Hp(c.classes, sheet.bonuses), c),
     classLabel: classesLabel(c.classes),
     conColumns,
     ac: { ...ac, misc: c.play.acMisc, total: ac.total + c.play.acMisc },
@@ -128,8 +138,8 @@ export function sheetFor(c: Character) {
     ranged: rows(c.play.ranged),
     experiences: [...fixed, ...c.experiences],
     abilities: [
-      ...sheet.classAbilities.filter((a) => isAbility(a.text)).map((a) => ({ text: multi ? `${a.cls}: ${a.text}` : a.text, off: abilityOff(restrictions, a.cls, a.text) })),
-      ...sheet.raceTraits.filter(isAbility).map((text) => ({ text, off: null as string | null })),
+      ...sheet.classAbilities.filter((a) => isAbility(a.text)).map((a) => ({ raw: a.text, text: multi ? `${a.cls}: ${a.text}` : a.text, off: abilityOff(restrictions, a.cls, a.text) })),
+      ...sheet.raceTraits.filter(isAbility).map((text) => ({ raw: text, text, off: null as string | null })),
     ],
     /** Spellcasting switched off by armour, per class, with the reason. */
     castingOff: Object.fromEntries(restrictions.filter((r) => r.spellcasting).map((r) => [r.cls, r.reason])) as Partial<Record<ClassName, string>>,

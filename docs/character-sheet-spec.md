@@ -75,6 +75,14 @@ One page per casting class. Same structure for all:
 - Multiclass restrictions (Classes v4): the armour can be worn, and while it is, the affected abilities are greyed with the reason and a casting class's page 2 says "No spellcasting" (David).
 - XP and Current HP start blank; the player writes them.
 
+## Levelling up
+
+- The toolbar has an Add XP box. XP earned gets the race's XP bonus (Human +20%) and is added to the XP total; a multiclass character's XP is divided equally between the classes.
+- When a class reaches its next XP Required, a Level up button appears. The level-up panel shows the HP for the level, what is new (abilities, Attack Bonus, spell slots) and asks for any picks: new cantrips, a Wizard's new spell, Thief Expertise, Bard Magical Secrets.
+- HP: levels 2 to 10 roll the class hit die (Roll button, or type a roll made with real dice) plus that class's CON bonus; from 11th the HP column's flat step with no CON. Multiclass divides by the number of classes, never below 1. Current HP goes up by the same amount.
+- Each level gained is recorded with its roll and picks, so Undo last level takes it back exactly.
+- Thief Expertise: two Experiences picked at creation, and two more at 6th and 16th, marked +4 on the sheet. Magical Secrets spells appear in their own box on the Bard's page 2. Natural Explorer has a box for the terrain.
+
 ## Character library (phase 5)
 
 Characters are kept in a "Character Sheets" folder in Documents, one file each, saved as the player plays (David). The start screen lists them with Open, Duplicate and Delete, plus New character and Import a file. The sheet's Export saves a copy anywhere.

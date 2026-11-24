@@ -7,6 +7,8 @@ import { sheetFor } from "./derived";
 import { Page1 } from "./Page1";
 import { Page2 } from "./Page2";
 import "./sheet.css";
+import { LevelUpPanel } from "./LevelUp";
+import { addXp, readyToLevel, undoLevelUp, xpWithBonus } from "../engine/levels";
 
 const AUTOSAVE_MS = 600;
 
@@ -22,6 +24,10 @@ export function Sheet({ initial, onClose }: { initial: Character; onClose: () =>
   const latest = useRef(c);
   latest.current = c;
   const view = useMemo(() => sheetFor(c), [c]);
+  const ready = readyToLevel(c);
+  const [xpText, setXpText] = useState("");
+  const [xpNote, setXpNote] = useState("");
+  const [levelling, setLevelling] = useState(false);
 
   const update = (fn: (c: Character) => Character) => {
     setC(fn);
@@ -69,6 +75,41 @@ export function Sheet({ initial, onClose }: { initial: Character; onClose: () =>
         <span class="save-status" role="status">
           {status}
         </span>
+        <form
+          class="add-xp"
+          onSubmit={(e) => {
+            e.preventDefault();
+            const n = Number.parseInt(xpText, 10);
+            if (!Number.isNaN(n) && n !== 0) {
+              update((ch) => addXp(ch, n));
+              const gained = xpWithBonus(c.race, n);
+              setXpNote(gained !== n ? `+${gained} XP (${n} + race bonus)` : `+${gained} XP`);
+            }
+            setXpText("");
+          }}
+        >
+          <input type="text" inputMode="numeric" aria-label="XP earned" placeholder="XP earned" value={xpText} onInput={(e) => setXpText((e.target as HTMLInputElement).value.trim())} />
+          <button type="submit" disabled={!xpText}>
+            Add XP
+          </button>
+          {xpNote && <span class="xp-note">{xpNote}</span>}
+        </form>
+        {ready.length > 0 && (
+          <button type="button" class="primary" onClick={() => setLevelling(true)}>
+            Level up
+          </button>
+        )}
+        {c.levelUps.length > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              const last = c.levelUps[c.levelUps.length - 1]!;
+              if (window.confirm(`Undo ${last.cls} level ${last.level}? Its HP and picks are removed.`)) update(undoLevelUp);
+            }}
+          >
+            Undo last level
+          </button>
+        )}
         <button type="button" onClick={exportFile}>
           Export
         </button>
@@ -76,6 +117,17 @@ export function Sheet({ initial, onClose }: { initial: Character; onClose: () =>
           Print
         </button>
       </div>
+      {levelling && ready.length > 0 && (
+        <LevelUpPanel
+          c={c}
+          ready={ready}
+          onCancel={() => setLevelling(false)}
+          onApply={(next) => {
+            update(() => next);
+            setLevelling(false);
+          }}
+        />
+      )}
       <div class="pages">
         <Page1 c={c} view={view} update={update} />
         {view.casters.map((caster) => (

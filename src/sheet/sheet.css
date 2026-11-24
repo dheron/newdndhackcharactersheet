@@ -17,6 +17,55 @@
   border-bottom: 1px solid #999;
 }
 
+.toolbar {
+  flex-wrap: wrap;
+}
+
+.toolbar .add-xp {
+  display: flex;
+  gap: 4px;
+}
+
+.toolbar .xp-note {
+  align-self: center;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.toolbar .add-xp input {
+  width: 110px;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 40px 16px;
+  overflow-y: auto;
+}
+
+.overlay .panel {
+  background: #fff;
+  border: 1px solid #999;
+  border-radius: 6px;
+  padding: 16px 20px;
+  width: 100%;
+  max-width: 640px;
+}
+
+.overlay .panel h2 {
+  margin: 0 0 8px;
+}
+
+.overlay .pick-list {
+  max-height: 220px;
+  overflow-y: auto;
+}
+
 .toolbar .file {
   font-weight: bold;
   overflow: hidden;
@@ -849,6 +898,38 @@
   font-weight: bold;
 }
 
+.pg .xp-mark {
+  font-size: 10px;
+  font-weight: bold;
+  margin-left: 4px;
+}
+
+.pg .ln-wrap {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #777;
+}
+
+.pg .ln-wrap input.in.ln {
+  border-bottom: 0;
+}
+
+.pg .ability-note {
+  display: inline-block;
+  width: 130px;
+  height: 18px;
+  font-size: 11px;
+  border: 0;
+  border-bottom: 1px solid #777;
+  padding: 0 2px;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.print-only-inline {
+  display: none;
+}
+
 /* Printing: US Letter, one sheet page per printed page, nothing but the pages. */
 @page {
   size: letter;
@@ -903,6 +984,10 @@
     display: block;
   }
 
+  .print-only-inline {
+    display: inline;
+  }
+
   .pg .bottom {
     min-height: 0;
   }
@@ -915,7 +1000,12 @@
   }
 
   .pg .lined.small .lines-text {
-    min-height: 42px;
+    min-height: 21px;
+  }
+
+  /* The "No spellcasting" notice depends on the armour worn right now, so it stays on screen. */
+  .pg .banner {
+    display: none;
   }
 
   .pg .bx.locked .bh {

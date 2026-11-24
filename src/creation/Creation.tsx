@@ -16,6 +16,8 @@ import {
   equipmentFor,
   experienceChoices,
   experienceSlots,
+  expertiseChoices,
+  expertiseCount,
   knowableSpellLevels,
   knownSpellCount,
   modifiers,
@@ -125,7 +127,7 @@ function summaryText(d: Draft, step: StepId): string {
     case "class":
       return `${classesLabel(d.classes)}${d.specialization ? `, Weapon Specialization: ${d.specialization}` : ""}`;
     case "experiences":
-      return [...experienceSlots(d).fixed, ...d.experiences].join(", ");
+      return [...experienceSlots(d).fixed, ...d.experiences].map((e) => (d.expertise.includes(e) ? `${e} (Expertise)` : e)).join(", ");
     case "equipment": {
       const e = equipmentFor(d);
       const from = d.classes.length > 1 && d.equipmentClass ? `${d.equipmentClass} options: ` : "";
@@ -434,7 +436,14 @@ function ExperiencesStep({ draft, update }: StepProps) {
   const { fixed, free } = experienceSlots(draft);
   const left = free - draft.experiences.length;
   const toggle = (e: string) =>
-    update((d) => (d.experiences.includes(e) ? { ...d, experiences: d.experiences.filter((x) => x !== e) } : d.experiences.length < free ? { ...d, experiences: [...d.experiences, e] } : d));
+    update((d) =>
+      d.experiences.includes(e)
+        ? { ...d, experiences: d.experiences.filter((x) => x !== e), expertise: d.expertise.filter((x) => x !== e) }
+        : d.experiences.length < free
+          ? { ...d, experiences: [...d.experiences, e] }
+          : d,
+    );
+  const nExpertise = expertiseCount(draft);
   const listed = experienceChoices(draft);
   const customs = draft.experiences.filter((e) => !listed.includes(e));
   const addCustom = () => {
@@ -486,6 +495,30 @@ function ExperiencesStep({ draft, update }: StepProps) {
             </button>
           ))}
         </div>
+      )}
+      {nExpertise > 0 && (
+        <>
+          <h3>
+            Expertise: double the bonus for {nExpertise} ({nExpertise - draft.expertise.length} left)
+          </h3>
+          <div class="chips">
+            {expertiseChoices(draft).map((e) => {
+              const on = draft.expertise.includes(e);
+              return (
+                <button
+                  key={e}
+                  type="button"
+                  class={on ? "chip on" : "chip"}
+                  aria-pressed={on}
+                  disabled={!on && draft.expertise.length >= nExpertise}
+                  onClick={() => update((d) => ({ ...d, expertise: on ? d.expertise.filter((x) => x !== e) : [...d.expertise, e] }))}
+                >
+                  {e}
+                </button>
+              );
+            })}
+          </div>
+        </>
       )}
     </>
   );

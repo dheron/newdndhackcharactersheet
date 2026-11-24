@@ -34,6 +34,11 @@ Source: David, in chat (not yet in the Drive docs). Kept in `src/rules/data/deci
 - Multiclass starting equipment: The player picks one of their classes and uses that class's starting equipment options.
 - Multiclass level 1 HP: The maximum of each class's hit die, averaged (rounded down), plus the CON bonus.
 - Multiclass HP per class level: HP for a class level is what that class would get (hit die plus that class's own CON bonus: warrior column for warriors, doubled for Barbarian), divided by the number of classes, rounded down, never less than 1. At 1st level every class gains a level at once, using the maximum of each hit die.
+- Levelling, XP: XP earned is added with an Add XP box; the race's XP bonus (Human +20%) is added to it. A multiclass character's XP is divided equally between the classes (Classes v4).
+- Levelling, HP to 10th: Levels 2 to 10: roll the class hit die (in the app or with real dice) and add that class's CON bonus; multiclass divides by the number of classes, never less than 1.
+- Levelling, HP from 11th: From 11th level the HP column adds a flat amount (e.g. +3 Fighter): only that amount, no CON; multiclass divides it by the number of classes, never less than 1.
+- Levelling, picks: New cantrips, a Wizard's new known spell, Thief Expertise (two Experiences doubled to +4, at 1st, 6th and 16th) and Bard Magical Secrets are picked when the level is gained. Natural Explorer's terrain is written next to the ability.
+- Interpretation: a Magical Secrets spell comes from another class's list and is of a spell level the Bard can cast at the new level.
 - Class armour: Armour each class may wear, read from the Classes v4 armour text. A multiclass character may wear what any of their classes allows; multiclass restrictions then switch abilities off (Classes v4). Druid non-metal armour: Padded, Leather, Hide and Shield (David).
   - Fighter: Light, Medium, Heavy, Shield; Barbarian: none, Shield; Paladin: Light, Medium, Heavy, Shield; Ranger: Light, Medium, Shield; Cleric: Light, Medium, Heavy, Shield; Druid: Padded, Leather, Hide, Shield; Bard: Light, Medium, Ring Mail, Chain Mail; Thief: Light; Wizard: none
 - Multiclass restrictions on the sheet: How the sheet applies the Classes v4 multiclass restrictions (David: allow the armour, flag what stops working). Unarmoured means no armour; a shield is not armour.

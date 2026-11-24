@@ -18,6 +18,7 @@ import {
   withEquipmentClass,
   withRace,
   creationCasters,
+  expertiseCount,
   type Draft,
 } from "../src/creation/draft";
 import { fromFileText, toFileText } from "../src/model/character";
@@ -169,6 +170,16 @@ describe("multiclass creation", () => {
     expect(withEquipmentClass({ ...d, equipmentClass: "Fighter" }, "Thief").choiceOne).toBeNull();
   });
 
+  it("asks a Thief to pick two Experiences for Expertise", () => {
+    const d = { ...mc(["Fighter", "Thief"]), specialization: "melee" as const };
+    const withExp = { ...d, experiences: Array.from({ length: experienceSlots(d).free }, (_, i) => `Exp ${i}`) };
+    expect(expertiseCount(withExp)).toBe(2);
+    expect(stepComplete(withExp, "experiences")).toBe(false);
+    expect(stepComplete({ ...withExp, expertise: ["Stealth", "Exp 1"] }, "experiences")).toBe(true);
+    expect(stepComplete({ ...withExp, expertise: ["Stealth", "Nope"] }, "experiences")).toBe(false);
+    expect(expertiseCount(mc(["Fighter", "Cleric"]))).toBe(0);
+  });
+
   it("asks for spells for each casting class", () => {
     const d = mc(["Cleric", "Wizard"]);
     expect(stepsFor(d)).toContain("spells");
@@ -187,6 +198,7 @@ describe("multiclass creation", () => {
       ...mc(["Fighter", "Thief"]),
       specialization: "melee",
       experiences: Array.from({ length: experienceSlots(mc(["Fighter", "Thief"])).free }, (_, i) => `Exp ${i}`),
+      expertise: ["Stealth", "Exp 0"],
       equipmentClass: "Thief",
       choiceOne: "Studded Leather",
       choiceTwo: "Longsword and Shortsword",

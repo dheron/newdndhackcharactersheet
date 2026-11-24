@@ -58,6 +58,26 @@ export interface CastingPlay {
 
 export const emptyCasting = (): CastingPlay => ({ slotsSpent: [], prepared: [], spellAttackMisc: 0 });
 
+export interface SecretSpell {
+  spell: string;
+  /** The class spell list it was taken from. */
+  from: ClassName;
+}
+
+/** One level gained after 1st: what was rolled and what was picked, so it can be undone. */
+export interface LevelUp {
+  cls: ClassName;
+  /** The class level reached. */
+  level: number;
+  /** The hit die roll (levels 2 to 10), or null when the HP column adds a flat amount (11+). */
+  roll: number | null;
+  hpGain: number;
+  cantrips: string[];
+  knownSpells: string[];
+  expertise: string[];
+  magicalSecrets: SecretSpell[];
+}
+
 export interface Character {
   format: typeof CHARACTER_FORMAT;
   id: string;
@@ -88,6 +108,14 @@ export interface Character {
   cantrips: Partial<Record<ClassName, string[]>>;
   /** Wizard spellbook. */
   knownSpells: string[];
+  /** Levels gained after 1st, oldest first. */
+  levelUps: LevelUp[];
+  /** Experiences with Thief Expertise: their bonus is doubled. */
+  expertise: string[];
+  /** Spells taken with Bard Magical Secrets. */
+  magicalSecrets: SecretSpell[];
+  /** What the player wrote against an ability, keyed by the ability text (e.g. the Natural Explorer terrain). */
+  abilityNotes: Record<string, string>;
   play: PlayState;
 }
 
@@ -169,6 +197,10 @@ export function fromFileText(text: string): Character {
   const c = {
     alignment: "",
     knownSpells: [],
+    levelUps: [],
+    expertise: [],
+    magicalSecrets: [],
+    abilityNotes: {},
     ...rest,
     classes,
     levels: data.levels ?? classes.map(() => data.level ?? 1),

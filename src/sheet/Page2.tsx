@@ -67,10 +67,10 @@ export function Page2({ c, caster, castingOff, update }: { c: Character; caster:
       </div>
     );
   };
-  const spellRow = (s: string) => (
+  const spellRow = (s: string, label: string = s) => (
     <label key={s} class="rw" style={rowStyle}>
       <input type="checkbox" class="ck" aria-label={`${s} prepared`} checked={mine.prepared.includes(s)} onChange={() => togglePrepared(s)} />
-      <span>{s}</span>
+      <span>{label}</span>
     </label>
   );
   const box = (id: BoxId) => {
@@ -122,7 +122,7 @@ export function Page2({ c, caster, castingOff, update }: { c: Character; caster:
       <div key={level} class={locked ? "bx locked" : "bx"}>
         <div class="bh">{ordinal(level)} level</div>
         {slotBand(level - 1)}
-        <div class="pad">{all.map(spellRow)}</div>
+        <div class="pad">{all.map((sp) => spellRow(sp))}</div>
       </div>
     );
   };
@@ -185,6 +185,12 @@ export function Page2({ c, caster, castingOff, update }: { c: Character; caster:
         {layout.columns.map((col, k) => (
           <div key={k} class={isWizard ? "lcol wide" : "lcol"}>
             {col.map(box)}
+            {k === 0 && cls === "Bard" && c.magicalSecrets.length > 0 && (
+              <div class="bx">
+                <div class="bh">Magical Secrets</div>
+                <div class="pad">{c.magicalSecrets.map((m) => spellRow(m.spell, `${m.spell} (${m.from})`))}</div>
+              </div>
+            )}
           </div>
         ))}
       </div>

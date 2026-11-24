@@ -2,6 +2,7 @@
 // Kept free of UI so it can be tested directly.
 import {
   STATS,
+  abilitiesUpTo,
   cantripsKnown,
   classes as classRules,
   experiences as experienceData,
@@ -33,6 +34,8 @@ export interface Draft {
   classes: ClassName[];
   specialization: "melee" | "ranged" | null;
   experiences: string[];
+  /** Thief Expertise: Experiences picked to double. */
+  expertise: string[];
   /** Which class's starting equipment options are used (multiclass characters pick one). */
   equipmentClass: ClassName | null;
   choiceOne: string | null;
@@ -56,6 +59,7 @@ export const emptyDraft = (): Draft => ({
   classes: [],
   specialization: null,
   experiences: [],
+  expertise: [],
   equipmentClass: null,
   choiceOne: null,
   choiceTwo: null,
@@ -108,6 +112,16 @@ export function experienceSlotsFor(classNames: ClassName[], raceName: string): {
 export function experienceChoices(d: Draft): string[] {
   const fixed = new Set(experienceSlots(d).fixed.map(norm));
   return experienceData.startingList.filter((e) => !fixed.has(norm(e)));
+}
+
+/** Thief Expertise picks at 1st level: two for each "Expertise" ability (Classes v4). */
+export function expertiseCount(d: Draft): number {
+  return 2 * d.classes.flatMap((c) => abilitiesUpTo(c, 1)).filter((a) => a.text.startsWith("Expertise")).length;
+}
+
+/** Experiences that can take Expertise: the fixed ones and the ones picked. */
+export function expertiseChoices(d: Draft): string[] {
+  return [...experienceSlots(d).fixed, ...d.experiences];
 }
 
 export function isCasterClass(cls: ClassName): boolean {
@@ -189,7 +203,7 @@ export function stepComplete(d: Draft, step: StepId): boolean {
     case "class":
       return d.classes.length > 0 && (!d.classes.includes("Fighter") || d.specialization !== null);
     case "experiences":
-      return d.classes.length > 0 && d.experiences.length === experienceSlots(d).free;
+      return d.classes.length > 0 && d.experiences.length === experienceSlots(d).free && d.expertise.length === expertiseCount(d) && d.expertise.every((e) => expertiseChoices(d).includes(e));
     case "equipment": {
       if (!d.equipmentClass) return false;
       const needsTwo = optionsFor(d.equipmentClass).choiceTwo.length > 0;
@@ -233,6 +247,10 @@ export function toCharacter(d: Draft): Character {
     gold,
     cantrips: Object.fromEntries(creationCasters(d).map((c) => [c, d.cantrips[c] ?? []])),
     knownSpells: d.classes.includes("Wizard") ? d.knownSpells : [],
+    levelUps: [],
+    expertise: d.expertise,
+    magicalSecrets: [],
+    abilityNotes: {},
     play: initialPlay({ equipment, gold }),
   };
 }
@@ -245,6 +263,7 @@ export function withClasses(d: Draft, classes: ClassName[]): Draft {
     classes,
     specialization: null,
     experiences: [],
+    expertise: [],
     equipmentClass: classes.length === 1 ? classes[0]! : null,
     choiceOne: null,
     choiceTwo: null,

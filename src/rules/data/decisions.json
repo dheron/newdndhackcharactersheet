@@ -44,6 +44,13 @@
       "Wizard": { "abilities": [], "spellcasting": true, "offIn": ["Light", "Medium", "Heavy"] }
     }
   },
+  "levelling": {
+    "xp": "XP earned is added with an Add XP box; the race's XP bonus (Human +20%) is added to it. A multiclass character's XP is divided equally between the classes (Classes v4).",
+    "hpRoll": "Levels 2 to 10: roll the class hit die (in the app or with real dice) and add that class's CON bonus; multiclass divides by the number of classes, never less than 1.",
+    "hpFlat": "From 11th level the HP column adds a flat amount (e.g. +3 Fighter): only that amount, no CON; multiclass divides it by the number of classes, never less than 1.",
+    "choices": "New cantrips, a Wizard's new known spell, Thief Expertise (two Experiences doubled to +4, at 1st, 6th and 16th) and Bard Magical Secrets are picked when the level is gained. Natural Explorer's terrain is written next to the ability.",
+    "magicalSecretsLevels": "Interpretation: a Magical Secrets spell comes from another class's list and is of a spell level the Bard can cast at the new level."
+  },
   "notOnAbilityList": {
     "rule": "Class abilities and race traits that are rules rather than abilities are left off the Abilities list (David): Expertise, bonus Experiences, multiclass restrictions, and (applying the same idea) ability score picks, cantrip counts (shown on page 2), and Barbarian's doubled CON and DEX (already in HP and AC). Save bonus traits and the Human XP bonus stay on the list (David). Thieves' Cant is a language.",
     "rules": [

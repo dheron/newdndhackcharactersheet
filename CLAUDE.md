@@ -63,6 +63,6 @@ Plan: [`docs/development-plan.md`](docs/development-plan.md).
 1. Print page 1: approved (first draft).
 2. Print page 2 for spellcasters: approved for Wizard and Cleric; Druid, Bard, Paladin, Ranger drafted.
 3. iPad and phone versions: on hold until David asks (desktop first).
-4. App build: phase 0 (app skeleton and CI) done. Phase 1 (rules data and report) done and reviewed. Phase 2 (character creation) done. Phase 3 (sheet on screen with play tracking) and multiclass creation built. Phase 4 (printing) done. Phase 5 (character library, equipment in play, installers 0.2.0) built, awaiting David's review. Next: levelling up.
+4. App build: phase 0 (app skeleton and CI) done. Phase 1 (rules data and report) done and reviewed. Phase 2 (character creation) done. Phase 3 (sheet on screen with play tracking) and multiclass creation built. Phase 4 (printing) done. Phase 5 (character library, equipment in play, installers 0.2.0) built. Levelling up built, awaiting David's review.
 
 Open questions are listed at the end of the spec.
