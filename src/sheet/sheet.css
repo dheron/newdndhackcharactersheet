@@ -898,6 +898,28 @@
   font-weight: bold;
 }
 
+.pg .acrow .note-box {
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 0 4px;
+}
+
+.pg .acrow .note-box .in {
+  border: 0;
+  flex: 1;
+  min-width: 40px;
+  padding: 0;
+}
+
+.pg .armour-warning {
+  font-size: 10px;
+  font-weight: bold;
+  white-space: normal;
+  line-height: 11px;
+  flex: none;
+  max-width: 70%;
+}
+
 .pg .xp-mark {
   font-size: 10px;
   font-weight: bold;
@@ -986,6 +1008,10 @@
 
   .print-only-inline {
     display: inline;
+  }
+
+  .pg .check input {
+    display: none;
   }
 
   .pg .bottom {

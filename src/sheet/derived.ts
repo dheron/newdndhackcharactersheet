@@ -141,6 +141,8 @@ export function sheetFor(c: Character) {
       ...sheet.classAbilities.filter((a) => isAbility(a.text)).map((a) => ({ raw: a.text, text: multi ? `${a.cls}: ${a.text}` : a.text, off: abilityOff(restrictions, a.cls, a.text) })),
       ...sheet.raceTraits.filter(isAbility).map((text) => ({ raw: text, text, off: null as string | null })),
     ],
+    /** Short warnings for the AC row's Note box: what the worn armour switches off (multiclass restrictions). */
+    armourWarnings: restrictions.map((r) => `${r.cls}: no ${r.abilities === "all" ? "class abilities" : [...r.abilities, ...(r.spellcasting ? ["spellcasting"] : [])].join(", ")}`),
     /** Spellcasting switched off by armour, per class, with the reason. */
     castingOff: Object.fromEntries(restrictions.filter((r) => r.spellcasting).map((r) => [r.cls, r.reason])) as Partial<Record<ClassName, string>>,
     /** Languages that come from class abilities (Thieves' Cant). */

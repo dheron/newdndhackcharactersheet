@@ -72,7 +72,7 @@ One page per casting class. Same structure for all:
 
 - The inventory is one item per line. Armour, Shield and weapon lines have a tick box: tick to equip, untick to unequip. The armour and weapon dropdowns list what is in the inventory. Each weapon has one row however many the character carries.
 - Armour a character's classes do not allow cannot be equipped (creation and play). A Druid, single or multiclassed, wears only Padded, Leather, Hide and a Shield (David). Chain Mail and Banded Mail (and Scale Mail and Brigandine, Ranseur and Pike) are separate items.
-- Multiclass restrictions (Classes v4): the armour can be worn, and while it is, the affected abilities are greyed with the reason and a casting class's page 2 says "No spellcasting" (David).
+- Multiclass restrictions (Classes v4): the armour can be worn, and while it is, the affected abilities are greyed with the reason, the AC row's Note box says what is switched off (printed too), and on screen a casting class's page 2 says "No spellcasting" (David).
 - XP and Current HP start blank; the player writes them.
 
 ## Levelling up
@@ -81,6 +81,8 @@ One page per casting class. Same structure for all:
 - When a class reaches its next XP Required, a Level up button appears. The level-up panel shows the HP for the level, what is new (abilities, Attack Bonus, spell slots) and asks for any picks: new cantrips, a Wizard's new spell, Thief Expertise, Bard Magical Secrets.
 - HP: levels 2 to 10 roll the class hit die (Roll button, or type a roll made with real dice) plus that class's CON bonus; from 11th the HP column's flat step with no CON. Multiclass divides by the number of classes, never below 1. Current HP goes up by the same amount.
 - Each level gained is recorded with its roll and picks, so Undo last level takes it back exactly.
+- New Experiences are gained by DM fiat (David): the player writes them on the spare Experience lines.
+- Magical Secrets: any spell from any class's list, any level (David).
 - Thief Expertise: two Experiences picked at creation, and two more at 6th and 16th, marked +4 on the sheet. Magical Secrets spells appear in their own box on the Bard's page 2. Natural Explorer has a box for the terrain.
 
 ## Character library (phase 5)

@@ -107,17 +107,12 @@ export function wizardSpellOptions(c: Character, newLevel: number): string[] {
   return castableLevels("Wizard", newLevel).flatMap((l) => (spells.Wizard?.levels[String(l)] ?? []).filter((s) => !c.knownSpells.includes(s)));
 }
 
-/**
- * Magical Secrets: a spell from any other class's list, of a spell level the Bard can cast at the
- * new level (the level limit is an interpretation, flagged in the rules report).
- */
-export function secretOptions(c: Character, newLevel: number): SecretSpell[] {
-  const levels = castableLevels("Bard", newLevel);
+/** Magical Secrets: any spell from any class's list, of any level (David). */
+export function secretOptions(c: Character): SecretSpell[] {
   const taken = new Set(c.magicalSecrets.map((s) => s.spell));
   const out: SecretSpell[] = [];
   for (const from of CLASS_NAMES) {
-    if (from === "Bard") continue;
-    for (const l of levels) for (const spell of spells[from]?.levels[String(l)] ?? []) if (!taken.has(spell) && !out.some((o) => o.spell === spell)) out.push({ spell, from });
+    for (const list of Object.values(spells[from]?.levels ?? {})) for (const spell of list) if (!taken.has(spell) && !out.some((o) => o.spell === spell)) out.push({ spell, from });
   }
   return out.sort((a, b) => a.spell.localeCompare(b.spell));
 }

@@ -71,6 +71,7 @@ out(`- Levelling, HP to 10th: ${decisions.levelling.hpRoll}`);
 out(`- Levelling, HP from 11th: ${decisions.levelling.hpFlat}`);
 out(`- Levelling, picks: ${decisions.levelling.choices}`);
 out(`- ${decisions.levelling.magicalSecretsLevels}`);
+out(`- ${decisions.levelling.experiences}`);
 out(`- Class armour: ${decisions.classArmour.rule}`);
 out(`  - ${Object.entries(decisions.classArmour.allowed).map(([c, a]) => `${c}: ${[...(a.groups ?? []), ...(a.names ?? [])].join(", ") || "none"}${a.shield ? ", Shield" : ""}`).join("; ")}`);
 out(`- Multiclass restrictions on the sheet: ${decisions.multiclassRestrictions.rule}`);

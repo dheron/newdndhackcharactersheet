@@ -273,7 +273,10 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
         </div>
         <div class="grow">
           <div class="l">Note</div>
-          <TextInput class="b" label="AC note" value={c.play.acNote} onChange={(v) => play({ acNote: v })} />
+          <div class="b val note-box">
+            {view.armourWarnings.length > 0 && <span class="armour-warning">{view.armourWarnings.join("; ")}</span>}
+            <TextInput label="AC note" value={c.play.acNote} onChange={(v) => play({ acNote: v })} />
+          </div>
         </div>
       </div>
 

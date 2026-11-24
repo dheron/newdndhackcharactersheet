@@ -82,9 +82,10 @@ describe("gaining a level", () => {
     expect(choicesFor(at(make(["Thief"]), 6), 0).expertise).toBe(2);
     expect(choicesFor(at(make(["Thief"]), 5), 0).expertise).toBe(0);
     expect(choicesFor(at(make(["Bard"]), 4), 0).magicalSecrets).toBe(1);
-    const secrets = secretOptions(make(["Bard"]), 4);
-    expect(secrets.length).toBeGreaterThan(0);
-    expect(secrets.every((s) => s.from !== "Bard")).toBe(true);
+    const secrets = secretOptions(make(["Bard"])).map((s) => s.spell);
+    // Any spell from any class, any level (David): a 9th level Wizard spell and a Bard spell are both offered.
+    expect(secrets).toContain("Wish");
+    expect(secrets.length).toBe(new Set(secrets).size);
   });
 
   it("keeps the scores used for CON the same as the sheet", () => {

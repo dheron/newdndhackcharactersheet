@@ -157,6 +157,7 @@ describe("equipping from the inventory", () => {
     const base = toCharacter(fighter());
     const fw = { ...base, classes: ["Fighter" as const, "Wizard" as const], levels: [1, 1], play: { ...base.play, armour: "Chain Mail" } };
     expect(sheetFor(fw).castingOff.Wizard).toMatch(/heavy armour/);
+    expect(sheetFor(fw).armourWarnings).toEqual(["Wizard: no spellcasting"]);
     expect(sheetFor({ ...fw, play: { ...fw.play, armour: null } }).castingOff.Wizard).toBeUndefined();
     const ft = { ...base, classes: ["Fighter" as const, "Thief" as const], levels: [1, 1], play: { ...base.play, armour: "Chain Shirt" } };
     const backstab = sheetFor(ft).abilities.find((a) => a.text.startsWith("Thief: Backstab"))!;

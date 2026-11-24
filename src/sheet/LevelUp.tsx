@@ -166,7 +166,7 @@ function LevelUpForm({ c, index, onApply, onCancel }: { c: Character; index: num
         name={(s) => s}
         onChange={setExpertise}
       />
-      <Picker label="Magical Secrets (a spell from any other list)" count={ch.magicalSecrets} options={secretOptions(c, ch.newLevel)} chosen={secrets} name={(s) => `${s.spell} (${s.from})`} onChange={setSecrets} />
+      <Picker label="Magical Secrets (any spell from any class)" count={ch.magicalSecrets} options={secretOptions(c)} chosen={secrets} name={(s) => `${s.spell} (${s.from})`} onChange={setSecrets} />
 
       <div class="actions">
         <button
