@@ -31,8 +31,8 @@ Top to bottom:
 3. **Armour class row:** AC (total, 2 digits) = Armour (name) + AC + Shield + DEX + Misc, then a Note box.
 4. **Melee weapons (4 rows):** Name, Hit Bns, Base, STR, Mag, Damage, Type (1 character), Note.
 5. **Ranged weapons (3 rows):** Name, Range (fits NNN/NNN), Hit Bns, Base, DEX, Mag, Damage, Type, Note.
-6. **Bottom (three columns):** "Abilities / Languages" over the first column; "Inventory / Notes" spanning the other two, which are separate columns (inventory, then notes).
-   - Abilities lists only abilities. Rules (Expertise, bonus Experiences, save bonuses, cantrip counts, multiclass restrictions and the like) are left off; the list is in `decisions.json` (`notOnAbilityList`). Thieves' Cant is shown under Languages.
+6. **Bottom (three columns):** "Abilities / Languages" over the first column; "Inventory / Notes" spanning the other two, which are separate columns (inventory, then notes). The inventory starts with the starting equipment and gold. Each weapon gets one row however many the character has.
+   - Abilities lists only abilities. Rules (Expertise, bonus Experiences, ability score picks, cantrip counts, multiclass restrictions and the like) are left off; save bonus traits and the Human XP bonus stay; the list is in `decisions.json` (`notOnAbilityList`). Thieves' Cant is shown under Languages.
 
 ## Page 2 (spellcasters only)
 

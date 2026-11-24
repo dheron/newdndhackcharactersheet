@@ -110,9 +110,21 @@ function padRows(rows: WeaponRow[], n: number): WeaponRow[] {
   return Array.from({ length: n }, (_, i) => ({ ...emptyRow(), ...rows[i] }));
 }
 
-/** The starting play state for a new character: starting weapons sorted into the melee and ranged rows. */
+/** "Dagger" or "2 x Dagger" for each distinct item, in first-seen order. */
+function counted(names: string[]): string[] {
+  const counts = new Map<string, number>();
+  for (const n of names) counts.set(n, (counts.get(n) ?? 0) + 1);
+  return [...counts].map(([n, k]) => (k > 1 ? `${k} x ${n}` : n));
+}
+
+/**
+ * The starting play state for a new character. Each starting weapon gets one row (two Daggers
+ * share a row, David); the inventory lists all the starting equipment and gold.
+ */
 export function initialPlay(c: Pick<Character, "equipment" | "gold">): PlayState {
   const row = (name: string): WeaponRow => ({ name, magic: 0, note: "" });
+  const distinct = [...new Set(c.equipment.weapons)];
+  const inventory = [...(c.equipment.armour ? [c.equipment.armour] : []), ...(c.equipment.shield ? ["Shield"] : []), ...counted(c.equipment.weapons), `Gold: ${c.gold} gp`];
   return {
     hpCurrent: null,
     tempHp: null,
@@ -124,10 +136,10 @@ export function initialPlay(c: Pick<Character, "equipment" | "gold">): PlayState
     shield: c.equipment.shield,
     acMisc: 0,
     acNote: "",
-    melee: padRows(c.equipment.weapons.filter((w) => !isRanged(w)).map(row), MELEE_ROWS),
-    ranged: padRows(c.equipment.weapons.filter(isRanged).map(row), RANGED_ROWS),
+    melee: padRows(distinct.filter((w) => !isRanged(w)).map(row), MELEE_ROWS),
+    ranged: padRows(distinct.filter(isRanged).map(row), RANGED_ROWS),
     languages: "",
-    inventory: `Gold: ${c.gold} gp`,
+    inventory: inventory.join("\n"),
     notes: "",
     casting: {},
   };

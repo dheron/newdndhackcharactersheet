@@ -4,7 +4,7 @@ import { CLASS_NAMES, STATS, abilitiesUpTo, decisions, races } from "../src/rule
 import { multiclassOptions } from "../src/engine/multiclass";
 import type { StatRoll } from "../src/engine/abilities";
 import { emptyDraft, toCharacter, withClass, experienceSlots, type Draft } from "../src/creation/draft";
-import { fromFileText, toFileText, MELEE_ROWS, RANGED_ROWS } from "../src/model/character";
+import { fromFileText, initialPlay, toFileText, MELEE_ROWS, RANGED_ROWS } from "../src/model/character";
 import { alignmentShort, classAndLevel, sheetFor, slotTable, turnUndeadColumn } from "../src/sheet/derived";
 
 const rolls = (values: number[]): StatRoll[] =>
@@ -29,6 +29,19 @@ describe("the sheet from a saved character", () => {
     expect(c.play.ranged.map((r) => r.name)).toEqual(["Light Crossbow", "", ""]);
     expect(c.play.armour).toBe("Chain Shirt");
     expect(c.play.shield).toBe(true);
+  });
+
+  it("gives two of the same weapon one row, and lists the starting equipment in the inventory", () => {
+    const play = initialPlay({ equipment: { armour: null, shield: false, weapons: ["Dagger", "Dagger", "Light Crossbow"] }, gold: 4 });
+    expect(play.melee.map((r) => r.name)).toEqual(["Dagger", "", "", ""]);
+    expect(play.ranged.map((r) => r.name)).toEqual(["Light Crossbow", "", ""]);
+    expect(play.inventory).toBe("2 x Dagger\nLight Crossbow\nGold: 4 gp");
+  });
+
+  it("keeps the Human XP bonus on the abilities list", () => {
+    const c = { ...toCharacter(fighter()), race: "Human", raceChoices: ["STR", "CON"] as ("STR" | "CON")[] };
+    expect(sheetFor(c).abilities).toContain("+20% experience points gained");
+    expect(sheetFor(c).abilities.some((a) => a.startsWith("+1 to any two"))).toBe(false);
   });
 
   it("adds magic to hit and AC misc to AC", () => {
@@ -60,7 +73,7 @@ describe("the sheet from a saved character", () => {
     expect(opened.alignment).toBe("");
     expect(opened.play.melee).toHaveLength(MELEE_ROWS);
     expect(opened.play.ranged).toHaveLength(RANGED_ROWS);
-    expect(opened.play.inventory).toBe("Gold: 7 gp");
+    expect(opened.play.inventory).toBe("Chain Shirt\nShield\nLong Sword\nLight Crossbow\nGold: 7 gp");
   });
 
   it("keeps play changes through a save", () => {
@@ -95,8 +108,8 @@ describe("abilities list", () => {
     expect(v.languages).toEqual(["Thieves Cant\u2019"]);
     expect(v.abilities.some((a) => a.startsWith("Thieves Cant") || a.startsWith("Expertise"))).toBe(false);
     expect(v.abilities).toContain("Backstab (x2 damage)");
-    // Dwarf traits that are save bonuses or bonus Experiences are rules.
-    expect(v.abilities).toEqual(["Backstab (x2 damage)", "Dwarves have darkvision to 60 feet."]);
+    // The Dwarf bonus Experience is a rule; save bonus traits stay (David).
+    expect(v.abilities).toEqual(["Backstab (x2 damage)", "Dwarves have darkvision to 60 feet.", "+2 on saves against poison and +2 on Magic Item saves against magic items."]);
   });
 });
 
