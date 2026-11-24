@@ -32,7 +32,10 @@ Source: David, in chat (not yet in the Drive docs). Kept in `src/rules/data/deci
 - Multiclass Experiences: Every fixed Experience from each class (and the race), plus free picks equal to the highest free count among the classes.
 - Multiclass starting equipment: The player picks one of their classes and uses that class's starting equipment options.
 - Multiclass level 1 HP: The maximum of each class's hit die, averaged (rounded down), plus the CON bonus.
-- Multiclass CON bonus: Each class uses its own CON column (warrior column for warriors, doubled for Barbarian) and the bonus is split equally between the classes, rounded down, as Classes v4 describes for levelling. David's answer was cut off; confirm.
+- Multiclass HP per class level: HP for a class level is what that class would get (hit die plus that class's own CON bonus: warrior column for warriors, doubled for Barbarian), divided by the number of classes, rounded down, never less than 1. At 1st level every class gains a level at once, using the maximum of each hit die.
+- Not on the Abilities list: Class abilities and race traits that are rules rather than abilities are left off the Abilities list (David): Expertise, bonus Experiences, multiclass restrictions, and (applying the same idea) ability score picks, XP bonuses, traits that are only save bonuses (shown on the saves), cantrip counts (shown on page 2), and Barbarian's doubled CON and DEX (already in HP and AC). Thieves' Cant is a language.
+  - Left off as rules: "Expertise (Pick two experiences, you may double the bonus)"; "Expertise (Pick two more)"; "Expertise (Pick 2 more)"; "2 Cantrips"; "3 Cantrips"; "3rd Cantrip"; "Third Cantrip"; "4th Cantrip"; "5th Cantrips"; "Double Con bonus to HP. Double Dex bonus to AC"; "+2 on saves against poison and +2 on Magic Item saves against magic items."; "Bonus Experience Stonecunning: things regarding slopes, new construction, stone traps, and gauging depth underground."; "Gains bonus Experiences in Woodland Stealth and Tracking."; "+2 on saves vs Magic Items and on Blast/Barrage saves against mechanical traps."; "Mountain Born +2 saves vs Cold."; "Gains bonus Experience in Mountain Survival."; "+1 to any two ability scores."; "+2 on Spell saves against sleep and charm."; "Two Bonus Experiences."; "+2 on saves against poison/fear, +2 on saves vs Magic Item."; "They gain +2 on saves against poison."; "+1 to any two ability scores, plus one bonus Experience."; "+20% experience points gained"
+  - Shown as languages: "Thieves Cant’"
 - Preparing: Spells are prepared like 5e: mark spells prepared, spend slots separately.
 - Cantrips: Wizard, Cleric, Druid, Bard only.
 - Alignment: The basic 5e alignments. Lawful Good (LG), Neutral Good (NG), Chaotic Good (CG), Lawful Neutral (LN), Neutral (N), Chaotic Neutral (CN), Lawful Evil (LE), Neutral Evil (NE), Chaotic Evil (CE). The list is the standard 5e one, written from memory.
@@ -784,17 +787,17 @@ Source: Classes v4, Multiclassing (1UDB0LV9BfAtNSdZ3lAkDJWmv1Wi6RIQGlaXwbqs3rpg)
 | Elf (High) | Fighter*/Thief**, Fighter*/Wizard, Fighter/Wizard/Thief. | *or Ranger **or Bard | Fighter/Thief, Fighter/Bard, Ranger/Thief, Ranger/Bard, Fighter/Wizard, Ranger/Wizard, Fighter/Wizard/Thief |
 | Elf (Wood) | Fighter*/Thief, Fighter*/Wizard, Fighter/Wizard/Thief, Fighter/Druid. | *or Ranger | Fighter/Thief, Ranger/Thief, Fighter/Wizard, Ranger/Wizard, Fighter/Wizard/Thief, Fighter/Druid |
 | Firbolg | Fighter*/Cleric, Fighter*/Wizard, Druid/Wizard. | *or Ranger | Fighter/Cleric, Ranger/Cleric, Fighter/Wizard, Ranger/Wizard, Druid/Wizard |
-| Gnome (Deep) | Fighter/Thief, Fighter/Mage, Mage/Thief |   | Fighter/Thief, Fighter/Wizard, Wizard/Thief |
-| Gnome (Forest) | Fighter*/Thief, Fighter*/Mage, Mage*/Thief, Fighter*/Cleric** | *or Ranger **or Druid | Fighter/Thief, Ranger/Thief, Fighter/Wizard, Ranger/Wizard, Wizard/Thief, Fighter/Cleric, Fighter/Druid, Ranger/Cleric, Ranger/Druid |
-| Gnome (Rock) | Fighter/Thief, Fighter/Mage, Mage/Thief |   | Fighter/Thief, Fighter/Wizard, Wizard/Thief |
+| Gnome (Deep) | Fighter/Thief, Fighter/Wizard, Wizard/Thief |   | Fighter/Thief, Fighter/Wizard, Wizard/Thief |
+| Gnome (Forest) | Fighter*/Thief, Fighter*/Wizard, Wizard*/Thief, Fighter*/Cleric** | *or Ranger **or Druid | Fighter/Thief, Ranger/Thief, Fighter/Wizard, Ranger/Wizard, Wizard/Thief, Fighter/Cleric, Fighter/Druid, Ranger/Cleric, Ranger/Druid |
+| Gnome (Rock) | Fighter/Thief, Fighter/Wizard, Wizard/Thief |   | Fighter/Thief, Fighter/Wizard, Wizard/Thief |
 | Goliath | Fighter*/Wizard, Fighter*/Cleric**, Barbarian/Cleric**. | *or Ranger **or Druid | Fighter/Wizard, Ranger/Wizard, Fighter/Cleric, Fighter/Druid, Ranger/Cleric, Ranger/Druid, Barbarian/Cleric, Barbarian/Druid |
 | Half-Elf | Fighter*/Thief**, Fighter*/Cleric***, Fighter*/Wizard, Cleric/Thief**, Cleric***/Wizard, Cleric***/Wizard, Fighter/Wizard/Thief. | *or Ranger **or Bard. ***or Druid | Fighter/Thief, Fighter/Bard, Ranger/Thief, Ranger/Bard, Fighter/Cleric, Fighter/Druid, Ranger/Cleric, Ranger/Druid, Fighter/Wizard, Ranger/Wizard, Cleric/Thief, Cleric/Bard, Cleric/Wizard, Druid/Wizard, Fighter/Wizard/Thief |
 | Halfling (Lightfoot) | Fighter*/Thief** | *or Ranger **or Bard | Fighter/Thief, Fighter/Bard, Ranger/Thief, Ranger/Bard |
 | Halfling (Stout) | Fighter/Thief, Fighter/Cleric |   | Fighter/Thief, Fighter/Cleric |
 | Human | Fighter*/Thief**, Fighter*/Cleric***, Fighter*/Wizard, Cleric/Thief**, Cleric***/Wizard, Cleric***/Wizard, Barbarian/Thief, Barbarian/Cleric***. | *or Ranger **or Bard. ***or Druid | Fighter/Thief, Fighter/Bard, Ranger/Thief, Ranger/Bard, Fighter/Cleric, Fighter/Druid, Ranger/Cleric, Ranger/Druid, Fighter/Wizard, Ranger/Wizard, Cleric/Thief, Cleric/Bard, Cleric/Wizard, Druid/Wizard, Barbarian/Thief, Barbarian/Cleric, Barbarian/Druid |
-| Tiefling | Fighter/Thief, Fighter/Mage, Mage/Thief |   | Fighter/Thief, Fighter/Wizard, Wizard/Thief |
+| Tiefling | Fighter/Thief, Fighter/Wizard, Wizard/Thief |   | Fighter/Thief, Fighter/Wizard, Wizard/Thief |
 
-The app reads "Mage" as Wizard, offers each starred class or its swap, and drops repeated combinations.
+The app offers each starred class or its swap, and drops repeated combinations. "Mage" in the doc is a typo for Wizard (David) and is written as Wizard in the data.
 
 - **Fighter:** A multi-classed fighter can use all of his abilities without restriction.
 - **Ranger:** A multi-classed Ranger may only benefit from Two-Handed Fighting, Natural Explorer, and Spellcasting if they are not wearing Heavy Armour.

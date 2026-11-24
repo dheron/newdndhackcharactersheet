@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import report from "../docs/rules-report.md?raw";
-import { STATS, races } from "../src/rules";
+import { CLASS_NAMES, STATS, abilitiesUpTo, decisions, races } from "../src/rules";
 import { multiclassOptions } from "../src/engine/multiclass";
 import type { StatRoll } from "../src/engine/abilities";
 import { emptyDraft, toCharacter, withClass, experienceSlots, type Draft } from "../src/creation/draft";
@@ -77,7 +77,26 @@ describe("a multiclass sheet", () => {
     expect(classAndLevel({ ...c, classes: [...c.classes] })).toBe("Cleric 1 / Wizard 1");
     expect(v.hitDice.map((h) => h.cls)).toEqual(["Cleric", "Wizard"]);
     expect(v.casters.map((x) => x.cls)).toEqual(["Cleric", "Wizard"]);
-    expect(v.abilities.some((a) => a.startsWith("Wizard: "))).toBe(true);
+    expect(v.abilities.some((a) => a.startsWith("Cleric: Turn Undead"))).toBe(true);
+    // Cantrip counts are rules (shown on page 2), not abilities.
+    expect(v.abilities.some((a) => a.includes("Cantrip"))).toBe(false);
+  });
+});
+
+describe("abilities list", () => {
+  it("leaves rules off and lists every rule text that exists in the data", () => {
+    const texts = new Set([...CLASS_NAMES.flatMap((c) => abilitiesUpTo(c, 20).map((a) => a.text)), ...races.flatMap((r) => r.traits)]);
+    for (const t of [...decisions.notOnAbilityList.rules, ...decisions.notOnAbilityList.languages]) expect(texts.has(t), t).toBe(true);
+  });
+
+  it("shows Thieves' Cant as a language, not an ability", () => {
+    const c = { ...toCharacter(fighter()), classes: ["Thief" as const], levels: [1] };
+    const v = sheetFor(c);
+    expect(v.languages).toEqual(["Thieves Cant\u2019"]);
+    expect(v.abilities.some((a) => a.startsWith("Thieves Cant") || a.startsWith("Expertise"))).toBe(false);
+    expect(v.abilities).toContain("Backstab (x2 damage)");
+    // Dwarf traits that are save bonuses or bonus Experiences are rules.
+    expect(v.abilities).toEqual(["Backstab (x2 damage)", "Dwarves have darkvision to 60 feet."]);
   });
 });
 

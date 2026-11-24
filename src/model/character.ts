@@ -42,6 +42,7 @@ export interface PlayState {
   ranged: WeaponRow[];
   languages: string;
   inventory: string;
+  notes: string;
   /** Spell slots spent, per spell level (index 0 = 1st level). */
   /** Spell tracking for each casting class. */
   casting: Partial<Record<ClassName, CastingPlay>>;
@@ -127,6 +128,7 @@ export function initialPlay(c: Pick<Character, "equipment" | "gold">): PlayState
     ranged: padRows(c.equipment.weapons.filter(isRanged).map(row), RANGED_ROWS),
     languages: "",
     inventory: `Gold: ${c.gold} gp`,
+    notes: "",
     casting: {},
   };
 }

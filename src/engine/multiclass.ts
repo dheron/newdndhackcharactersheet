@@ -4,13 +4,9 @@
 // Fighter/Bard and Ranger/Bard).
 import { CLASS_NAMES, multiclass, type ClassName } from "../rules";
 
-/** The table says "Mage" for some races; this system's class is Wizard. */
-const NAME_FIXES: Record<string, ClassName> = { Mage: "Wizard" };
-
 function className(raw: string): ClassName {
-  const name = NAME_FIXES[raw] ?? raw;
-  if (!(CLASS_NAMES as readonly string[]).includes(name)) throw new Error(`Unknown class in multiclass table: ${raw}`);
-  return name as ClassName;
+  if (!(CLASS_NAMES as readonly string[]).includes(raw)) throw new Error(`Unknown class in multiclass table: ${raw}`);
+  return raw as ClassName;
 }
 
 /** "*or Ranger **or Bard. ***or Druid" -> { 1: "Ranger", 2: "Bard", 3: "Druid" } */

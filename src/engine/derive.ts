@@ -100,15 +100,17 @@ export function conHp(cls: ClassName, bonuses: StatBonuses): number {
 }
 
 /**
- * Level 1 HP: maximum of the hit die plus the class's CON bonus.
- * Multiclass (David): the maximum of each class's hit die averaged, plus each class's CON bonus
- * averaged, each rounded down (Classes v4 splits the CON bonus between the classes). Never below 1.
+ * HP gained for one level in a class: the hit die result plus that class's own CON bonus,
+ * divided by the number of classes, rounded down, never less than 1 (Classes v4; David).
+ * A single-class character divides by 1.
  */
+export function hpForClassLevel(cls: ClassName, dieResult: number, classCount: number, bonuses: StatBonuses): number {
+  return Math.max(1, Math.floor((dieResult + conHp(cls, bonuses)) / classCount));
+}
+
+/** Level 1 HP: every class gains its first level at once, with the maximum of each hit die. */
 export function level1Hp(classes: ClassName[], bonuses: StatBonuses): number {
-  const n = classes.length;
-  const dice = Math.floor(classes.reduce((t, c) => t + hitDie(c), 0) / n);
-  const con = Math.floor(classes.reduce((t, c) => t + conHp(c, bonuses), 0) / n);
-  return Math.max(1, dice + con);
+  return classes.reduce((total, cls) => total + hpForClassLevel(cls, hitDie(cls), classes.length, bonuses), 0);
 }
 
 /**

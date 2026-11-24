@@ -1,5 +1,5 @@
 // Everything the sheet shows that is worked out from the saved character and the rules data.
-import { classes, decisions, isWarrior, multiclass, raceByName, spellSlots, turnUndead, type ClassName, type Stat } from "../rules";
+import { classes, decisions, isWarrior, raceByName, spellSlots, turnUndead, type ClassName, type Stat } from "../rules";
 import { finalScores, racialModifiers } from "../engine/abilities";
 import { armourClass, deriveSheet, weaponLine, type ClassLevel } from "../engine/derive";
 import { classesLabel } from "../engine/multiclass";
@@ -31,6 +31,14 @@ export function classAndLevel(c: Character): string {
     .join(" / ");
 }
 
+const RULES = new Set<string>(decisions.notOnAbilityList.rules);
+const LANGUAGES = new Set<string>(decisions.notOnAbilityList.languages);
+
+/** Class abilities and race traits that are rules or languages are left off the Abilities list (David). */
+export function isAbility(text: string): boolean {
+  return !RULES.has(text) && !LANGUAGES.has(text);
+}
+
 export function sheetFor(c: Character) {
   const scores = characterScores(c);
   const fighter = c.classes.includes("Fighter");
@@ -55,10 +63,9 @@ export function sheetFor(c: Character) {
     melee: rows(c.play.melee),
     ranged: rows(c.play.ranged),
     experiences: [...fixed, ...c.experiences],
-    abilities: [
-      ...sheet.classAbilities.map((a) => (multi ? `${a.cls}: ${a.text}` : a.text)),
-      ...(multi ? c.classes.map((cls) => (multiclass.restrictions as Record<string, string>)[cls]).filter((t): t is string => Boolean(t)) : []),
-    ],
+    abilities: [...sheet.classAbilities.filter((a) => isAbility(a.text)).map((a) => (multi ? `${a.cls}: ${a.text}` : a.text)), ...sheet.raceTraits.filter(isAbility)],
+    /** Languages that come from class abilities (Thieves' Cant). */
+    languages: sheet.classAbilities.map((a) => a.text).filter((t) => LANGUAGES.has(t)),
   };
 }
 

@@ -4,7 +4,7 @@ import { multiclassOptions } from "../src/engine/multiclass";
 import { EXPECTED_ROLL, ROLL_METHODS, capWasteChance, clampScore, finalScores, racialModifiers, rollForPick } from "../src/engine/abilities";
 import { fixedRng, seededRng } from "../src/engine/dice";
 import { OPTION_SLOTS, meetsStrength, optionAvailable, optionsFor, slotsFor, weaponByName, weaponsFor, WEAPON_FILTERS, type WeaponFilter } from "../src/engine/equipment";
-import { armourClass, deriveSheet, level1Hp, statBonuses } from "../src/engine/derive";
+import { armourClass, deriveSheet, hpForClassLevel, level1Hp, statBonuses } from "../src/engine/derive";
 
 const scores = (values: number[]) => Object.fromEntries(STATS.map((s, i) => [s, values[i]!])) as Record<Stat, number>;
 
@@ -119,14 +119,18 @@ describe("derived sheet values", () => {
     expect(level1Hp(["Barbarian"], statBonuses(scores([10, 10, 16, 10, 10, 10])))).toBe(16);
   });
 
-  it("averages maximum hit dice and each class's CON bonus for a multiclass character", () => {
+  it("gives a multiclass character each class's HP, with that class's own CON bonus, divided by the number of classes", () => {
     const b = statBonuses(scores([10, 10, 18, 10, 10, 10]));
-    // Fighter d10 and Thief d6: (10 + 6) / 2 = 8; CON warrior share + normal share, halved, rounded down.
-    expect(level1Hp(["Fighter", "Thief"], b)).toBe(8 + Math.floor((b.hpPerHitDieWarrior + b.hpPerHitDie) / 2));
+    const share = (die: number, con: number, n: number) => Math.max(1, Math.floor((die + con) / n));
+    // Fighter uses the warrior CON column only for its own share.
+    expect(level1Hp(["Fighter", "Thief"], b)).toBe(share(10, b.hpPerHitDieWarrior, 2) + share(6, b.hpPerHitDie, 2));
     // Barbarian doubles only its own share.
-    expect(level1Hp(["Barbarian", "Cleric"], b)).toBe(Math.floor((12 + 8) / 2) + Math.floor((b.hpPerHitDieWarrior * 2 + b.hpPerHitDie) / 2));
-    // Fighter / Wizard / Thief: (10 + 4 + 6) / 3 = 6.67, rounded down to 6.
-    expect(level1Hp(["Fighter", "Wizard", "Thief"], b)).toBe(6 + Math.floor((b.hpPerHitDieWarrior + 2 * b.hpPerHitDie) / 3));
+    expect(level1Hp(["Barbarian", "Cleric"], b)).toBe(share(12, b.hpPerHitDieWarrior * 2, 2) + share(8, b.hpPerHitDie, 2));
+    expect(level1Hp(["Fighter", "Wizard", "Thief"], b)).toBe(share(10, b.hpPerHitDieWarrior, 3) + share(4, b.hpPerHitDie, 3) + share(6, b.hpPerHitDie, 3));
+  });
+
+  it("never gives less than 1 HP for a class level", () => {
+    expect(hpForClassLevel("Wizard", 1, 3, statBonuses(scores([10, 10, 3, 10, 10, 10])))).toBe(1);
   });
 
   it("works out AC from armour, DEX and shield", () => {
@@ -190,7 +194,7 @@ describe("multiclass combinations (Classes v4)", () => {
     ]);
   });
 
-  it("reads Mage as Wizard and drops repeated combinations", () => {
+  it("drops repeated combinations", () => {
     expect(multiclassOptions("Gnome (Rock)").map((c) => c.join("/"))).toEqual(["Fighter/Thief", "Fighter/Wizard", "Wizard/Thief"]);
     const human = multiclassOptions("Human").map((c) => c.join("/"));
     expect(new Set(human).size).toBe(human.length);

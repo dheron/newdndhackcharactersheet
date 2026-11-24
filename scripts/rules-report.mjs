@@ -64,7 +64,10 @@ out(`- Multiclass: ${decisions.multiclass}`);
 out(`- Multiclass Experiences: ${decisions.multiclassCreation.experiences}`);
 out(`- Multiclass starting equipment: ${decisions.multiclassCreation.equipment}`);
 out(`- Multiclass level 1 HP: ${decisions.multiclassCreation.level1Hp}`);
-out(`- Multiclass CON bonus: ${decisions.multiclassCreation.conBonus}`);
+out(`- Multiclass HP per class level: ${decisions.multiclassCreation.conBonus}`);
+out(`- Not on the Abilities list: ${decisions.notOnAbilityList.rule}`);
+out(`  - Left off as rules: ${decisions.notOnAbilityList.rules.map((t) => `"${t}"`).join("; ")}`);
+out(`  - Shown as languages: ${decisions.notOnAbilityList.languages.map((t) => `"${t}"`).join("; ")}`);
 out(`- Preparing: ${decisions.preparing}`);
 out(`- Cantrips: ${decisions.cantripClasses.join(", ")} only.`);
 out(`- Alignment: ${decisions.alignments.rule} ${decisions.alignments.list.map((a) => `${a.name} (${a.short})`).join(", ")}. The list is the standard 5e one, written from memory.`);
@@ -206,7 +209,7 @@ out(`Source: ${multi.source}`);
 out();
 // Same reading as src/engine/multiclass.ts (tests/sheet.test.ts checks they agree).
 const expand = (entry) => {
-  const fix = (n) => (n === "Mage" ? "Wizard" : n);
+  const fix = (n) => n;
   const swaps = {};
   for (const m of entry.key.matchAll(/(\*+)\s*or\s+([A-Za-z]+)/g)) swaps[m[1].length] = fix(m[2]);
   const seen = [];
@@ -225,7 +228,7 @@ table(
   ["Race", "Combinations (doc text)", "Key", "Combinations offered in the app"],
   Object.entries(multi.combinations).map(([race, c]) => [race, c.options, c.key || " ", expand(c).join(", ")]),
 );
-out("The app reads \"Mage\" as Wizard, offers each starred class or its swap, and drops repeated combinations.");
+out("The app offers each starred class or its swap, and drops repeated combinations. \"Mage\" in the doc is a typo for Wizard (David) and is written as Wizard in the data.");
 out();
 for (const [cls, text] of Object.entries(multi.restrictions)) out(`- **${cls}:** ${text}`);
 out();

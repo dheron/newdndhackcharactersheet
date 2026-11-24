@@ -480,6 +480,13 @@
   height: 100%;
 }
 
+.pg .known-langs {
+  font-size: 12px;
+  line-height: 20px;
+  border-bottom: 1px solid #777;
+  padding: 0 4px;
+}
+
 .pg textarea.area.small {
   min-height: 63px;
   flex: 1;

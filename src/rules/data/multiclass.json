@@ -1,6 +1,6 @@
 {
   "source": "Classes v4, Multiclassing (1UDB0LV9BfAtNSdZ3lAkDJWmv1Wi6RIQGlaXwbqs3rpg)",
-  "note": "Combinations text copied from the doc. In the doc, * means the Fighter (or other marked class) can be swapped for Ranger, ** for Bard or Druid as noted per race. Each class in a multiclass character gets its own sheet (David's decision).",
+  "note": "Combinations text copied from the doc, except \"Mage\", a typo for Wizard (David), which is written as Wizard here. In the doc, * means the Fighter (or other marked class) can be swapped for Ranger, ** for Bard or Druid as noted per race. Each class in a multiclass character gets its own sheet (David's decision).",
   "rules": [
     "A multi-class character improves in two or more classes simultaneously. His experience is divided equally between each class. The available class combinations vary according to race. The character can use the abilities of both classes at any time, with only a few restrictions.",
     "A multi-class character always uses the most favorable attack bonus and saving throw from his different classes.",
@@ -16,15 +16,15 @@
     "Elf (High)": { "options": "Fighter*/Thief**, Fighter*/Wizard, Fighter/Wizard/Thief.", "key": "*or Ranger **or Bard" },
     "Elf (Wood)": { "options": "Fighter*/Thief, Fighter*/Wizard, Fighter/Wizard/Thief, Fighter/Druid.", "key": "*or Ranger" },
     "Firbolg": { "options": "Fighter*/Cleric, Fighter*/Wizard, Druid/Wizard.", "key": "*or Ranger" },
-    "Gnome (Deep)": { "options": "Fighter/Thief, Fighter/Mage, Mage/Thief", "key": "" },
-    "Gnome (Forest)": { "options": "Fighter*/Thief, Fighter*/Mage, Mage*/Thief, Fighter*/Cleric**", "key": "*or Ranger **or Druid" },
-    "Gnome (Rock)": { "options": "Fighter/Thief, Fighter/Mage, Mage/Thief", "key": "" },
+    "Gnome (Deep)": { "options": "Fighter/Thief, Fighter/Wizard, Wizard/Thief", "key": "" },
+    "Gnome (Forest)": { "options": "Fighter*/Thief, Fighter*/Wizard, Wizard*/Thief, Fighter*/Cleric**", "key": "*or Ranger **or Druid" },
+    "Gnome (Rock)": { "options": "Fighter/Thief, Fighter/Wizard, Wizard/Thief", "key": "" },
     "Goliath": { "options": "Fighter*/Wizard, Fighter*/Cleric**, Barbarian/Cleric**.", "key": "*or Ranger **or Druid" },
     "Half-Elf": { "options": "Fighter*/Thief**, Fighter*/Cleric***, Fighter*/Wizard, Cleric/Thief**, Cleric***/Wizard, Cleric***/Wizard, Fighter/Wizard/Thief.", "key": "*or Ranger **or Bard. ***or Druid" },
     "Halfling (Lightfoot)": { "options": "Fighter*/Thief**", "key": "*or Ranger **or Bard" },
     "Halfling (Stout)": { "options": "Fighter/Thief, Fighter/Cleric", "key": "" },
     "Human": { "options": "Fighter*/Thief**, Fighter*/Cleric***, Fighter*/Wizard, Cleric/Thief**, Cleric***/Wizard, Cleric***/Wizard, Barbarian/Thief, Barbarian/Cleric***.", "key": "*or Ranger **or Bard. ***or Druid" },
-    "Tiefling": { "options": "Fighter/Thief, Fighter/Mage, Mage/Thief", "key": "" }
+    "Tiefling": { "options": "Fighter/Thief, Fighter/Wizard, Wizard/Thief", "key": "" }
   },
   "restrictions": {
     "Fighter": "A multi-classed fighter can use all of his abilities without restriction.",

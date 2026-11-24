@@ -286,14 +286,13 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
             {view.abilities.map((a) => (
               <li key={a}>{a}</li>
             ))}
-            {view.raceTraits.map((t) => (
-              <li key={t}>{t}</li>
-            ))}
           </ul>
           <div class="l left">Languages ({view.bonuses.languages})</div>
+          {view.languages.length > 0 && <div class="known-langs">{view.languages.join(", ")}</div>}
           <textarea class="in area small" aria-label="Languages" value={c.play.languages} onInput={(e) => play({ languages: (e.target as HTMLTextAreaElement).value })} />
         </div>
-        <textarea class="in area span2" aria-label="Inventory and notes" value={c.play.inventory} onInput={(e) => play({ inventory: (e.target as HTMLTextAreaElement).value })} />
+        <textarea class="in area" aria-label="Inventory" value={c.play.inventory} onInput={(e) => play({ inventory: (e.target as HTMLTextAreaElement).value })} />
+        <textarea class="in area" aria-label="Notes" value={c.play.notes} onInput={(e) => play({ notes: (e.target as HTMLTextAreaElement).value })} />
       </div>
     </div>
   );

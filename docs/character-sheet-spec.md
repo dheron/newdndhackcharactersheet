@@ -31,7 +31,8 @@ Top to bottom:
 3. **Armour class row:** AC (total, 2 digits) = Armour (name) + AC + Shield + DEX + Misc, then a Note box.
 4. **Melee weapons (4 rows):** Name, Hit Bns, Base, STR, Mag, Damage, Type (1 character), Note.
 5. **Ranged weapons (3 rows):** Name, Range (fits NNN/NNN), Hit Bns, Base, DEX, Mag, Damage, Type, Note.
-6. **Bottom (three columns):** "Abilities / Languages" over the first column; "Inventory / Notes" spanning the other two.
+6. **Bottom (three columns):** "Abilities / Languages" over the first column; "Inventory / Notes" spanning the other two, which are separate columns (inventory, then notes).
+   - Abilities lists only abilities. Rules (Expertise, bonus Experiences, save bonuses, cantrip counts, multiclass restrictions and the like) are left off; the list is in `decisions.json` (`notOnAbilityList`). Thieves' Cant is shown under Languages.
 
 ## Page 2 (spellcasters only)
 
@@ -54,7 +55,7 @@ One page per casting class. Same structure for all:
 ## Rules decisions (from David)
 
 - Multiclass characters: one page 1 showing all classes, and a page 2 for each casting class.
-- Multiclass creation (David): combinations by race from Classes v4 (starred classes can be swapped as the table's key says; "Mage" is Wizard). Experiences: every fixed one from each class plus the highest free count. Starting equipment: the player picks one class's options. Level 1 HP: the maximum of each hit die averaged, plus the CON bonus split between the classes (each class's own column). Hit dice lines show one class each.
+- Multiclass creation (David): combinations by race from Classes v4 (starred classes can be swapped as the table's key says; "Mage" is Wizard). Experiences: every fixed one from each class plus the highest free count. Starting equipment: the player picks one class's options. HP for each class level is what that class would get (hit die plus that class's own CON bonus) divided by the number of classes, rounded down, never below 1; at 1st level every class gains a level at once with the maximum hit die. Hit dice lines show one class each.
 - Cantrips exist for Wizard, Cleric, Druid and Bard only (counts in the Classes doc).
 - Preparing spells works like 5e. Spellbook size is not capped.
 - Wizard spells known: INT Languages at 1st level, +1 spell on each level up (Classes v4).
