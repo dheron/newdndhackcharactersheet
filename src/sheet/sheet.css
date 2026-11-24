@@ -1,0 +1,626 @@
+/* The sheet, ported from the approved print wireframes (design/wireframes/). Greyscale only. */
+
+.sheet-screen {
+  background: #d9d9d9;
+  min-height: 100vh;
+}
+
+.toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 16px;
+  background: #fff;
+  border-bottom: 1px solid #999;
+}
+
+.toolbar .file {
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toolbar .save-status {
+  flex: 1;
+  color: #555;
+  font-size: 0.85rem;
+}
+
+.pages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 24px 16px 48px;
+  overflow-x: auto;
+}
+
+.pg {
+  width: 816px;
+  min-height: 1056px;
+  box-sizing: border-box;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #fff;
+  color: #111;
+  font-family: Arial, Helvetica, sans-serif;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  flex-shrink: 0;
+}
+
+.pg * {
+  box-sizing: border-box;
+}
+
+.pg .sh {
+  background: #333;
+  color: #fff;
+  font: 700 12px/22px Arial, Helvetica, sans-serif;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0 8px;
+  height: 22px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: center;
+  flex: none;
+}
+
+.pg .sh.left {
+  text-align: left;
+}
+
+.pg .l {
+  font: 400 10px/12px Arial, Helvetica, sans-serif;
+  color: #444;
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: center;
+}
+
+.pg .l.left {
+  text-align: left;
+}
+
+.pg .b {
+  border: 1.5px solid #111;
+  background: #fff;
+  border-radius: 0;
+}
+
+.pg .thick {
+  border-width: 3px;
+}
+
+/* Worked-out values and inputs share the box look. */
+.pg .val,
+.pg .in {
+  font: 400 13px Arial, Helvetica, sans-serif;
+  color: #111;
+  min-height: 0;
+  height: 28px;
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 100%;
+}
+
+.pg input.in,
+.pg select.in,
+.pg textarea.in {
+  display: block;
+  margin: 0;
+  border-radius: 0;
+}
+
+.pg input.in:not(.b),
+.pg textarea.in:not(.b) {
+  border: 0;
+  background-color: transparent;
+}
+
+.pg input.in:focus,
+.pg select.in:focus,
+.pg textarea.in:focus {
+  outline: 2px solid #111;
+  outline-offset: -2px;
+  background: #f2f2f2;
+}
+
+.pg .num {
+  text-align: center;
+}
+
+.pg .hdr .val,
+.pg .hdr .in {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.pg .hdr .thick,
+.pg .hdr .num {
+  justify-content: center;
+  text-align: center;
+}
+
+.pg .op {
+  font: 700 15px Arial, Helvetica, sans-serif;
+  padding-top: 14px;
+  width: 10px;
+  text-align: center;
+}
+
+/* Header */
+.pg .hdr {
+  border: 1.5px solid #111;
+  padding: 6px 8px;
+  display: grid;
+  grid-template-columns: 2.2fr 1.3fr 2.6fr 2fr 0.5fr 0.6fr 0.6fr;
+  gap: 6px;
+}
+
+/* Main row */
+.pg .main {
+  display: grid;
+  grid-template-columns: 72px 186px 72px minmax(0, 1fr) 190px;
+  gap: 12px;
+  height: 312px;
+}
+
+.pg .col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pg .row {
+  flex: 1;
+  border-bottom: 1px solid #bbb;
+  display: flex;
+  align-items: center;
+}
+
+.pg .stat {
+  gap: 4px;
+}
+
+.pg .stat b {
+  width: 28px;
+  font-size: 13px;
+}
+
+.pg .score {
+  width: 38px;
+  height: 32px;
+  padding: 0;
+  font-size: 15px;
+  font-weight: bold;
+}
+
+.pg .br {
+  flex: 1;
+  border-bottom: 1px solid #bbb;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding-bottom: 4px;
+}
+
+.pg .bc {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 44px;
+}
+
+.pg .bc .lw {
+  font: 400 10px/12px Arial, Helvetica, sans-serif;
+  color: #444;
+  white-space: nowrap;
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+.pg .sp {
+  width: 44px;
+}
+
+.pg .bc .b {
+  width: 44px;
+  height: 22px;
+  padding: 0;
+}
+
+.pg .hp {
+  gap: 5px;
+}
+
+.pg .hp .sh {
+  padding: 0 4px;
+}
+
+.pg .hp .max {
+  height: 34px;
+  font-size: 15px;
+}
+
+.pg .hp .current {
+  height: 52px;
+  font-size: 22px;
+  font-weight: bold;
+  padding: 0;
+}
+
+.pg .hp .temp {
+  height: 32px;
+  font-size: 15px;
+  padding: 0;
+}
+
+.pg .hp .hd {
+  height: 26px;
+  margin-bottom: 3px;
+  padding: 0 2px;
+  font-size: 12px;
+  text-align: center;
+}
+
+.pg .exp {
+  overflow: hidden;
+}
+
+.pg .ln {
+  border-bottom: 1px solid #777;
+  height: 21px;
+  flex: none;
+  font-size: 12px;
+  line-height: 20px;
+  padding: 0 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pg input.in.ln {
+  border: 0;
+  border-bottom: 1px solid #777;
+  width: 100%;
+  height: 21px;
+  justify-content: flex-start;
+  text-align: left;
+  font-size: 12px;
+  padding: 0 4px;
+}
+
+.pg .sv {
+  flex: 1;
+  border-bottom: 1px solid #bbb;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+}
+
+.pg .sv.last {
+  border: 0;
+}
+
+.pg .sg {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 28px 28px 28px;
+  gap: 4px;
+  align-items: center;
+  font: 400 11px/12px Arial, Helvetica, sans-serif;
+}
+
+.pg .sg.head {
+  padding: 3px 0 1px;
+}
+
+.pg .sg .b {
+  height: 22px;
+  padding: 0;
+  font-size: 12px;
+}
+
+.pg .nt {
+  border-bottom: 1px dotted #555;
+  height: 15px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+}
+
+.pg .nt .derived {
+  white-space: nowrap;
+}
+
+.pg .nt .in {
+  height: 14px;
+  font-size: 10px;
+  padding: 0 2px;
+  flex: 1;
+  justify-content: flex-start;
+  text-align: left;
+}
+
+/* Armour class row */
+.pg .acrow {
+  border: 1.5px solid #111;
+  padding: 6px 8px;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+}
+
+.pg .acrow .val,
+.pg .acrow .in {
+  height: 32px;
+}
+
+.pg .acrow .big {
+  font-size: 17px;
+  font-weight: bold;
+  padding: 0;
+}
+
+.pg .w40 {
+  width: 40px;
+}
+
+.pg .w190 {
+  width: 190px;
+}
+
+.pg .w36 {
+  width: 36px;
+}
+
+.pg .w36 .val,
+.pg .w36 .in {
+  padding: 0;
+}
+
+.pg .grow {
+  flex: 1;
+  margin-left: 8px;
+}
+
+.pg .grow .in {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.pg .check {
+  gap: 2px;
+  cursor: pointer;
+}
+
+.pg .check input {
+  margin: 0;
+  width: 12px;
+  height: 12px;
+}
+
+/* Weapons */
+.pg .wt {
+  display: grid;
+  gap: 4px;
+  margin-top: 3px;
+}
+
+.pg .wt.melee {
+  grid-template-columns: minmax(0, 1.3fr) 38px 30px 30px 30px 62px 24px minmax(0, 1.6fr);
+}
+
+.pg .wt.ranged {
+  grid-template-columns: minmax(0, 1.3fr) 66px 38px 30px 30px 30px 62px 24px minmax(0, 1.3fr);
+}
+
+.pg .wt .b {
+  height: 24px;
+  padding: 0 2px;
+  font-size: 12px;
+}
+
+.pg .wt select.b,
+.pg .wt input.b:not(.num) {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+/* Bottom section */
+.pg .bottom {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: 12px;
+  min-height: 216px;
+  flex: 1;
+  align-content: stretch;
+  grid-template-rows: auto 1fr;
+}
+
+.pg .span2 {
+  grid-column: span 2;
+}
+
+.pg .abilities {
+  font-size: 11px;
+  line-height: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 4px;
+}
+
+.pg .abilities ul {
+  margin: 0;
+  padding-left: 14px;
+}
+
+.pg textarea.area {
+  width: 100%;
+  min-height: 190px;
+  resize: vertical;
+  font: 400 12px/21px Arial, Helvetica, sans-serif;
+  padding: 0 4px;
+  background-image: repeating-linear-gradient(transparent, transparent 20px, #777 20px, #777 21px);
+  background-attachment: local;
+  height: 100%;
+}
+
+.pg textarea.area.small {
+  min-height: 63px;
+  flex: 1;
+}
+
+/* Page 2 */
+.pg .hdr2 {
+  border: 1.5px solid #111;
+  padding: 6px 8px;
+  display: grid;
+  grid-template-columns: 2fr 1.6fr auto 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.pg .hdr2 .val {
+  justify-content: flex-start;
+}
+
+.pg .hdr2 .atk {
+  display: flex;
+  gap: 4px;
+}
+
+.pg .hdr2 .atk > div:not(.op) {
+  width: 52px;
+}
+
+.pg .hdr2 .atk .val,
+.pg .hdr2 .atk .in {
+  justify-content: center;
+  padding: 0;
+}
+
+.pg .levels {
+  column-count: 3;
+  column-gap: 12px;
+}
+
+.pg .lvl {
+  break-inside: avoid;
+  margin-bottom: 12px;
+  border: 1.5px solid #111;
+}
+
+.pg .lvl.locked {
+  color: #777;
+}
+
+.pg .lvl .sh {
+  text-align: left;
+}
+
+.pg .slots {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+  padding: 4px 6px;
+  border-bottom: 1px solid #bbb;
+}
+
+.pg .slots .gap {
+  margin-left: 8px;
+}
+
+.pg .slots input {
+  margin: 0;
+  width: 13px;
+  height: 13px;
+}
+
+.pg .tick {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border: 1.5px solid #999;
+}
+
+.pg .tick.have {
+  border-color: #111;
+  background: #111;
+}
+
+.pg .spells {
+  list-style: none;
+  margin: 0;
+  padding: 2px 6px 4px;
+  font-size: 11px;
+  line-height: 18px;
+}
+
+.pg .spells label {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.pg .spells input {
+  margin: 0;
+  width: 12px;
+  height: 12px;
+}
+
+.pg .add {
+  margin: 0 6px 6px;
+  width: calc(100% - 12px);
+  min-height: 26px;
+  font-size: 11px;
+  padding: 2px 4px;
+}
+
+.pg .turn table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 11px;
+  margin-top: 4px;
+}
+
+.pg .turn th,
+.pg .turn td {
+  border: 1px solid #999;
+  text-align: center;
+  padding: 2px;
+}
+
+.pg .turn .on {
+  background: #ddd;
+  font-weight: bold;
+}
+
+.pg .note {
+  font-size: 10px;
+  color: #444;
+  margin: 4px 0 0;
+}
+
+.home {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}

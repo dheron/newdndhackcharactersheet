@@ -1,11 +1,11 @@
-import { useMemo, useRef, useState } from "preact/hooks";
+import { useRef, useState } from "preact/hooks";
 import { CLASS_NAMES, STATS, abilitiesUpTo, classes, hitDie, raceByName, races, type Stat } from "../rules";
 import { EXPECTED_ROLL, ROLL_METHODS, capWasteChance, rollForPick } from "../engine/abilities";
 import { rollTotal } from "../engine/dice";
 import { WEAPON_FILTERS, armourByName, meetsStrength, optionAvailable, optionsFor, weaponsFor, type Slot } from "../engine/equipment";
-import { deriveSheet } from "../engine/derive";
 import { decisions } from "../rules";
-import { saveCharacterFile } from "../storage";
+import { saveCharacterFileAs, type FilePath } from "../storage";
+import type { Character } from "../model/character";
 import {
   cantripCount,
   cantripList,
@@ -32,7 +32,7 @@ import {
 } from "./draft";
 
 const STEP_TITLES: Record<StepId, string> = {
-  race: "Name and race",
+  race: "Name, race and alignment",
   stats: "Ability scores",
   class: "Class",
   experiences: "Experiences",
@@ -48,7 +48,7 @@ const modsText = (mods: Partial<Record<Stat, number>>) =>
     .map(([k, v]) => `${sign(v!)} ${k}`)
     .join(", ");
 
-export function Creation({ onExit }: { onExit?: () => void }) {
+export function Creation({ onFinish }: { onFinish: (c: Character, path: FilePath) => void }) {
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [editing, setEditing] = useState<StepId | null>(null);
   const update = (patch: Partial<Draft> | ((d: Draft) => Draft)) => setDraft((d) => (typeof patch === "function" ? patch(d) : { ...d, ...patch }));
@@ -85,7 +85,16 @@ export function Creation({ onExit }: { onExit?: () => void }) {
         {active === "experiences" && <ExperiencesStep draft={draft} update={update} />}
         {active === "equipment" && <EquipmentStep draft={draft} update={update} />}
         {active === "spells" && <SpellsStep draft={draft} update={update} />}
-        {active === "done" && <DoneStep draft={draft} onNew={() => { setDraft(emptyDraft()); setEditing(null); }} onExit={onExit} />}
+        {active === "done" && (
+          <DoneStep
+            draft={draft}
+            onNew={() => {
+              setDraft(emptyDraft());
+              setEditing(null);
+            }}
+            onFinish={onFinish}
+          />
+        )}
         {editing && (
           <div class="actions">
             <button type="button" class="primary" disabled={!stepComplete(draft, editing)} onClick={() => setEditing(null)}>
@@ -102,7 +111,7 @@ function summaryText(d: Draft, step: StepId): string {
   switch (step) {
     case "race": {
       const mods = d.race ? modsText(modifiers(d)) : "";
-      return `${d.name}, ${d.race}${mods ? ` (${mods})` : ""}`;
+      return `${d.name}, ${d.race}${mods ? ` (${mods})` : ""}, ${d.alignment}`;
     }
     case "stats": {
       const s = scores(d);
@@ -176,6 +185,19 @@ function RaceStep({ draft, update }: StepProps) {
           </div>
         </fieldset>
       )}
+      <label class="field">
+        <span>Alignment</span>
+        <select value={draft.alignment} onChange={(e) => update({ alignment: (e.target as HTMLSelectElement).value })}>
+          <option value="" disabled>
+            Choose an alignment
+          </option>
+          {decisions.alignments.list.map((a) => (
+            <option key={a.name} value={a.name}>
+              {a.name}
+            </option>
+          ))}
+        </select>
+      </label>
       {!draft.raceConfirmed && (
         <div class="actions">
           <button type="button" class="primary" disabled={!raceReady(draft)} onClick={() => update({ raceConfirmed: true })}>
@@ -583,18 +605,14 @@ function SpellsStep({ draft, update }: StepProps) {
   );
 }
 
-function DoneStep({ draft, onNew, onExit }: { draft: Draft; onNew: () => void; onExit?: () => void }) {
+function DoneStep({ draft, onNew, onFinish }: { draft: Draft; onNew: () => void; onFinish: (c: Character, path: FilePath) => void }) {
   const [status, setStatus] = useState<string>("");
-  const s = scores(draft)!;
-  const equipment = equipmentFor(draft);
-  const sheet = useMemo(
-    () => deriveSheet({ race: draft.race!, cls: draft.cls!, level: 1, scores: s, armour: equipment.armour, shield: equipment.shield, weapons: equipment.weapons, specialization: draft.specialization }),
-    [draft],
-  );
-  const save = async () => {
+  const finish = async () => {
     try {
-      const where = await saveCharacterFile(toCharacter(draft));
-      setStatus(where ? `Saved: ${where}` : "Not saved.");
+      const c = toCharacter(draft);
+      const saved = await saveCharacterFileAs(c);
+      if (!saved) return setStatus("Not saved. Choose where to save the character to open its sheet.");
+      onFinish(c, saved.path);
     } catch (e) {
       setStatus(`Could not save: ${e instanceof Error ? e.message : String(e)}`);
     }
@@ -602,88 +620,21 @@ function DoneStep({ draft, onNew, onExit }: { draft: Draft; onNew: () => void; o
   return (
     <>
       <p class="hint">
-        {draft.name}, {draft.race} {draft.cls}, level 1. The full sheet comes in the next phase; this is a check of the numbers.
+        {draft.name} is ready: {draft.race} {draft.cls}, level 1. Save the character to a file, then play from the sheet.
       </p>
-      <dl class="details">
-        <dt>Scores</dt>
-        <dd>{STATS.map((k) => `${k} ${s[k]}`).join("  ")}</dd>
-        <dt>HP</dt>
-        <dd>
-          {sheet.hpMax} (hit dice {sheet.hitDice})
-        </dd>
-        <dt>AC</dt>
-        <dd>
-          {sheet.ac.total} = {equipment.armour ?? "no armour"} {sheet.ac.base} + DEX {sign(sheet.ac.dex)}
-          {sheet.ac.shield ? ` + Shield ${sheet.ac.shield}` : ""}
-        </dd>
-        <dt>Move</dt>
-        <dd>{sheet.move} ft</dd>
-        <dt>Attack bonus</dt>
-        <dd>{sign(sheet.attackBonus)}</dd>
-        <dt>Weapons</dt>
-        <dd>
-          <ul>
-            {sheet.weapons.map((w, i) => (
-              <li key={`${w.name}-${i}`}>
-                {w.name}: {sign(w.hitBonus)} to hit, {w.damage}
-                {draft.specialization === (w.ranged ? "ranged" : "melee") ? " (includes +2 specialization)" : ""}
-                {w.range ? `, range ${w.range}` : ""}
-              </li>
-            ))}
-          </ul>
-        </dd>
-        <dt>Saves</dt>
-        <dd>
-          <ul>
-            {Object.entries(sheet.saves).map(([k, v]) => (
-              <li key={k}>
-                {SAVE_LABELS[k]}: {v.base}
-                {v.bonus ? `, BNS ${sign(v.bonus)}` : ""}
-                {v.notes.length ? ` (${v.notes.join("; ")})` : ""}
-              </li>
-            ))}
-            {sheet.generalSaveNotes.map((n) => (
-              <li key={n}>Any save: {n}</li>
-            ))}
-          </ul>
-        </dd>
-        <dt>Experiences</dt>
-        <dd>{[...experienceSlots(draft).fixed, ...draft.experiences].join(", ")}</dd>
-        <dt>Languages</dt>
-        <dd>{sheet.bonuses.languages}</dd>
-        {sheet.spellcasting && (
-          <>
-            <dt>Spellcasting</dt>
-            <dd>
-              Spell attack {sign(sheet.spellcasting.spellAttack)}, {sheet.spellcasting.potencyKind} potency {sign(sheet.spellcasting.potency)}, slots {sheet.spellcasting.slots.join(", ") || "none at level 1"}
-            </dd>
-          </>
-        )}
-        <dt>Gold</dt>
-        <dd>{draft.gold?.total} gp</dd>
-      </dl>
       <div class="actions">
-        <button type="button" class="primary" onClick={save}>
-          Save character
+        <button type="button" class="primary" onClick={finish}>
+          Save and open sheet
         </button>
         <button type="button" onClick={onNew}>
-          Start another
+          Start again
         </button>
-        {onExit && (
-          <button type="button" onClick={onExit}>
-            Back
-          </button>
-        )}
       </div>
-      {status && <p class="status" role="status">{status}</p>}
+      {status && (
+        <p class="status" role="status">
+          {status}
+        </p>
+      )}
     </>
   );
 }
-
-const SAVE_LABELS: Record<string, string> = {
-  deathParalyze: "Death / Paralyze",
-  magicItem: "Magic Item",
-  petrificationPolymorph: "Petrification / Polymorph",
-  blastBarrage: "Blast / Barrage",
-  spell: "Spell",
-};

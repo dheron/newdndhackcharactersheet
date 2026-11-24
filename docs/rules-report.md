@@ -13,6 +13,8 @@ Where the docs are silent or the app has to read them a certain way. Each needs 
 - Attacks: bows, crossbows, slings and darts use DEX to hit and add no damage bonus; every other weapon, including thrown ones, uses STR to hit and adds STR damage (as in the original app).
 - AC with no armour: 10 + DEX AC bonus (Barbarian: 10 + double). The 10 comes from the original app, not a doc.
 - Fighter Weapon Specialization (+2 damage, melee or ranged) is chosen during creation and added to that weapon type's damage.
+- Saves on the sheet: BNS is every bonus that always applies to that save (racial bonuses, and DEX on Blast / Barrage). Total = Base - BNS, the number the d20 must reach, because the Saving Throws doc adds bonuses to the roll. Situational bonuses (WIS vs mind spells, racial vs poison and so on) stay on the note lines.
+- Weapon Mag (magic bonus) is added to Hit Bns only, as the formula in the development plan; it is not added to damage.
 - Ability scores (from the original app): six rolls by pick order, racial modifiers applied after, then each score held to 6 to 18. Ability Score Tables v4 goes to 24 for racial and magical bonuses.
 - Level 1 HP (from the original app): maximum of the class hit die plus the CON HP bonus; Barbarian doubles the CON bonus.
 - Text is copied as written, including doc typos (for example 'Learther', 'You are immunity to disease', 'Thieves Cant’').
@@ -29,6 +31,7 @@ Source: David, in chat (not yet in the Drive docs). Kept in `src/rules/data/deci
 - Multiclass: Each class of a multiclass character uses its own sheet.
 - Preparing: Spells are prepared like 5e: mark spells prepared, spend slots separately.
 - Cantrips: Wizard, Cleric, Druid, Bard only.
+- Alignment: The basic 5e alignments. Lawful Good (LG), Neutral Good (NG), Chaotic Good (CG), Lawful Neutral (LN), Neutral (N), Chaotic Neutral (CN), Lawful Evil (LE), Neutral Evil (NE), Chaotic Evil (CE). The list is the standard 5e one, written from memory.
 
 ## Ability Score Tables v4
 

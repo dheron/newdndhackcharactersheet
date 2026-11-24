@@ -14,6 +14,7 @@ What the sheet shows and why. Values come from the Drive docs listed in `CLAUDE.
 Top to bottom:
 
 1. **Header row:** Name, Race, Class and level, XP, Align, Move, Atk Bns.
+   - Align is one of the basic 5e alignments, written short (LG, N, CE...). Move comes from the Races doc.
    - Multiclass characters write all classes in Class and level (for example "Fighter 3 / Thief 3"). XP is one total, split equally between classes. Atk Bns is the best of their classes.
 2. **Main row (five columns, same height):**
    - **Stats:** STR, DEX, CON, INT, WIS, CHA, one score box each.
@@ -26,7 +27,7 @@ Top to bottom:
      - CHA: empty (no effect in the docs)
    - **HP:** Max, Current, Temp HP, Hit dice (three lines).
    - **Experiences:** 13 lines.
-   - **Saving throws:** columns Type, Total, Base, BNS. Rows in this order: Spell, Blast / Barrage, Petrification / Polymorph, Magic Item, Death / Paralyze. Each row has a blank note line under it for situational bonuses, plus two spare note lines at the bottom.
+   - **Saving throws:** columns Type, Total, Base, BNS. BNS is every bonus that always applies (racial, and DEX on Blast / Barrage); Total = Base minus BNS, the number the d20 must reach. Rows in this order: Spell, Blast / Barrage, Petrification / Polymorph, Magic Item, Death / Paralyze. Each row has a blank note line under it for situational bonuses, plus two spare note lines at the bottom.
 3. **Armour class row:** AC (total, 2 digits) = Armour (name) + AC + Shield + DEX + Misc, then a Note box.
 4. **Melee weapons (4 rows):** Name, Hit Bns, Base, STR, Mag, Damage, Type (1 character), Note.
 5. **Ranged weapons (3 rows):** Name, Range (fits NNN/NNN), Hit Bns, Base, DEX, Mag, Damage, Type, Note.
@@ -63,8 +64,12 @@ One page per casting class. Same structure for all:
 - Racial save bonuses that apply only to some effects (for example +2 vs poison) are written on the save note lines.
 - Turn Undead appears on the Cleric and Paladin page 2.
 - Concentration is not a rule in this system.
+- Alignment is the basic 5e list (David).
+
+## On screen (phase 3)
+
+The app shows the same pages as the print layout, with worked-out values filled in and inputs for what changes in play: XP, current and temp HP, hit dice lines 2 and 3, extra Experiences, save notes, armour, shield, AC misc and note, weapons with Mag and Note, languages, inventory and notes. Page 2 shows the slots the character has now (filled), Spent tick boxes for those, and a Prepared tick beside each spell; Wizards add spells to their spellbook from the list. In the desktop app every change is saved back to the character's file.
 
 ## Open questions
 
 1. Save row order on page 1 (Spell first) is the reverse of the Saving Throws doc priority order. Confirm this is intended.
-2. Alignment is on page 1 at David's request but has no rules in the docs yet. (Move now comes from the Races doc.)

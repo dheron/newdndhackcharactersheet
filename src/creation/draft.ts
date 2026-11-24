@@ -14,7 +14,7 @@ import {
 } from "../rules";
 import { finalScores, racialModifiers, type StatRoll } from "../engine/abilities";
 import { optionsFor, slotsFor, weaponsFor, type Slot } from "../engine/equipment";
-import { newId, rolledScores, CHARACTER_FORMAT, type Character, type CharacterEquipment } from "../model/character";
+import { initialPlay, newId, rolledScores, CHARACTER_FORMAT, type Character, type CharacterEquipment } from "../model/character";
 
 export type StepId = "race" | "stats" | "class" | "experiences" | "equipment" | "spells" | "done";
 
@@ -22,6 +22,7 @@ export interface Draft {
   name: string;
   race: string | null;
   raceChoices: Stat[];
+  alignment: string;
   /** Set when the player presses Next on the race step, so they can read the race details first. */
   raceConfirmed: boolean;
   rolls: StatRoll[];
@@ -41,6 +42,7 @@ export const emptyDraft = (): Draft => ({
   name: "",
   race: null,
   raceChoices: [],
+  alignment: "",
   raceConfirmed: false,
   rolls: [],
   cls: null,
@@ -76,8 +78,12 @@ const norm = (s: string) => s.trim().toLowerCase();
 /** Experiences the character gets automatically, and how many more the player picks. */
 export function experienceSlots(d: Draft): { fixed: string[]; free: number } {
   if (!d.cls || !d.race) return { fixed: [], free: 0 };
-  const cls = classes[d.cls].experiences;
-  const race = raceByName(d.race);
+  return experienceSlotsFor(d.cls, d.race);
+}
+
+export function experienceSlotsFor(clsName: ClassName, raceName: string): { fixed: string[]; free: number } {
+  const cls = classes[clsName].experiences;
+  const race = raceByName(raceName);
   const fixed = [...cls.fixed, ...race.bonusExperiences];
   const free = (cls.total ?? 0) - cls.fixed.length + (race.bonusExperienceChoices ?? 0);
   return { fixed, free: Math.max(0, free) };
@@ -146,7 +152,7 @@ export function stepsFor(d: Draft): StepId[] {
 
 /** Name and race filled in; the Next button is enabled. */
 export function raceReady(d: Draft): boolean {
-  return d.name.trim() !== "" && d.race !== null && (!needsRaceChoices(d) || d.raceChoices.length === 2);
+  return d.name.trim() !== "" && d.race !== null && d.alignment !== "" && (!needsRaceChoices(d) || d.raceChoices.length === 2);
 }
 
 export function stepComplete(d: Draft, step: StepId): boolean {
@@ -179,6 +185,8 @@ export function currentStep(d: Draft): StepId {
 
 export function toCharacter(d: Draft): Character {
   if (!d.race || !d.cls || !d.gold) throw new Error("The character is not finished.");
+  const equipment = equipmentFor(d);
+  const gold = d.gold.total;
   return {
     format: CHARACTER_FORMAT,
     id: newId(),
@@ -186,6 +194,7 @@ export function toCharacter(d: Draft): Character {
     name: d.name.trim(),
     race: d.race,
     raceChoices: d.raceChoices,
+    alignment: d.alignment,
     rolls: d.rolls,
     cls: d.cls,
     level: 1,
@@ -193,10 +202,11 @@ export function toCharacter(d: Draft): Character {
     specialization: d.specialization,
     experiences: d.experiences,
     equipmentChoices: { choiceOne: d.choiceOne, choiceTwo: d.choiceTwo },
-    equipment: equipmentFor(d),
-    gold: d.gold.total,
+    equipment,
+    gold,
     cantrips: d.cantrips,
     knownSpells: d.knownSpells,
+    play: initialPlay({ equipment, gold }),
   };
 }
 

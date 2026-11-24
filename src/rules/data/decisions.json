@@ -15,5 +15,19 @@
   },
   "multiclass": "Each class of a multiclass character uses its own sheet.",
   "preparing": "Spells are prepared like 5e: mark spells prepared, spend slots separately.",
-  "cantripClasses": ["Wizard", "Cleric", "Druid", "Bard"]
+  "cantripClasses": ["Wizard", "Cleric", "Druid", "Bard"],
+  "alignments": {
+    "rule": "The basic 5e alignments.",
+    "list": [
+      { "name": "Lawful Good", "short": "LG" },
+      { "name": "Neutral Good", "short": "NG" },
+      { "name": "Chaotic Good", "short": "CG" },
+      { "name": "Lawful Neutral", "short": "LN" },
+      { "name": "Neutral", "short": "N" },
+      { "name": "Chaotic Neutral", "short": "CN" },
+      { "name": "Lawful Evil", "short": "LE" },
+      { "name": "Neutral Evil", "short": "NE" },
+      { "name": "Chaotic Evil", "short": "CE" }
+    ]
+  }
 }
