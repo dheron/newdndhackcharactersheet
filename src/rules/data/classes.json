@@ -36,9 +36,9 @@
       }
     },
     "Paladin": {
-      "armour": null,
-      "weapons": null,
-      "experiences": { "docText": null, "fixed": [], "total": null },
+      "armour": "Any armour, Shields",
+      "weapons": "Any Weapons",
+      "experiences": { "docText": "Religion, 3 others", "fixed": ["Religion"], "total": 4 },
       "xp": [0, 350, 800, 1480, 2940, 5280, 8600, 13000, 20420, 30910, 44540, 64300, 72530, 95730, 140970, 239440, 411720, 617360, 823000, 1028640],
       "attackBonus": [1, 1, 2, 2, 3, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 9, 10, 10, 11, 12],
       "hp": ["1d10", "2d10", "3d10", "4d10", "5d10", "6d10", "7d10", "8d10", "9d10", "10d10", "10d10+3", "10d10+6", "10d10+9", "10d10+12", "10d10+15", "10d10+18", "10d10+21", "10d10+24", "10d10+27", "10d10+30"],
@@ -152,7 +152,8 @@
     "Wizard": {
       "armour": "No armour",
       "weapons": "Daggers, darts, slings, quarterstaffs, Sickle, light crossbow",
-      "experiences": { "docText": null, "fixed": [], "total": null },
+      "experiences": { "docText": "Arcana, 3 others", "fixed": ["Arcana"], "total": 4 },
+      "knownSpells": { "docText": "Known Spells: 1st level = known languages, +1 spell on each level up" },
       "xp": [0, 350, 850, 1600, 3250, 5950, 9850, 15100, 25080, 39890, 59630, 84400, 106690, 179800, 294080, 454400, 626990, 799580, 972180, 1144770],
       "attackBonus": [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4],
       "spellAttack": [0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6],

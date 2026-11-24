@@ -55,6 +55,9 @@ One page per casting class. Same structure for all:
 - Multiclass characters use a separate sheet per class.
 - Cantrips exist for Wizard, Cleric, Druid and Bard only (counts in the Classes doc).
 - Preparing spells works like 5e. Spellbook size is not capped.
+- Wizard spells known: INT Languages at 1st level, +1 spell on each level up (Classes v4).
+- Cleric, Bard, Ranger and Paladin spell attack uses the class Attack Bonus from the levelling chart.
+- Ability score generation, level 1 HP and the AC and attack formulas follow David's original app (see `docs/development-plan.md`).
 - WIS bonus applies only to saves against spells that attack the mind; it is not a general Spell save bonus.
 - Racial save bonuses that apply only to some effects (for example +2 vs poison) are written on the save note lines.
 - Turn Undead appears on the Cleric and Paladin page 2.
@@ -62,10 +65,7 @@ One page per casting class. Same structure for all:
 
 ## Open questions
 
-1. Stat generation: the pick-order rolling method (7d6 down to 2d6 best of two) is not in any doc. Cap at 18 and floor at 6 conflict with Ability Score Tables v4 (scores 3 to 24, racial bonuses can exceed 18).
-2. Level 1 HP: maximum hit die, or rolled?
-3. Equipment, armour AC values and weapon damage dice are not in the docs.
-4. Cleric spell attack: class Attack Bonus only, or plus a stat?
-5. Druid spell attack and the potency used by Druid, Bard, Paladin and Ranger were assumed (see table above). Confirm.
-6. Save row order on page 1 (Spell first) is the reverse of the Saving Throws doc priority order. Confirm this is intended.
-7. Alignment and Move are on page 1 at David's request but have no rules in the docs yet.
+1. Druid spell attack and the potency used by Druid, Bard, Paladin and Ranger were assumed (see table above). Confirm.
+2. Save row order on page 1 (Spell first) is the reverse of the Saving Throws doc priority order. Confirm this is intended.
+3. Alignment and Move are on page 1 at David's request but have no rules in the docs yet.
+4. Dart has no damage type in the Weapons and Armour sheet.

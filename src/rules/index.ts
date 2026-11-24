@@ -27,6 +27,7 @@ export interface ClassRules {
   armour: string | null;
   weapons: string | null;
   experiences: { docText: string | null; fixed: string[]; total: number | null };
+  knownSpells?: { docText: string };
   xp: number[];
   attackBonus: number[];
   spellAttack?: number[];
@@ -148,6 +149,15 @@ export function abilitiesUpTo(cls: ClassName, level: number): { level: number; t
     .filter(({ lvl }) => lvl <= level)
     .sort((a, b) => a.lvl - b.lvl)
     .flatMap(({ lvl, list }) => list.map((text) => ({ level: lvl, text })));
+}
+
+/**
+ * Wizard spells known (Classes v4): "1st level = known languages, +1 spell on each level up".
+ * Known languages is the INT Languages column of Ability Score Tables v4.
+ */
+export function wizardSpellsKnown(level: number, intScore: number): number {
+  checkLevel(level);
+  return abilityValue("INT", "languages", intScore) + (level - 1);
 }
 
 /** Hit die size from the level 1 HP column ("1d10" gives 10). */

@@ -14,9 +14,9 @@ Purpose order: character creation first, then the sheet, then printing. iPad and
 | 1. Name and race | Pick a race. Human and Half-Elf choose two stats for +1 each. | Races |
 | 2. Ability scores | Pick a stat, then roll for it. Dice by pick order: 7d6, 6d6, 5d6, 4d6 keep top 3, then 3d6, then 2d6 twice keep higher. Racial modifiers apply after rolling, then each score is held to 6 to 18. Show the dice, expected result and a short text warning when a positive racial bonus may be wasted at 18. Desktop: hover previews, click confirms. Touch: tap selects, tap again confirms. | Original app |
 | 3. Class | Pick a class. Multiclass combinations are offered by race; each class gets its own sheet. | Classes v4 |
-| 4. Experiences | Fixed Experiences for the class, free picks up to the class count, plus racial bonus Experiences. Pick from the list or write your own. Paladin and Wizard choose freely (no count in the doc). | Classes v4, Races, Experiences |
+| 4. Experiences | Fixed Experiences for the class, free picks up to the class count, plus racial bonus Experiences. Pick from the list or write your own. | Classes v4, Races, Experiences |
 | 5. Equipment | Choose Choice One and Choice Two from the class's Starting Equipment options. Where an option names a category ("Two-Handed Martial Melee", "any Druid weapon"), pick the weapon from the Weapons sheet. | Weapons and Armour |
-| 6. Spells (casters) | Pick cantrips (counts in Classes v4). Wizards also pick their starting spellbook. Other casters prepare from their full list. | Classes v4, Spell Books |
+| 6. Spells (casters) | Pick cantrips (counts in Classes v4). Wizards also pick their known spells: as many as their INT Languages at 1st level, +1 per level up. Other casters prepare from their full list. | Classes v4, Ability Score Tables v4, Spell Books |
 | 7. Sheet | The app works out everything below, shows the approved sheet, saves the character and can print it. | All |
 
 Completed steps collapse into summary cards above the current step; clicking one returns to edit it. Changing an earlier step recalculates everything after it (the original app kept stale racial bonuses when race changed; fixed here).
@@ -31,11 +31,10 @@ Completed steps collapse into summary cards above the current step; clicking one
 
 ## Proposed defaults (David to confirm)
 
-1. Wizard starting spellbook: cantrips per the class table plus 6 first-level spells, chosen at creation.
-2. Starting money: none. Starting Equipment options cover gear, and treasure counts as XP.
-3. Armour Strength requirement: warn, do not block.
-4. Name differences between the Starting Equipment options and the tables are matched ("Chain Mail" = "Chain / Banded Mail", "Light Cross" = "Light Crossbow", "Longsword" = "Long Sword", "Shortsword" = "Short Sword", "Learther" = "Leather").
-5. Missing values (Club damage, Great Axe cost, Dart type) show as blank and are listed in the rules report.
+1. Starting money: none. Starting Equipment options cover gear, and treasure counts as XP.
+2. Armour Strength requirement: warn, do not block.
+3. Name differences between the Starting Equipment options and the tables are matched ("Chain Mail" = "Chain / Banded Mail", "Light Cross" = "Light Crossbow", "Longsword" = "Long Sword", "Shortsword" = "Short Sword", "Learther" = "Leather").
+4. Missing values (currently Dart damage type) show as blank and are listed in the rules report.
 
 ## Technology
 

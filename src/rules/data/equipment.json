@@ -2,7 +2,7 @@
   "source": "Weapons and Armour (12wbQbJ4gk696MVNLaP_taK80j9Xb374qkDi8E90CU_E)",
   "note": "Copied from the sheet. null means the cell is empty in the sheet. Damage with a slash is one-handed/two-handed for Versatile weapons. AC is written as in the sheet; the app reads 'Dex. Mod.' as the DEX AC Bonus from Ability Score Tables v4.",
   "weapons": [
-    { "name": "Club", "category": "Simple", "cost": 3, "type": "B", "damage": null, "range": null, "traits": [] },
+    { "name": "Club", "category": "Simple", "cost": 3, "type": "B", "damage": "1d6", "range": null, "traits": [] },
     { "name": "Dagger", "category": "Simple", "cost": 2, "type": "P/S", "damage": "1d4", "range": "20/60", "traits": ["Light", "Thrown"] },
     { "name": "Mace", "category": "Simple", "cost": 8, "type": "B", "damage": "1d6", "range": null, "traits": [] },
     { "name": "Hand Axe", "category": "Simple", "cost": 1, "type": "S", "damage": "1d6", "range": "20/60", "traits": ["Light", "Thrown"] },
@@ -31,7 +31,7 @@
     { "name": "Scimitar", "category": "Martial", "cost": 25, "type": "S", "damage": "1d6", "range": null, "traits": ["Light"] },
     { "name": "Trident", "category": "Martial", "cost": 5, "type": "P", "damage": "1d8/2d4", "range": "20/60", "traits": ["Versatile", "Thrown"] },
     { "name": "War Pick", "category": "Martial", "cost": 5, "type": "P", "damage": "1d8", "range": null, "traits": [] },
-    { "name": "Great Axe", "category": "Martial", "cost": null, "type": "S", "damage": "1d12", "range": null, "traits": ["Heavy", "Two-Handed"] },
+    { "name": "Great Axe", "category": "Martial", "cost": 50, "type": "S", "damage": "1d12", "range": null, "traits": ["Heavy", "Two-Handed"] },
     { "name": "Halberd", "category": "Martial", "cost": 15, "type": "P/S", "damage": "1d10", "range": null, "traits": ["Heavy", "Two-Handed", "Reach"] },
     { "name": "Glaive", "category": "Martial", "cost": 8, "type": "S", "damage": "1d10", "range": null, "traits": ["Heavy", "Two-Handed", "Reach"] },
     { "name": "Ranseur/Pike", "category": "Martial", "cost": 7, "type": "P", "damage": "1d10", "range": null, "traits": ["Heavy", "Two-Handed", "Reach"] },

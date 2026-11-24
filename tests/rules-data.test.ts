@@ -17,6 +17,7 @@ import {
   spells,
   startingOptions,
   weapons,
+  wizardSpellsKnown,
 } from "../src/rules";
 import abilityData from "../src/rules/data/ability-scores.json";
 
@@ -99,6 +100,19 @@ describe("classes", () => {
     expect(classes.Wizard.spellAttack?.[0]).toBe(0);
     expect(classes.Barbarian.xp[1]).toBe(2000);
     expect(classes.Thief.experiences.total).toBe(9);
+    expect(classes.Paladin.armour).toBe("Any armour, Shields");
+    expect(classes.Paladin.experiences).toEqual({ docText: "Religion, 3 others", fixed: ["Religion"], total: 4 });
+    expect(classes.Wizard.experiences).toEqual({ docText: "Arcana, 3 others", fixed: ["Arcana"], total: 4 });
+  });
+
+  it("gives every class an Experiences count", () => {
+    for (const cls of CLASS_NAMES) expect(classes[cls].experiences.total, cls).toBeGreaterThan(0);
+  });
+
+  it("counts Wizard spells known from INT languages plus one per level", () => {
+    expect(wizardSpellsKnown(1, 10)).toBe(2);
+    expect(wizardSpellsKnown(1, 18)).toBe(7);
+    expect(wizardSpellsKnown(5, 16)).toBe(9);
   });
 
   it("counts cantrips from the class table", () => {
@@ -168,6 +182,8 @@ describe("equipment", () => {
 
   it("matches doc values", () => {
     expect(weapons.find((w) => w.name === "Long Sword")?.damage).toBe("1d8/1d10");
+    expect(weapons.find((w) => w.name === "Club")?.damage).toBe("1d6");
+    expect(weapons.find((w) => w.name === "Great Axe")?.cost).toBe(50);
     expect(weapons.find((w) => w.name === "Long Bow")?.range).toBe("150/600");
     expect(armour.find((a) => a.name === "Plate")?.baseAC).toBe(18);
     expect(armour.find((a) => a.name === "Chain / Banded Mail")?.strReq).toBe(13);

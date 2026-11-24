@@ -34,15 +34,15 @@ out();
 out("Where the docs are silent or the app has to read them a certain way. Each needs David's confirmation.");
 out();
 const gaps = [
-  "Weapons and Armour: Club has no damage, Great Axe has no cost, Dart has no damage type.",
-  "Classes v4: Paladin has no armour, weapons or Experiences line. Wizard has no Experiences count (players choose freely, as in the original app).",
+  "Weapons and Armour: Dart has no damage type.",
+  "Wizard spells known (Classes v4): INT Languages at 1st level, +1 per level up. Which spells is the player's choice from the Wizard Spellbook, at the levels their slots allow.",
   "Armour: the sheet writes AC as '11 + Dex. Mod.'. The app uses the DEX AC Bonus from Ability Score Tables v4 as the Dex. Mod.",
   "Armour: Heavy armour lists a flat AC. The app adds no DEX bonus to Heavy armour.",
   "Starting equipment names are matched to the tables: 'Chain Mail' = Chain / Banded Mail, 'Light Cross' = Light Crossbow, 'Longsword' = Long Sword, 'Shortsword' = Short Sword, 'Shortbow' = Short Bow, 'Learther Armour' = Leather, 'Scale Mail' = Scale Mail / Brigandine.",
   "Starting equipment: 'Thrown weapon' means a weapon with the Thrown trait; 'One-Handed' means a weapon without the Two-Handed trait.",
   "Ability scores (from the original app): six rolls by pick order, racial modifiers applied after, then each score held to 6 to 18. Ability Score Tables v4 goes to 24 for racial and magical bonuses.",
   "Level 1 HP (from the original app): maximum of the class hit die plus the CON HP bonus; Barbarian doubles the CON bonus.",
-  "Proposed defaults awaiting confirmation: Wizard starts with 6 first-level spells; no starting money; armour Strength requirement warns but does not block.",
+  "Proposed defaults awaiting confirmation: no starting money; armour Strength requirement warns but does not block.",
   "Text is copied as written, including doc typos (for example 'Learther', 'You are immunity to disease', 'Thieves Cant’').",
 ];
 for (const g of gaps) out(`- ${g}`);
@@ -84,6 +84,7 @@ for (const [name, c] of Object.entries(classData.classes)) {
   out(`- Armour: ${cell(c.armour)}`);
   out(`- Weapons: ${cell(c.weapons)}`);
   out(`- Experiences: ${cell(c.experiences.docText)} (fixed: ${c.experiences.fixed.join(", ") || "none"}; total: ${cell(c.experiences.total)})`);
+  if (c.knownSpells) out(`- ${c.knownSpells.docText}`);
   if (c.cantrips) out(`- Cantrips known: ${Object.entries(c.cantrips).map(([l, n]) => `${n} from level ${l}`).join(", ")}`);
   out();
   const head = ["Level", "XP", "Attack"];
