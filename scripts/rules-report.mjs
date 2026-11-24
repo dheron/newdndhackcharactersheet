@@ -13,6 +13,7 @@ const spells = load("spells");
 const turn = load("turn-undead");
 const multi = load("multiclass");
 const decisions = load("decisions");
+const spellTexts = load("spell-texts");
 
 const lines = [];
 const out = (s = "") => lines.push(s);
@@ -205,6 +206,14 @@ for (const [cls, data] of Object.entries(spells.classes)) {
   for (const [lvl, list] of Object.entries(data.levels)) out(`- **${lvl === "0" ? "Cantrips" : `Level ${lvl}`}** (${list.length}): ${list.join(", ")}`);
   out();
 }
+
+out("### Spell texts");
+out();
+out(`Source: ${spellTexts.source}. ${Object.keys(spellTexts.spells).length} spells; shown when a spell is hovered (or held on a touch screen). Spells in a class list with no text: ${(() => {
+  const missing = Object.values(spells.classes).flatMap((d) => Object.values(d.levels).flat()).filter((n) => !spellTexts.spells[n]);
+  return missing.length ? [...new Set(missing)].join(", ") : "none";
+})()}.`);
+out();
 
 // Turn undead
 out("## Turn Undead");

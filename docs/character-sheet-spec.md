@@ -77,6 +77,12 @@ One page per casting class. Same structure for all:
 - Multiclass restrictions (Classes v4): the armour can be worn, and while it is, the affected abilities are greyed with the reason, the AC row's Note box says what is switched off (printed too), and on screen a casting class's page 2 says "No spellcasting" (David).
 - XP and Current HP start blank; the player writes them.
 
+## Spell texts
+
+- Spell texts come from the Spell Compendium (exported to `sources/spell-compendium.md`, generated into `spell-texts.json` by `npm run rules`).
+- On the spell page, resting the pointer on a spell (desktop) or pressing and holding it (iPad) shows a card with its level, school, duration and text. A tap still ticks it as prepared.
+- When picking spells (creation, level up, Magical Secrets) each spell shows its level and the same card.
+
 ## Coins and buying
 
 - The top of the Inventory column has Platinum, Gold, Silver and Copper. Starting gold goes in Gold.

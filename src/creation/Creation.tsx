@@ -5,6 +5,7 @@ import { rollTotal } from "../engine/dice";
 import { WEAPON_FILTERS, armourByName, armourChoosable, optionAvailable, optionsFor, weaponsFor, type Slot } from "../engine/equipment";
 import { decisions } from "../rules";
 import { classesLabel, multiclassOptions } from "../engine/multiclass";
+import { SpellChip } from "../spells/SpellInfo";
 import { saveCharacter } from "../library";
 import type { Character } from "../model/character";
 import {
@@ -674,11 +675,7 @@ function SpellsStep({ draft, update }: StepProps) {
                 <div class="chips">
                   {cantripList(cls).map((s) => {
                     const on = mine.includes(s);
-                    return (
-                      <button key={s} type="button" class={on ? "chip on" : "chip"} aria-pressed={on} disabled={!on && mine.length >= nCantrips} onClick={() => toggleCantrip(cls, nCantrips, s)}>
-                        {s}
-                      </button>
-                    );
+                    return <SpellChip key={s} name={s} on={on} disabled={!on && mine.length >= nCantrips} onClick={() => toggleCantrip(cls, nCantrips, s)} />;
                   })}
                 </div>
               </>
@@ -695,11 +692,7 @@ function SpellsStep({ draft, update }: StepProps) {
                     <div class="chips">
                       {spellList(cls, lvl).map((s) => {
                         const on = draft.knownSpells.includes(s);
-                        return (
-                          <button key={s} type="button" class={on ? "chip on" : "chip"} aria-pressed={on} disabled={!on && draft.knownSpells.length >= nKnown} onClick={() => toggleKnown(s)}>
-                            {s}
-                          </button>
-                        );
+                        return <SpellChip key={s} name={s} on={on} disabled={!on && draft.knownSpells.length >= nKnown} onClick={() => toggleKnown(s)} />;
                       })}
                     </div>
                   </div>

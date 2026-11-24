@@ -10,6 +10,7 @@ import equipmentData from "./data/equipment.json";
 import spellData from "./data/spells.json";
 import turnUndeadData from "./data/turn-undead.json";
 import multiclassData from "./data/multiclass.json";
+import spellTextData from "./data/spell-texts.json";
 import decisionData from "./data/decisions.json";
 
 export const STATS = ["STR", "DEX", "CON", "INT", "WIS", "CHA"] as const;
@@ -84,6 +85,7 @@ export const SOURCES = {
   equipment: equipmentData.source,
   turnUndead: turnUndeadData.source,
   multiclass: multiclassData.source,
+  spellTexts: spellTextData.source,
   decisions: decisionData.source,
 };
 
@@ -101,6 +103,19 @@ export const experiences = experienceData;
 export const spells = spellData.classes as Partial<Record<ClassName, { source: string; levels: Record<string, string[]> }>>;
 export const turnUndead = turnUndeadData;
 export const multiclass = multiclassData;
+
+export interface SpellText {
+  /** "Cantrip", "1st" ... "9th", as the Spell Compendium writes it. */
+  level: string;
+  school: string;
+  duration: string | null;
+  /** Class tags from the compendium, e.g. "Wi 3, Dr 3". */
+  classes: string;
+  /** The spell's text, with the doc's **bold** and *italic* marks. */
+  text: string;
+}
+
+export const spellTexts = spellTextData.spells as Record<string, SpellText>;
 
 const abilityTables = abilityData as unknown as Record<Stat, Record<string, number[]>> & { minScore: number; maxScore: number };
 

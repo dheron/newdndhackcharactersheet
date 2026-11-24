@@ -768,6 +768,10 @@ Source: Ranger Spellbook (1ktsRQDGr9sEKXM7dhtrLk32wAmWKqobjh-jjv2EUOQk)
 - **Level 4** (6): Conjure Woodland Beings, Dominate Beast, Freedom of Movement, Grasping Vine, Locate Creature, Stoneskin
 - **Level 5** (7): Commune with Nature, Conjure Volley, Greater Restoration, Steel Wind Strike, Swift Quiver, Tree Stride, Wrath of Nature
 
+### Spell texts
+
+Source: Spell Compendium (1uvEi5cgM7sd6U6fmZQaH0iNzc_T5SdbKK1LJdmwFX0I). 410 spells; shown when a spell is hovered (or held on a touch screen). Spells in a class list with no text: none.
+
 ## Turn Undead
 
 Source: Classes v4, Turn Undead (1UDB0LV9BfAtNSdZ3lAkDJWmv1Wi6RIQGlaXwbqs3rpg)

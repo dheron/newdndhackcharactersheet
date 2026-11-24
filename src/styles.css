@@ -348,3 +348,47 @@ button.primary {
   color: var(--muted);
   font-size: 0.85rem;
 }
+
+/* The spell card (src/spells/SpellInfo.tsx). */
+.spell-card {
+  position: fixed;
+  z-index: 50;
+  max-height: 70vh;
+  overflow-y: auto;
+  background: #fff;
+  border: 1.5px solid #111;
+  border-radius: 6px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #111;
+  pointer-events: none;
+}
+
+.spell-card-title {
+  font-weight: bold;
+  font-size: 15px;
+}
+
+.spell-card-meta {
+  color: #555;
+  margin-bottom: 6px;
+}
+
+.spell-card p {
+  margin: 0 0 6px;
+}
+
+.spell-level {
+  color: #555;
+  font-size: 0.8em;
+  margin-left: 4px;
+}
+
+.pg .rw,
+.chip {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}

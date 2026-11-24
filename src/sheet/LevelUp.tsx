@@ -15,6 +15,7 @@ import {
 } from "../engine/levels";
 import type { Character, SecretSpell } from "../model/character";
 import { allExperiences, characterScores } from "./derived";
+import { SpellChip } from "../spells/SpellInfo";
 
 const sign = (n: number) => (n > 0 ? `+${n}` : `${n}`);
 
@@ -39,7 +40,24 @@ export function LevelUpPanel({ c, ready, onApply, onCancel }: { c: Character; re
   );
 }
 
-function Picker<T>({ label, count, options, chosen, name, onChange }: { label: string; count: number; options: T[]; chosen: T[]; name: (o: T) => string; onChange: (v: T[]) => void }) {
+function Picker<T>({
+  label,
+  count,
+  options,
+  chosen,
+  name,
+  spell,
+  onChange,
+}: {
+  label: string;
+  count: number;
+  options: T[];
+  chosen: T[];
+  name: (o: T) => string;
+  /** For spells: the spell's name, so the chip shows its level and spell card. */
+  spell?: (o: T) => string;
+  onChange: (v: T[]) => void;
+}) {
   if (count === 0) return null;
   return (
     <fieldset class="field">
@@ -49,6 +67,8 @@ function Picker<T>({ label, count, options, chosen, name, onChange }: { label: s
       <div class="chips pick-list">
         {options.map((o) => {
           const on = chosen.some((x) => name(x) === name(o));
+          const toggle = () => onChange(on ? chosen.filter((x) => name(x) !== name(o)) : [...chosen, o]);
+          if (spell) return <SpellChip key={name(o)} name={spell(o)} label={name(o)} on={on} disabled={!on && chosen.length >= count} onClick={toggle} />;
           return (
             <button
               key={name(o)}
@@ -168,8 +188,8 @@ function LevelUpForm({ c, index, onApply, onCancel }: { c: Character; index: num
         </dl>
       )}
 
-      <Picker label="New cantrip" count={ch.cantrips} options={cantripOptions(c, cls)} chosen={cantrips} name={(s) => s} onChange={setCantrips} />
-      <Picker label="New spell for the spellbook" count={ch.knownSpells} options={wizardSpellOptions(c, ch.newLevel)} chosen={known} name={(s) => s} onChange={setKnown} />
+      <Picker label="New cantrip" count={ch.cantrips} options={cantripOptions(c, cls)} chosen={cantrips} name={(s) => s} spell={(s) => s} onChange={setCantrips} />
+      <Picker label="New spell for the spellbook" count={ch.knownSpells} options={wizardSpellOptions(c, ch.newLevel)} chosen={known} name={(s) => s} spell={(s) => s} onChange={setKnown} />
       <Picker
         label="Expertise (double the bonus)"
         count={Math.min(ch.expertise, expertiseOptions(allExperiences(c), c).length)}
@@ -178,7 +198,7 @@ function LevelUpForm({ c, index, onApply, onCancel }: { c: Character; index: num
         name={(s) => s}
         onChange={setExpertise}
       />
-      <Picker label="Magical Secrets (any spell from any class)" count={ch.magicalSecrets} options={secretOptions(c)} chosen={secrets} name={(s) => `${s.spell} (${s.from})`} onChange={setSecrets} />
+      <Picker label="Magical Secrets (any spell from any class)" count={ch.magicalSecrets} options={secretOptions(c)} chosen={secrets} name={(s) => `${s.spell} (${s.from})`} spell={(s) => s.spell} onChange={setSecrets} />
 
       <div class="actions">
         <button

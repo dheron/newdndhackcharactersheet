@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  spellTexts,
   CLASS_NAMES,
   STATS,
   abilitiesUpTo,
@@ -224,5 +225,11 @@ describe("spells", () => {
 describe("race movement (Races doc)", () => {
   it("is 25 ft for Dwarves, Gnomes and Halflings, 30 ft for the rest", () => {
     for (const r of races) expect(r.move, r.name).toBe(/^(Dwarf|Gnome|Halfling)/.test(r.name) ? 25 : 30);
+  });
+});
+
+describe("spell texts (Spell Compendium)", () => {
+  it("has the text of every spell in every class list", () => {
+    for (const [cls, book] of Object.entries(spells)) for (const list of Object.values(book!.levels)) for (const name of list) expect(spellTexts[name], `${cls}: ${name}`).toBeDefined();
   });
 });

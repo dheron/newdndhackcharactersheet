@@ -53,7 +53,7 @@ Plan: [`docs/development-plan.md`](docs/development-plan.md).
 - `npm run dev`: front end in a browser at http://localhost:1420.
 - `npx tauri dev`: the desktop app with live reload.
 - `npm run check`: typecheck, tests and front end build. Run before every commit.
-- Rules data: `src/rules/data/*.json`, one file per source doc, each naming its source. `src/rules/index.ts` is the only way the app reads it. Spell lists are generated from `sources/spell-lists.txt`.
+- Rules data: `src/rules/data/*.json`, one file per source doc, each naming its source. `src/rules/index.ts` is the only way the app reads it. Spell lists are generated from `sources/spell-lists.txt`; spell texts from `sources/spell-compendium.md` (the Spell Compendium exported from Google Docs as Markdown; re-export it after the doc changes).
 - `npm run rules`: regenerates `spells.json` and `docs/rules-report.md` (every value next to its source, plus gaps and interpretations). Run after any data change; CI fails if they are stale.
 - Web version: the same build (`dist/`) published to GitHub Pages by `.github/workflows/pages.yml` on pushes to the default branch. `public/sw.js` is the offline helper; `public/manifest.webmanifest` makes it installable.
 - `npx tauri build`: installers for the current OS. CI (`.github/workflows/ci.yml`) builds the macOS (universal) and Windows installers and attaches them to each run.

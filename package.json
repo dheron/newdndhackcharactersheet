@@ -9,7 +9,7 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "check": "npm run typecheck && npm run test && npm run build",
-    "rules": "node scripts/import-spell-lists.mjs && node scripts/rules-report.mjs",
+    "rules": "node scripts/import-spell-lists.mjs && node scripts/import-spell-texts.mjs && node scripts/rules-report.mjs",
     "tauri": "tauri"
   },
   "dependencies": {

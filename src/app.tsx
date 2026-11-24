@@ -4,6 +4,7 @@ import type { Character } from "./model/character";
 import { Sheet } from "./sheet/Sheet";
 import { LIBRARY_FOLDER, deleteCharacter, duplicateCharacter, importCharacter, listCharacters, loadCharacter, type CharacterSummary } from "./library";
 import { inTauri } from "./storage";
+import { SpellInfoProvider } from "./spells/SpellInfo";
 import { APP_VERSION } from "./version";
 
 type Screen = { kind: "home" } | { kind: "create" } | { kind: "sheet"; character: Character };
@@ -11,6 +12,14 @@ type Screen = { kind: "home" } | { kind: "create" } | { kind: "sheet"; character
 const message = (e: unknown) => (e instanceof Error ? e.message : String(e));
 
 export function App() {
+  return (
+    <SpellInfoProvider>
+      <Screens />
+    </SpellInfoProvider>
+  );
+}
+
+function Screens() {
   const [screen, setScreen] = useState<Screen>({ kind: "home" });
   const home = () => setScreen({ kind: "home" });
 

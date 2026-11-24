@@ -1094,6 +1094,10 @@
     display: none;
   }
 
+  .spell-card {
+    display: none;
+  }
+
   .pg .bottom {
     min-height: 0;
   }

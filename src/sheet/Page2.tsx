@@ -6,6 +6,7 @@ import { emptyCasting, type Character } from "../model/character";
 import type { Caster } from "../engine/derive";
 import { slotTable, turnUndeadColumn } from "./derived";
 import { PAGE2_LAYOUT, type BoxId } from "./page2Layout";
+import { useSpellInfo } from "../spells/SpellInfo";
 import type { Update } from "./Page1";
 
 const sign = (n: number) => (n > 0 ? `+${n}` : `${n}`);
@@ -68,10 +69,7 @@ export function Page2({ c, caster, castingOff, update }: { c: Character; caster:
     );
   };
   const spellRow = (s: string, label: string = s) => (
-    <label key={s} class="rw" style={rowStyle}>
-      <input type="checkbox" class="ck" aria-label={`${s} prepared`} checked={mine.prepared.includes(s)} onChange={() => togglePrepared(s)} />
-      <span>{label}</span>
-    </label>
+    <SpellRow key={s} name={s} label={label} style={rowStyle} checked={mine.prepared.includes(s)} onToggle={() => togglePrepared(s)} />
   );
   const box = (id: BoxId) => {
     if (id === "cantrips") {
@@ -102,10 +100,7 @@ export function Page2({ c, caster, castingOff, update }: { c: Character; caster:
           {Array.from({ length: lines }, (_, k) => {
             const s = known[k];
             return s ? (
-              <label key={k} class="rw book" style={rowStyle}>
-                <input type="checkbox" class="ck" aria-label={`${s} prepared`} checked={mine.prepared.includes(s)} onChange={() => togglePrepared(s)} />
-                <span class="nm">{s}</span>
-              </label>
+              <SpellRow key={k} book name={s} label={s} style={rowStyle} checked={mine.prepared.includes(s)} onToggle={() => togglePrepared(s)} />
             ) : (
               <div key={k} class="rw book" style={rowStyle}>
                 <span class="ck" />
@@ -226,6 +221,17 @@ export function Page2({ c, caster, castingOff, update }: { c: Character; caster:
         </div>
       )}
     </div>
+  );
+}
+
+/** A spell with its Prepared tick box; hovering it (or holding it on a touch screen) shows the spell card. */
+function SpellRow({ name, label, style, checked, onToggle, book }: { name: string; label: string; style: string; checked: boolean; onToggle: () => void; book?: boolean }) {
+  const info = useSpellInfo(name);
+  return (
+    <label class={book ? "rw book" : "rw"} style={style} {...info}>
+      <input type="checkbox" class="ck" aria-label={`${name} prepared`} checked={checked} onChange={onToggle} />
+      <span class={book ? "nm" : ""}>{label}</span>
+    </label>
   );
 }
 
