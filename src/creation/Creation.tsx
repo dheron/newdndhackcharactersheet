@@ -1,0 +1,678 @@
+import { useMemo, useRef, useState } from "preact/hooks";
+import { CLASS_NAMES, STATS, abilitiesUpTo, classes, hitDie, raceByName, races, type Stat } from "../rules";
+import { EXPECTED_ROLL, ROLL_METHODS, capWasteChance, rollForPick } from "../engine/abilities";
+import { rollTotal } from "../engine/dice";
+import { WEAPON_FILTERS, armourByName, meetsStrength, optionAvailable, optionsFor, weaponsFor, type Slot } from "../engine/equipment";
+import { deriveSheet } from "../engine/derive";
+import { decisions } from "../rules";
+import { saveCharacterFile } from "../storage";
+import {
+  cantripCount,
+  cantripList,
+  currentStep,
+  emptyDraft,
+  equipmentFor,
+  experienceChoices,
+  experienceSlots,
+  knowableSpellLevels,
+  knownSpellCount,
+  modifiers,
+  needsRaceChoices,
+  scores,
+  slotsWithKeys,
+  spellList,
+  stepComplete,
+  stepsFor,
+  toCharacter,
+  withClass,
+  withRace,
+  type Draft,
+  type StepId,
+} from "./draft";
+
+const STEP_TITLES: Record<StepId, string> = {
+  race: "Name and race",
+  stats: "Ability scores",
+  class: "Class",
+  experiences: "Experiences",
+  equipment: "Equipment",
+  spells: "Spells",
+  done: "Character",
+};
+
+const sign = (n: number) => (n > 0 ? `+${n}` : `${n}`);
+const modsText = (mods: Partial<Record<Stat, number>>) =>
+  Object.entries(mods)
+    .filter(([, v]) => v)
+    .map(([k, v]) => `${sign(v!)} ${k}`)
+    .join(", ");
+
+export function Creation({ onExit }: { onExit?: () => void }) {
+  const [draft, setDraft] = useState<Draft>(emptyDraft);
+  const [editing, setEditing] = useState<StepId | null>(null);
+  const update = (patch: Partial<Draft> | ((d: Draft) => Draft)) => setDraft((d) => (typeof patch === "function" ? patch(d) : { ...d, ...patch }));
+
+  const steps = stepsFor(draft);
+  const active = editing ?? currentStep(draft);
+  const activeIndex = steps.indexOf(active);
+
+  return (
+    <div class="creation">
+      <ol class="progress" aria-label="Steps">
+        {steps.map((s, i) => (
+          <li key={s} class={s === active ? "on" : i < activeIndex || stepComplete(draft, s) ? "done" : ""}>
+            {STEP_TITLES[s]}
+          </li>
+        ))}
+      </ol>
+
+      {steps
+        .filter((s) => s !== active && s !== "done" && stepComplete(draft, s) && steps.indexOf(s) < Math.max(activeIndex, steps.indexOf(currentStep(draft))))
+        .map((s) => (
+          <button key={s} type="button" class="summary" onClick={() => setEditing(s)}>
+            <span class="summary-label">{STEP_TITLES[s]}</span>
+            <span class="summary-value">{summaryText(draft, s)}</span>
+            <span class="summary-edit">Edit</span>
+          </button>
+        ))}
+
+      <section class="step" aria-labelledby="step-title">
+        <h2 id="step-title">{STEP_TITLES[active]}</h2>
+        {active === "race" && <RaceStep draft={draft} update={update} />}
+        {active === "stats" && <StatsStep draft={draft} update={update} />}
+        {active === "class" && <ClassStep draft={draft} update={update} />}
+        {active === "experiences" && <ExperiencesStep draft={draft} update={update} />}
+        {active === "equipment" && <EquipmentStep draft={draft} update={update} />}
+        {active === "spells" && <SpellsStep draft={draft} update={update} />}
+        {active === "done" && <DoneStep draft={draft} onNew={() => { setDraft(emptyDraft()); setEditing(null); }} onExit={onExit} />}
+        {editing && (
+          <div class="actions">
+            <button type="button" class="primary" disabled={!stepComplete(draft, editing)} onClick={() => setEditing(null)}>
+              Done
+            </button>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function summaryText(d: Draft, step: StepId): string {
+  switch (step) {
+    case "race": {
+      const mods = d.race ? modsText(modifiers(d)) : "";
+      return `${d.name}, ${d.race}${mods ? ` (${mods})` : ""}`;
+    }
+    case "stats": {
+      const s = scores(d);
+      return s ? STATS.map((k) => `${k} ${s[k]}`).join("  ") : "";
+    }
+    case "class":
+      return `${d.cls}${d.specialization ? `, Weapon Specialization: ${d.specialization}` : ""}`;
+    case "experiences":
+      return [...experienceSlots(d).fixed, ...d.experiences].join(", ");
+    case "equipment": {
+      const e = equipmentFor(d);
+      return [e.armour, e.shield ? "Shield" : null, ...e.weapons, d.gold ? `${d.gold.total} gp` : null].filter(Boolean).join(", ");
+    }
+    case "spells":
+      return [...d.cantrips, ...d.knownSpells].join(", ");
+    default:
+      return "";
+  }
+}
+
+type StepProps = { draft: Draft; update: (patch: Partial<Draft> | ((d: Draft) => Draft)) => void };
+
+function RaceStep({ draft, update }: StepProps) {
+  const race = draft.race ? raceByName(draft.race) : null;
+  return (
+    <>
+      <label class="field">
+        <span>Name</span>
+        <input type="text" value={draft.name} onInput={(e) => update({ name: (e.target as HTMLInputElement).value })} autoFocus />
+      </label>
+      <label class="field">
+        <span>Race</span>
+        <select value={draft.race ?? ""} onChange={(e) => update((d) => withRace(d, (e.target as HTMLSelectElement).value))}>
+          <option value="" disabled>
+            Choose a race
+          </option>
+          {races.map((r) => (
+            <option key={r.name} value={r.name}>
+              {r.name} ({r.chooseTwo ? "+1 to any two" : modsText(r.modifiers)})
+            </option>
+          ))}
+        </select>
+      </label>
+      {race && (
+        <ul class="traits">
+          {race.traits.map((t) => (
+            <li key={t}>{t}</li>
+          ))}
+        </ul>
+      )}
+      {needsRaceChoices(draft) && (
+        <fieldset class="field">
+          <legend>Choose two stats for +1 ({2 - draft.raceChoices.length} left)</legend>
+          <div class="chips">
+            {STATS.map((s) => {
+              const on = draft.raceChoices.includes(s);
+              return (
+                <button
+                  key={s}
+                  type="button"
+                  class={on ? "chip on" : "chip"}
+                  aria-pressed={on}
+                  disabled={!on && draft.raceChoices.length >= 2}
+                  onClick={() => update((d) => ({ ...d, raceChoices: on ? d.raceChoices.filter((x) => x !== s) : [...d.raceChoices, s] }))}
+                >
+                  {s}
+                </button>
+              );
+            })}
+          </div>
+        </fieldset>
+      )}
+    </>
+  );
+}
+
+function StatsStep({ draft, update }: StepProps) {
+  const [preview, setPreview] = useState<Stat | null>(null);
+  // A ref, not state: the click handler runs straight after pointerdown, before a re-render.
+  const pointer = useRef<string>("mouse");
+  const [touchMode, setTouchMode] = useState(false);
+  const pick = draft.rolls.length;
+  const mods = modifiers(draft);
+  const rolled = new Set(draft.rolls.map((r) => r.stat));
+  const final = scores(draft);
+  const method = ROLL_METHODS[pick];
+
+  const roll = (stat: Stat) => {
+    update((d) => ({ ...d, rolls: [...d.rolls, rollForPick(stat, d.rolls.length)] }));
+    setPreview(null);
+  };
+  const onStat = (stat: Stat) => {
+    // Desktop: click rolls. Touch: first tap previews, second tap rolls.
+    if (pointer.current !== "mouse" && preview !== stat) return setPreview(stat);
+    roll(stat);
+  };
+
+  return (
+    <>
+      {method && (
+        <p class="hint">
+          Pick {pick + 1} of 6 rolls {method.label}. Pick the stat that matters most first. {touchMode ? "Tap a stat to preview, tap again to roll." : "Hover a stat to preview, click to roll."}
+        </p>
+      )}
+      {method && (
+        <div class="stat-picks">
+          {STATS.map((s) => (
+            <button
+              key={s}
+              type="button"
+              class={preview === s ? "chip on" : "chip"}
+              disabled={rolled.has(s)}
+              onPointerDown={(e) => {
+                pointer.current = e.pointerType;
+                setTouchMode(e.pointerType !== "mouse");
+              }}
+              onPointerEnter={(e) => e.pointerType === "mouse" && setPreview(s)}
+              onPointerLeave={(e) => e.pointerType === "mouse" && setPreview(null)}
+              onClick={() => onStat(s)}
+            >
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
+      {method && preview && <StatPreview stat={preview} pick={pick} mod={mods[preview]} />}
+
+      <table class="rolls">
+        <thead>
+          <tr>
+            <th>Stat</th>
+            <th>Dice</th>
+            <th>Rolled</th>
+            <th>Racial</th>
+            <th>Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {draft.rolls.map((r) => {
+            const raw = r.total + mods[r.stat];
+            const score = final ? final[r.stat] : Math.max(6, Math.min(18, raw));
+            return (
+              <tr key={r.stat}>
+                <th scope="row">{r.stat}</th>
+                <td>
+                  {r.method}: <DiceFaces roll={r} />
+                </td>
+                <td>{r.total}</td>
+                <td>{mods[r.stat] ? sign(mods[r.stat]) : ""}</td>
+                <td>
+                  <strong>{score}</strong>
+                  {raw !== score && <span class="note"> (held to {score})</span>}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      {draft.rolls.length > 0 && (
+        <div class="actions">
+          <button type="button" onClick={() => update({ rolls: [] })}>
+            Reroll all
+          </button>
+        </div>
+      )}
+    </>
+  );
+}
+
+function DiceFaces({ roll }: { roll: { dice: number[]; kept: number[] } }) {
+  const kept = [...roll.kept];
+  return (
+    <span class="dice">
+      {roll.dice.map((d, i) => {
+        const k = kept.indexOf(d);
+        const isKept = k >= 0;
+        if (isKept) kept.splice(k, 1);
+        return (
+          <span key={i} class={isKept ? "die kept" : "die"}>
+            {d}
+          </span>
+        );
+      })}
+    </span>
+  );
+}
+
+function StatPreview({ stat, pick, mod }: { stat: Stat; pick: number; mod: number }) {
+  const expected = EXPECTED_ROLL[pick]!;
+  const waste = capWasteChance(pick, mod);
+  return (
+    <div class="preview" role="status">
+      {stat}: {ROLL_METHODS[pick]!.label}
+      {mod ? ` ${sign(mod)} racial` : ""}, expected {Math.min(18, Math.max(6, expected + mod)).toFixed(1)}
+      {waste > 0.04 && <div class="warn">About {Math.round(waste * 100)}% of rolls would lose some of the {sign(mod)} racial bonus at the 18 cap.</div>}
+    </div>
+  );
+}
+
+function ClassStep({ draft, update }: StepProps) {
+  const cls = draft.cls ? classes[draft.cls] : null;
+  return (
+    <>
+      <div class="chips">
+        {CLASS_NAMES.map((c) => (
+          <button key={c} type="button" class={draft.cls === c ? "chip on" : "chip"} aria-pressed={draft.cls === c} onClick={() => update((d) => withClass(d, c))}>
+            {c}
+          </button>
+        ))}
+      </div>
+      {draft.cls && cls && (
+        <dl class="details">
+          <dt>Armour</dt>
+          <dd>{cls.armour}</dd>
+          <dt>Weapons</dt>
+          <dd>{cls.weapons}</dd>
+          <dt>Hit die</dt>
+          <dd>d{hitDie(draft.cls)}</dd>
+          <dt>Experiences</dt>
+          <dd>{cls.experiences.docText}</dd>
+          <dt>Level 1</dt>
+          <dd>
+            <ul>
+              {abilitiesUpTo(draft.cls, 1).map((a) => (
+                <li key={a.text}>{a.text}</li>
+              ))}
+            </ul>
+          </dd>
+        </dl>
+      )}
+      {draft.cls === "Fighter" && (
+        <fieldset class="field">
+          <legend>Weapon Specialization: +2 damage to</legend>
+          <div class="chips">
+            {(["melee", "ranged"] as const).map((s) => (
+              <button key={s} type="button" class={draft.specialization === s ? "chip on" : "chip"} aria-pressed={draft.specialization === s} onClick={() => update({ specialization: s })}>
+                {s === "melee" ? "Melee attacks" : "Ranged attacks"}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      )}
+    </>
+  );
+}
+
+function ExperiencesStep({ draft, update }: StepProps) {
+  const [custom, setCustom] = useState("");
+  const { fixed, free } = experienceSlots(draft);
+  const left = free - draft.experiences.length;
+  const toggle = (e: string) =>
+    update((d) => (d.experiences.includes(e) ? { ...d, experiences: d.experiences.filter((x) => x !== e) } : d.experiences.length < free ? { ...d, experiences: [...d.experiences, e] } : d));
+  const listed = experienceChoices(draft);
+  const customs = draft.experiences.filter((e) => !listed.includes(e));
+  const addCustom = () => {
+    const value = custom.trim();
+    if (!value || left <= 0 || draft.experiences.some((e) => e.toLowerCase() === value.toLowerCase()) || fixed.some((e) => e.toLowerCase() === value.toLowerCase())) return;
+    update((d) => ({ ...d, experiences: [...d.experiences, value] }));
+    setCustom("");
+  };
+  return (
+    <>
+      <p class="hint">
+        Each Experience gives +2 to a roll-under check when the DM agrees it applies. Choose {free}: {left} left.
+      </p>
+      {fixed.length > 0 && (
+        <>
+          <h3>Already yours</h3>
+          <div class="chips">
+            {fixed.map((e) => (
+              <span key={e} class="chip on static">
+                {e}
+              </span>
+            ))}
+          </div>
+        </>
+      )}
+      <h3>Choose from the list</h3>
+      <div class="chips">
+        {listed.map((e) => {
+          const on = draft.experiences.includes(e);
+          return (
+            <button key={e} type="button" class={on ? "chip on" : "chip"} aria-pressed={on} disabled={!on && left <= 0} onClick={() => toggle(e)}>
+              {e}
+            </button>
+          );
+        })}
+      </div>
+      <h3>Or write your own</h3>
+      <div class="inline">
+        <input type="text" value={custom} placeholder="For example Sailor" onInput={(e) => setCustom((e.target as HTMLInputElement).value)} onKeyDown={(e) => e.key === "Enter" && addCustom()} />
+        <button type="button" disabled={left <= 0 || !custom.trim()} onClick={addCustom}>
+          Add
+        </button>
+      </div>
+      {customs.length > 0 && (
+        <div class="chips">
+          {customs.map((e) => (
+            <button key={e} type="button" class="chip on" onClick={() => toggle(e)} aria-label={`Remove ${e}`}>
+              {e} (remove)
+            </button>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
+function EquipmentStep({ draft, update }: StepProps) {
+  const cls = draft.cls!;
+  const opts = optionsFor(cls);
+  const str = scores(draft)?.STR ?? 0;
+  const choose = (which: "one" | "two", option: string) =>
+    update((d) => {
+      const picks = Object.fromEntries(Object.entries(d.slotPicks).filter(([k]) => !k.startsWith(`${which}:`)));
+      return which === "one" ? { ...d, choiceOne: option, slotPicks: picks } : { ...d, choiceTwo: option, slotPicks: picks };
+    });
+  const group = (which: "one" | "two", label: string, list: string[], value: string | null) =>
+    list.length > 0 && (
+      <fieldset class="field">
+        <legend>{label}</legend>
+        {list.map((o) => {
+          const ok = optionAvailable(o, str);
+          return (
+            <label key={o} class={ok ? "option" : "option disabled"}>
+              <input type="radio" name={`choice-${which}`} checked={value === o} disabled={!ok} onChange={() => choose(which, o)} />
+              <span>{o}</span>
+              {!ok && <span class="note"> Needs more STR for the armour</span>}
+            </label>
+          );
+        })}
+        {slotsWithKeys(which, value).map(({ key, slot }) => (
+          <SlotPicker key={key} slot={slot} picks={draft.slotPicks[key] ?? []} str={str} onChange={(p) => update((d) => ({ ...d, slotPicks: { ...d.slotPicks, [key]: p } }))} />
+        ))}
+      </fieldset>
+    );
+
+  return (
+    <>
+      {group("one", "Choice One", opts.choiceOne, draft.choiceOne)}
+      {group("two", "Choice Two", opts.choiceTwo, draft.choiceTwo)}
+      <fieldset class="field">
+        <legend>Starting gold ({decisions.startingGold.dice} {decisions.startingGold.unit})</legend>
+        {draft.gold ? (
+          <p>
+            Rolled {draft.gold.rolls.join(" + ")} = <strong>{draft.gold.total} gp</strong>
+          </p>
+        ) : (
+          <button type="button" onClick={() => update({ gold: rollTotal(decisions.startingGold.dice) })}>
+            Roll {decisions.startingGold.dice}
+          </button>
+        )}
+      </fieldset>
+    </>
+  );
+}
+
+function SlotPicker({ slot, picks, str, onChange }: { slot: Slot; picks: string[]; str: number; onChange: (p: string[]) => void }) {
+  if (slot.kind === "shield") return <p class="slot">Shield</p>;
+  if (slot.kind === "weapon") return <p class="slot">{slot.count > 1 ? `${slot.count} x ${slot.name}` : slot.name}</p>;
+  if (slot.kind === "armour") {
+    if (slot.options.length === 1) {
+      const a = armourByName(slot.options[0]!);
+      return (
+        <p class="slot">
+          {a.name} (AC {a.acText}
+          {a.strReq ? `, Str ${a.strReq}` : ""})
+        </p>
+      );
+    }
+    return (
+      <div class="slot">
+        Armour:{" "}
+        <select value={picks[0] ?? ""} onChange={(e) => onChange([(e.target as HTMLSelectElement).value])}>
+          <option value="" disabled>
+            Choose armour
+          </option>
+          {slot.options.map((o) => (
+            <option key={o} value={o} disabled={!meetsStrength(o, str)}>
+              {o} (AC {armourByName(o).acText})
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+  const list = weaponsFor(slot.filter);
+  return (
+    <div class="slot">
+      {Array.from({ length: slot.count }, (_, i) => (
+        <select
+          key={i}
+          aria-label={`${WEAPON_FILTERS[slot.filter].label} ${i + 1}`}
+          value={picks[i] ?? ""}
+          onChange={(e) => {
+            const next = [...picks];
+            next[i] = (e.target as HTMLSelectElement).value;
+            onChange(next.filter(Boolean).length === slot.count ? next : next.slice(0, Math.max(i + 1, picks.length)));
+          }}
+        >
+          <option value="" disabled>
+            Choose a {WEAPON_FILTERS[slot.filter].label}
+          </option>
+          {list.map((w) => (
+            <option key={w.name} value={w.name}>
+              {w.name} ({w.damage ?? "TBD"}
+              {w.traits.length ? `, ${w.traits.join(", ")}` : ""})
+            </option>
+          ))}
+        </select>
+      ))}
+    </div>
+  );
+}
+
+function SpellsStep({ draft, update }: StepProps) {
+  const cls = draft.cls!;
+  const nCantrips = cantripCount(draft);
+  const nKnown = knownSpellCount(draft);
+  const toggle = (field: "cantrips" | "knownSpells", max: number, name: string) =>
+    update((d) => {
+      const list = d[field];
+      if (list.includes(name)) return { ...d, [field]: list.filter((x) => x !== name) };
+      return list.length < max ? { ...d, [field]: [...list, name] } : d;
+    });
+  return (
+    <>
+      {nCantrips > 0 && (
+        <>
+          <h3>
+            Cantrips: choose {nCantrips} ({nCantrips - draft.cantrips.length} left)
+          </h3>
+          <div class="chips">
+            {cantripList(cls).map((s) => {
+              const on = draft.cantrips.includes(s);
+              return (
+                <button key={s} type="button" class={on ? "chip on" : "chip"} aria-pressed={on} disabled={!on && draft.cantrips.length >= nCantrips} onClick={() => toggle("cantrips", nCantrips, s)}>
+                  {s}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      )}
+      {cls === "Wizard" && (
+        <>
+          <h3>
+            Spellbook: choose {nKnown} ({nKnown - draft.knownSpells.length} left)
+          </h3>
+          <p class="hint">A Wizard knows as many spells as their INT Languages at 1st level, of any level they can cast.</p>
+          {knowableSpellLevels(cls, 1).map((lvl) => (
+            <div key={lvl}>
+              <h4>Level {lvl}</h4>
+              <div class="chips">
+                {spellList(cls, lvl).map((s) => {
+                  const on = draft.knownSpells.includes(s);
+                  return (
+                    <button key={s} type="button" class={on ? "chip on" : "chip"} aria-pressed={on} disabled={!on && draft.knownSpells.length >= nKnown} onClick={() => toggle("knownSpells", nKnown, s)}>
+                      {s}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </>
+      )}
+      {cls !== "Wizard" && <p class="hint">{cls === "Paladin" || cls === "Ranger" ? "" : `${cls}s prepare spells from their full list during play.`}</p>}
+    </>
+  );
+}
+
+function DoneStep({ draft, onNew, onExit }: { draft: Draft; onNew: () => void; onExit?: () => void }) {
+  const [status, setStatus] = useState<string>("");
+  const s = scores(draft)!;
+  const equipment = equipmentFor(draft);
+  const sheet = useMemo(
+    () => deriveSheet({ race: draft.race!, cls: draft.cls!, level: 1, scores: s, armour: equipment.armour, shield: equipment.shield, weapons: equipment.weapons, specialization: draft.specialization }),
+    [draft],
+  );
+  const save = async () => {
+    try {
+      const where = await saveCharacterFile(toCharacter(draft));
+      setStatus(where ? `Saved: ${where}` : "Not saved.");
+    } catch (e) {
+      setStatus(`Could not save: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  };
+  return (
+    <>
+      <p class="hint">
+        {draft.name}, {draft.race} {draft.cls}, level 1. The full sheet comes in the next phase; this is a check of the numbers.
+      </p>
+      <dl class="details">
+        <dt>Scores</dt>
+        <dd>{STATS.map((k) => `${k} ${s[k]}`).join("  ")}</dd>
+        <dt>HP</dt>
+        <dd>
+          {sheet.hpMax} (hit dice {sheet.hitDice})
+        </dd>
+        <dt>AC</dt>
+        <dd>
+          {sheet.ac.total} = {equipment.armour ?? "no armour"} {sheet.ac.base} + DEX {sign(sheet.ac.dex)}
+          {sheet.ac.shield ? ` + Shield ${sheet.ac.shield}` : ""}
+        </dd>
+        <dt>Attack bonus</dt>
+        <dd>{sign(sheet.attackBonus)}</dd>
+        <dt>Weapons</dt>
+        <dd>
+          <ul>
+            {sheet.weapons.map((w, i) => (
+              <li key={`${w.name}-${i}`}>
+                {w.name}: {sign(w.hitBonus)} to hit, {w.damage}
+                {draft.specialization === (w.ranged ? "ranged" : "melee") ? " (includes +2 specialization)" : ""}
+                {w.range ? `, range ${w.range}` : ""}
+              </li>
+            ))}
+          </ul>
+        </dd>
+        <dt>Saves</dt>
+        <dd>
+          <ul>
+            {Object.entries(sheet.saves).map(([k, v]) => (
+              <li key={k}>
+                {SAVE_LABELS[k]}: {v.base}
+                {v.bonus ? `, BNS ${sign(v.bonus)}` : ""}
+                {v.notes.length ? ` (${v.notes.join("; ")})` : ""}
+              </li>
+            ))}
+            {sheet.generalSaveNotes.map((n) => (
+              <li key={n}>Any save: {n}</li>
+            ))}
+          </ul>
+        </dd>
+        <dt>Experiences</dt>
+        <dd>{[...experienceSlots(draft).fixed, ...draft.experiences].join(", ")}</dd>
+        <dt>Languages</dt>
+        <dd>{sheet.bonuses.languages}</dd>
+        {sheet.spellcasting && (
+          <>
+            <dt>Spellcasting</dt>
+            <dd>
+              Spell attack {sign(sheet.spellcasting.spellAttack)}, {sheet.spellcasting.potencyKind} potency {sign(sheet.spellcasting.potency)}, slots {sheet.spellcasting.slots.join(", ") || "none at level 1"}
+            </dd>
+          </>
+        )}
+        <dt>Gold</dt>
+        <dd>{draft.gold?.total} gp</dd>
+      </dl>
+      <div class="actions">
+        <button type="button" class="primary" onClick={save}>
+          Save character
+        </button>
+        <button type="button" onClick={onNew}>
+          Start another
+        </button>
+        {onExit && (
+          <button type="button" onClick={onExit}>
+            Back
+          </button>
+        )}
+      </div>
+      {status && <p class="status" role="status">{status}</p>}
+    </>
+  );
+}
+
+const SAVE_LABELS: Record<string, string> = {
+  deathParalyze: "Death / Paralyze",
+  magicItem: "Magic Item",
+  petrificationPolymorph: "Petrification / Polymorph",
+  blastBarrage: "Blast / Barrage",
+  spell: "Spell",
+};

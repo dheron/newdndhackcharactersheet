@@ -28,6 +28,8 @@ export interface DeriveInput {
   armour: string | null;
   shield: boolean;
   weapons: string[];
+  /** Fighter Weapon Specialization (Classes v4): +2 damage to melee or ranged attacks. */
+  specialization?: "melee" | "ranged" | null;
 }
 
 export interface StatBonuses {
@@ -103,12 +105,15 @@ export function armourClass(cls: ClassName, armourName: string | null, shield: b
   return { total: a.baseAC + dex + shieldBonus, base: a.baseAC, dex, shield: shieldBonus };
 }
 
-export function weaponLine(name: string, cls: ClassName, level: number, bonuses: StatBonuses): WeaponLine {
+export const SPECIALIZATION_DAMAGE = 2;
+
+export function weaponLine(name: string, cls: ClassName, level: number, bonuses: StatBonuses, specialization: "melee" | "ranged" | null = null): WeaponLine {
   const w = weaponByName(name);
   const ranged = isRangedWeapon(w);
   const base = attackBonus(cls, level);
   const stat = ranged ? bonuses.rangedHit : bonuses.meleeHit;
-  const dmgBonus = ranged ? 0 : bonuses.damage;
+  const spec = specialization === (ranged ? "ranged" : "melee") ? SPECIALIZATION_DAMAGE : 0;
+  const dmgBonus = (ranged ? 0 : bonuses.damage) + spec;
   const die = w.damage ?? "";
   const damage = dmgBonus === 0 ? die : `${die} ${dmgBonus > 0 ? "+" : "-"}${Math.abs(dmgBonus)}`;
   return { name, ranged, hitBonus: base + stat, base, stat, magic: 0, damage, type: w.type, range: w.range };
@@ -138,7 +143,7 @@ export function deriveSheet(input: DeriveInput) {
     hitDice: c.hp[input.level - 1]!,
     attackBonus: attackBonus(input.cls, input.level),
     ac: armourClass(input.cls, input.armour, input.shield, bonuses.ac),
-    weapons: input.weapons.map((w) => weaponLine(w, input.cls, input.level, bonuses)),
+    weapons: input.weapons.map((w) => weaponLine(w, input.cls, input.level, bonuses, input.specialization ?? null)),
     saves: saves(input.race, input.cls, input.level, bonuses),
     generalSaveNotes: race.situational.filter((s) => s.save === null).map((s) => s.text),
     classAbilities: abilitiesUpTo(input.cls, input.level).map((a) => a.text),
