@@ -7,7 +7,7 @@ import { classesLabel } from "../engine/multiclass";
 import { experienceSlotsFor } from "../creation/draft";
 import { parseItem, rolledScores, type Character, type WeaponRow } from "../model/character";
 import { armour as armourList, weapons as weaponList } from "../rules";
-import { cannotWearReason, isRangedWeapon, restrictionsFor, type Restriction } from "../engine/equipment";
+import { cannotWearReason, isRangedWeapon, restrictionsFor, weaponWarning, type Restriction } from "../engine/equipment";
 
 export type ItemKind = "armour" | "shield" | "melee" | "ranged";
 
@@ -54,7 +54,8 @@ export function toggleEquip(c: Character, item: { kind: ItemKind; name: string }
 /** Why an item cannot be equipped right now, or null. */
 export function equipBlocked(c: Character, item: { kind: ItemKind; name: string }): string | null {
   if (isEquipped(c, item)) return null;
-  if (item.kind === "armour" || item.kind === "shield") return cannotWearReason(c.classes, item.name);
+  // Armour the classes do not allow can still be equipped; the AC note warns (David).
+  if (item.kind === "armour" || item.kind === "shield") return null;
   const rows = item.kind === "melee" ? c.play.melee : c.play.ranged;
   return rows.some((r) => !r.name) ? null : `No free ${item.kind} weapon row`;
 }
@@ -82,6 +83,8 @@ export interface WeaponRowView {
   row: WeaponRow;
   /** Null for an empty row. */
   line: ReturnType<typeof weaponLine> | null;
+  /** Set when none of the character's classes may use this weapon. */
+  warning: string | null;
 }
 
 export function classLevels(c: Character): ClassLevel[] {
@@ -140,9 +143,9 @@ export function sheetFor(c: Character) {
   const ac = armourClass(c.classes, c.play.armour, c.play.shield, sheet.bonuses.ac);
   const rows = (list: WeaponRow[]): WeaponRowView[] =>
     list.map((row) => {
-      if (!row.name) return { row, line: null };
+      if (!row.name) return { row, line: null, warning: null };
       const line = weaponLine(row.name, sheet.attackBonus, sheet.bonuses, fighter ? c.specialization : null);
-      return { row, line: { ...line, magic: row.magic, hitBonus: line.hitBonus + row.magic } };
+      return { row, line: { ...line, magic: row.magic, hitBonus: line.hitBonus + row.magic }, warning: weaponWarning(c.classes, c.race, row.name) };
     });
   const { fixed } = experienceSlotsFor(c.classes, c.race);
   // The CON column(s) the character's classes use, for the HP per hit die box.
@@ -164,7 +167,13 @@ export function sheetFor(c: Character) {
       ...sheet.raceTraits.filter(isAbility).map((text) => ({ raw: text, text, off: null as string | null })),
     ],
     /** Short warnings for the AC row's Note box: what the worn armour switches off (multiclass restrictions). */
-    armourWarnings: restrictions.map((r) => `${r.cls}: no ${r.abilities === "all" ? "class abilities" : [...r.abilities, ...(r.spellcasting ? ["spellcasting"] : [])].join(", ")}`),
+    armourWarnings: [
+      ...[c.play.armour, c.play.shield ? "Shield" : null].flatMap((name) => {
+        const why = name ? cannotWearReason(c.classes, name) : null;
+        return why ? [`${name}: ${why}`] : [];
+      }),
+      ...restrictions.map((r) => `${r.cls}: no ${r.abilities === "all" ? "class abilities" : [...r.abilities, ...(r.spellcasting ? ["spellcasting"] : [])].join(", ")}`),
+    ],
     /** Spellcasting switched off by armour, per class, with the reason. */
     castingOff: Object.fromEntries(restrictions.filter((r) => r.spellcasting).map((r) => [r.cls, r.reason])) as Partial<Record<ClassName, string>>,
     /** Languages that come from class abilities (Thieves' Cant). */

@@ -168,3 +168,22 @@ export function restrictionsFor(classes: ClassName[], armourName: string | null)
     return [{ cls, abilities: rule.abilities, spellcasting: rule.spellcasting, reason: `not while wearing ${a.group.toLowerCase()} armour (multiclassed ${cls})` }];
   });
 }
+
+// Weapons each class may use (Classes v4, decisions.json classWeapons).
+const THIEF_EXTRA = decisions.classWeapons.thiefExtra;
+const ELF_EXTRA = decisions.classWeapons.elfExtra;
+
+export function classAllowsWeapon(cls: ClassName, w: Weapon): boolean {
+  if (cls === "Druid") return DRUID_WEAPONS.includes(w.name);
+  if (cls === "Wizard") return WIZARD_WEAPONS.includes(w.name);
+  if (cls === "Thief") return w.category === "Simple" || THIEF_EXTRA.includes(w.name);
+  return true;
+}
+
+/** A warning when none of the character's classes (nor an Elf's race) allows the weapon, else null. */
+export function weaponWarning(classes: ClassName[], race: string, name: string): string | null {
+  const w = weaponByName(name);
+  if (classes.some((c) => classAllowsWeapon(c, w))) return null;
+  if (race.startsWith("Elf") && ELF_EXTRA.includes(w.name)) return null;
+  return `Not a ${classes.join(" / ")} weapon`;
+}

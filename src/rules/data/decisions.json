@@ -34,6 +34,11 @@
       "Wizard": { "groups": [], "shield": false }
     }
   },
+  "classWeapons": {
+    "rule": "Weapons each class may use, read from the Classes v4 weapon text (Druid and Wizard lists as in the starting equipment). A multiclass character may use what any class allows; Elves may also use Long Swords and Long Bows (Races). Armour or weapons the character's classes do not allow can still be equipped; the sheet writes a warning in the AC note or the weapon's note (David).",
+    "thiefExtra": ["Hand Crossbow", "Long Sword", "Rapier", "Short Sword"],
+    "elfExtra": ["Long Sword", "Long Bow"]
+  },
   "multiclassRestrictions": {
     "rule": "How the sheet applies the Classes v4 multiclass restrictions (David: allow the armour, flag what stops working). Unarmoured means no armour; a shield is not armour.",
     "classes": {

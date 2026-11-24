@@ -997,17 +997,35 @@
   padding: 0 2px;
 }
 
+.pg .inv-remove {
+  min-height: 0;
+  height: 18px;
+  width: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #777;
+  font-size: 14px;
+  line-height: 18px;
+  flex: none;
+}
+
+.pg .inv-remove:hover {
+  color: #111;
+}
+
 .pg .inv-row.on input.in.ln {
   font-weight: bold;
 }
 
-.pg .acrow .note-box {
+.pg .note-box {
   justify-content: flex-start;
   gap: 6px;
   padding: 0 4px;
 }
 
-.pg .acrow .note-box .in {
+.pg .note-box .in {
+  height: 100%;
   border: 0;
   flex: 1;
   min-width: 40px;
@@ -1386,6 +1404,12 @@
 
   .touch .pg .inv-row input.in.ln {
     height: 33px;
+  }
+
+  .touch .pg .inv-remove {
+    width: 32px;
+    height: 32px;
+    font-size: 20px;
   }
 
   .touch .pg .inv-row .ck,

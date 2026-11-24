@@ -78,11 +78,15 @@ export function Page2({ c, caster, castingOff, update }: { c: Character; caster:
         <div key="c" class="bx">
           <div class="bh">Cantrips</div>
           <div class="pad">
-            {Array.from({ length: lines }, (_, k) => (
-              <div key={k} class="wl">
-                <div class="nm">{cantrips[k] ?? ""}</div>
-              </div>
-            ))}
+            {Array.from({ length: lines }, (_, k) =>
+              cantrips[k] ? (
+                <CantripLine key={k} name={cantrips[k]!} />
+              ) : (
+                <div key={k} class="wl">
+                  <div class="nm" />
+                </div>
+              ),
+            )}
           </div>
         </div>
       );
@@ -233,6 +237,16 @@ function SpellRow({ name, label, style, checked, onToggle, book }: { name: strin
       <input type="checkbox" class="ck" aria-label={`${name} prepared`} checked={checked} onChange={onToggle} />
       <span class={book ? "nm" : ""}>{label}</span>
     </label>
+  );
+}
+
+/** A cantrip on its line; hovering it (or holding it on a touch screen) shows the spell card. */
+function CantripLine({ name }: { name: string }) {
+  const info = useSpellInfo(name);
+  return (
+    <div class="wl" {...info}>
+      <div class="nm">{name}</div>
+    </div>
   );
 }
 

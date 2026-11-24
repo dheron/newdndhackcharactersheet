@@ -2,12 +2,10 @@
 // (design/wireframes/page1-print.dc.html). Worked-out values are plain text; things
 // that change in play are inputs.
 import type { JSX } from "preact";
-import { useState } from "preact/hooks";
 import type { SaveKey } from "../rules";
 import type { Coins } from "../engine/coins";
-import { BuyDialog } from "./Buy";
 import { classXp } from "../engine/levels";
-import { EXPERIENCE_LINES, type Character, type PlayState, type WeaponRow } from "../model/character";
+import { EXPERIENCE_LINES, parseItem, type Character, type PlayState, type WeaponRow } from "../model/character";
 import { alignmentShort, classAndLevel, takesNote, equipBlocked, equippable, inventoryOf, isEquipped, toggleEquip, type SheetView, type WeaponRowView } from "./derived";
 
 export type Update = (fn: (c: Character) => Character) => void;
@@ -341,11 +339,26 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
 const INVENTORY_LINES = 9;
 
 /**
+ * Removes one of the item on an inventory line ("2 x Dagger" becomes "Dagger"; a single item's
+ * line goes). Removing the last of an equipped item unequips it.
+ */
+export function removeOne(c: Character, index: number): Character {
+  const line = c.play.inventory[index];
+  if (line === undefined) return c;
+  const { count, name } = parseItem(line);
+  const item = equippable(line);
+  const inventory = count > 1 ? c.play.inventory.map((l, j) => (j === index ? (count - 1 > 1 ? `${count - 1} x ${name}` : name) : l)) : c.play.inventory.filter((_, j) => j !== index);
+  let next: Character = { ...c, play: { ...c.play, inventory } };
+  const stillHave = item ? inventory.some((l) => equippable(l)?.name === item.name) : true;
+  if (item && !stillHave && isEquipped(next, item)) next = toggleEquip(next, item);
+  return next;
+}
+
+/**
  * The inventory, one item per line. Armour, shields and weapons have a tick box to equip or
  * unequip them; equipped armour sets the AC row and equipped weapons fill the weapon rows.
  */
 function Inventory({ c, update }: { c: Character; update: Update }) {
-  const [buying, setBuying] = useState(false);
   const lines = [...c.play.inventory];
   const shown = Math.max(INVENTORY_LINES, lines.length + 1);
   const setLine = (i: number, text: string) =>
@@ -378,17 +391,7 @@ function Inventory({ c, update }: { c: Character; update: Update }) {
         {coin("gp", "Gold")}
         {coin("sp", "Silver")}
         {coin("cp", "Copper")}
-        <button type="button" class="buy-btn no-print" onClick={() => setBuying(true)}>
-          Buy equipment
-        </button>
       </div>
-      {buying && (
-        <BuyDialog
-          c={c}
-          onClose={() => setBuying(false)}
-          onBuy={(next) => update(() => next)}
-        />
-      )}
       <div class="no-print">
         {Array.from({ length: shown }, (_, i) => {
           const line = lines[i] ?? "";
@@ -411,6 +414,11 @@ function Inventory({ c, update }: { c: Character; update: Update }) {
                 <span class="ck-pad" />
               )}
               <input class="in ln" type="text" aria-label={`Inventory line ${i + 1}`} value={line} onInput={(e) => setLine(i, (e.target as HTMLInputElement).value)} />
+              {line.trim() !== "" && (
+                <button type="button" class="inv-remove" aria-label={`Remove one ${parseItem(line).name}`} title="Remove one" onClick={() => update((ch) => removeOne(ch, i))}>
+                  ×
+                </button>
+              )}
             </div>
           );
         })}
@@ -461,7 +469,7 @@ function WeaponTable({ title, ranged, rows, options, onChange }: { title: string
         <div class="l">Damage</div>
         <div class="l">Type</div>
         <div class="l">Note</div>
-        {rows.map(({ row, line }, i) => [
+        {rows.map(({ row, line, warning }, i) => [
           <select key={`n${i}`} class="b in" aria-label={`${title} ${i + 1}`} value={row.name} onChange={(e) => onChange(i, { ...row, name: (e.target as HTMLSelectElement).value })}>
             <option value="" />
             {[...new Set([...options.filter((o) => !rows.some((r, j) => j !== i && r.row.name === o)), ...(row.name ? [row.name] : [])])].map((o) => (
@@ -477,7 +485,10 @@ function WeaponTable({ title, ranged, rows, options, onChange }: { title: string
           <NumInput key={`m${i}`} label={`${title} ${i + 1} magic`} value={row.magic || null} onChange={(v) => onChange(i, { ...row, magic: v ?? 0 })} />,
           <Box key={`d${i}`}>{line?.damage ?? ""}</Box>,
           <Box key={`t${i}`}>{line?.type ?? ""}</Box>,
-          <TextInput key={`o${i}`} class="b" label={`${title} ${i + 1} note`} value={row.note} onChange={(v) => onChange(i, { ...row, note: v })} />,
+          <div key={`o${i}`} class="b val note-box">
+            {warning && <span class="armour-warning">{warning}</span>}
+            <TextInput label={`${title} ${i + 1} note`} value={row.note} onChange={(v) => onChange(i, { ...row, note: v })} />
+          </div>,
         ])}
       </div>
     </div>

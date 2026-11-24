@@ -75,6 +75,7 @@ out(`- ${decisions.levelling.magicalSecretsLevels}`);
 out(`- ${decisions.levelling.experiences}`);
 out(`- Class armour: ${decisions.classArmour.rule}`);
 out(`  - ${Object.entries(decisions.classArmour.allowed).map(([c, a]) => `${c}: ${[...(a.groups ?? []), ...(a.names ?? [])].join(", ") || "none"}${a.shield ? ", Shield" : ""}`).join("; ")}`);
+out(`- Class weapons: ${decisions.classWeapons.rule} Thief also: ${decisions.classWeapons.thiefExtra.join(", ")}. Elf also: ${decisions.classWeapons.elfExtra.join(", ")}.`);
 out(`- Multiclass restrictions on the sheet: ${decisions.multiclassRestrictions.rule}`);
 out(`  - ${Object.entries(decisions.multiclassRestrictions.classes).map(([c, r]) => `${c}: ${r.abilities === "all" ? "all class abilities" : [...r.abilities, ...(r.spellcasting ? ["spellcasting"] : [])].join(", ")} off in ${r.offIn.join(", ")} armour`).join("; ")}`);
 out(`- Coins: ${decisions.coins.rule}`);

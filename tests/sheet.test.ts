@@ -6,7 +6,8 @@ import type { StatRoll } from "../src/engine/abilities";
 import { emptyDraft, toCharacter, withClass, experienceSlots, type Draft } from "../src/creation/draft";
 import { fromFileText, initialPlay, toFileText, MELEE_ROWS, RANGED_ROWS } from "../src/model/character";
 import { currentAbilities, alignmentShort, classAndLevel, equipBlocked, equippable, inventoryOf, isEquipped, sheetFor, slotTable, toggleEquip, turnUndeadColumn } from "../src/sheet/derived";
-import { canWear, cannotWearReason, restrictionsFor } from "../src/engine/equipment";
+import { canWear, cannotWearReason, restrictionsFor, weaponWarning } from "../src/engine/equipment";
+import { removeOne } from "../src/sheet/Page1";
 import { copyOf, libraryFileName } from "../src/library";
 
 const rolls = (values: number[]): StatRoll[] =>
@@ -160,14 +161,41 @@ describe("equipping from the inventory", () => {
     expect(equippable("Rope")).toBeNull();
   });
 
-  it("blocks armour the classes cannot wear, and Druids never wear metal", () => {
+  it("lets armour the classes cannot wear be equipped, with a warning in the AC note", () => {
     const wiz = { ...toCharacter(fighter()), classes: ["Wizard" as const], levels: [1] };
-    expect(equipBlocked(wiz, { kind: "armour", name: "Leather" })).not.toBeNull();
+    expect(equipBlocked(wiz, { kind: "armour", name: "Leather" })).toBeNull();
+    const wearing = { ...wiz, play: { ...wiz.play, armour: "Leather", shield: true } };
+    expect(sheetFor(wearing).armourWarnings).toEqual(["Leather: Not allowed for Wizard", "Shield: Not allowed for Wizard"]);
     const fd = { ...toCharacter(fighter()), classes: ["Fighter" as const, "Druid" as const], levels: [1, 1] };
     expect(canWear(fd.classes, "Chain Mail")).toBe(false);
     expect(canWear(fd.classes, "Hide")).toBe(true);
     expect(canWear(fd.classes, "Shield")).toBe(true);
     expect(cannotWearReason(fd.classes, "Plate")).toMatch(/non-metal/);
+  });
+
+  it("warns in a weapon's note when no class (or an Elf's race) allows it", () => {
+    expect(weaponWarning(["Wizard"], "Human", "Long Sword")).toBe("Not a Wizard weapon");
+    expect(weaponWarning(["Wizard"], "Elf (High)", "Long Sword")).toBeNull();
+    expect(weaponWarning(["Wizard"], "Human", "Dagger")).toBeNull();
+    expect(weaponWarning(["Thief"], "Human", "Rapier")).toBeNull();
+    expect(weaponWarning(["Thief"], "Human", "Club")).toBeNull();
+    expect(weaponWarning(["Thief"], "Human", "Great Axe")).toBe("Not a Thief weapon");
+    expect(weaponWarning(["Fighter", "Wizard"], "Human", "Great Axe")).toBeNull();
+    const base = toCharacter(fighter());
+    const wiz = { ...base, classes: ["Wizard" as const], levels: [1] };
+    expect(sheetFor(wiz).melee[0]!.warning).toBe("Not a Wizard weapon");
+  });
+
+  it("removes one of an item, and unequips it when the last one goes", () => {
+    const base = toCharacter(fighter());
+    let c = { ...base, play: { ...base.play, inventory: ["2 x Dagger", "Long Sword"] } };
+    c = toggleEquip(c, { kind: "melee", name: "Dagger" });
+    c = removeOne(c, 0);
+    expect(c.play.inventory).toEqual(["Dagger", "Long Sword"]);
+    expect(isEquipped(c, { kind: "melee", name: "Dagger" })).toBe(true);
+    c = removeOne(c, 0);
+    expect(c.play.inventory).toEqual(["Long Sword"]);
+    expect(isEquipped(c, { kind: "melee", name: "Dagger" })).toBe(false);
   });
 
   it("flags abilities and spellcasting a multiclass restriction switches off", () => {

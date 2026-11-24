@@ -73,7 +73,8 @@ One page per casting class. Same structure for all:
 ## Equipment in play
 
 - The inventory is one item per line. Armour, Shield and weapon lines have a tick box: tick to equip, untick to unequip. The armour and weapon dropdowns list what is in the inventory. Each weapon has one row however many the character carries.
-- Armour a character's classes do not allow cannot be equipped (creation and play). A Druid, single or multiclassed, wears only Padded, Leather, Hide and a Shield (David). Chain Mail and Banded Mail (and Scale Mail and Brigandine, Ranseur and Pike) are separate items.
+- Starting equipment offers only armour the character's classes allow. In play, armour or weapons the classes do not allow can be equipped, with a warning written in the AC note or the weapon's note (David). A Druid, single or multiclassed, wears only Padded, Leather, Hide and a Shield (David); Elves may use Long Swords and Long Bows whatever their class (Races).
+- Each inventory line has a remove button (screen only) that takes away one; removing the last of an equipped item unequips it. Chain Mail and Banded Mail (and Scale Mail and Brigandine, Ranseur and Pike) are separate items.
 - Multiclass restrictions (Classes v4): the armour can be worn, and while it is, the affected abilities are greyed with the reason, the AC row's Note box says what is switched off (printed too), and on screen a casting class's page 2 says "No spellcasting" (David).
 - XP and Current HP start blank; the player writes them.
 
@@ -86,7 +87,7 @@ One page per casting class. Same structure for all:
 ## Coins and buying
 
 - The top of the Inventory column has Platinum, Gold, Silver and Copper. Starting gold goes in Gold.
-- Buy equipment (on screen) lists the weapons and armour from the Weapons and Armour sheet with their cost; buying pays from the coins (standard 5e rates, David; smallest coins first, with change) and adds the item to the inventory.
+- Buy equipment (in the toolbar) lists the weapons and armour from the Weapons and Armour sheet with their cost; buying pays from the coins (standard 5e rates, David; smallest coins first, with change) and adds the item to the inventory.
 
 ## Levelling up
 

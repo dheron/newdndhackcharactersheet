@@ -8,6 +8,7 @@ import { Page1 } from "./Page1";
 import { Page2 } from "./Page2";
 import "./sheet.css";
 import { LevelUpPanel } from "./LevelUp";
+import { BuyDialog } from "./Buy";
 import { addXp, readyToLevel, undoLevelUp, xpWithBonus } from "../engine/levels";
 
 const AUTOSAVE_MS = 600;
@@ -52,6 +53,7 @@ export function Sheet({ initial, onClose }: { initial: Character; onClose: () =>
   const [xpText, setXpText] = useState("");
   const [xpNote, setXpNote] = useState("");
   const [levelling, setLevelling] = useState(false);
+  const [buying, setBuying] = useState(false);
 
   const update = (fn: (c: Character) => Character) => {
     setC(fn);
@@ -123,6 +125,9 @@ export function Sheet({ initial, onClose }: { initial: Character; onClose: () =>
             Level up
           </button>
         )}
+        <button type="button" onClick={() => setBuying(true)}>
+          Buy equipment
+        </button>
         {c.levelUps.length > 0 && (
           <button
             type="button"
@@ -141,6 +146,7 @@ export function Sheet({ initial, onClose }: { initial: Character; onClose: () =>
           Print
         </button>
       </div>
+      {buying && <BuyDialog c={c} onClose={() => setBuying(false)} onBuy={(next) => update(() => next)} />}
       {levelling && ready.length > 0 && (
         <LevelUpPanel
           c={c}
