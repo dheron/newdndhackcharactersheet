@@ -1,0 +1,13 @@
+:root {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #111;
+  background: #fff;
+}
+
+body {
+  margin: 0;
+}
+
+.shell {
+  padding: 40px;
+}

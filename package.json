@@ -1,0 +1,25 @@
+{
+  "name": "character-sheet",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "check": "npm run typecheck && npm run test && npm run build",
+    "tauri": "tauri"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "2.12.5",
+    "preact": "11.2.0"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "2.10.6",
+    "@tauri-apps/cli": "2.12.5",
+    "typescript": "7.0.2",
+    "vite": "8.3.8",
+    "vitest": "5.1.1"
+  }
+}

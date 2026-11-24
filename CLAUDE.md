@@ -45,11 +45,22 @@ Legacy single-file app, for reference only: `legacy/dnd-character-generator.html
 
 The approved character sheet layout and the rules decisions behind it are in [`docs/character-sheet-spec.md`](docs/character-sheet-spec.md). Wireframe sources are in `design/wireframes/`.
 
+## Development
+
+Plan: [`docs/development-plan.md`](docs/development-plan.md).
+
+- Stack: TypeScript, Vite, Preact; Tauri 2 desktop shell in `src-tauri/`.
+- `npm run dev`: front end in a browser at http://localhost:1420.
+- `npx tauri dev`: the desktop app with live reload.
+- `npm run check`: typecheck, tests and front end build. Run before every commit.
+- `npx tauri build`: installers for the current OS. CI (`.github/workflows/ci.yml`) builds the macOS (universal) and Windows installers and attaches them to each run.
+- App icon: `app-icon.png` is a placeholder; regenerate sizes with `npx tauri icon app-icon.png`.
+
 ## Status
 
 1. Print page 1: approved (first draft).
 2. Print page 2 for spellcasters: approved for Wizard and Cleric; Druid, Bard, Paladin, Ranger drafted.
 3. iPad and phone versions: in progress.
-4. App build: not started. Plan: rules data as sourced JSON, a tested rules engine, a saved character record (local save plus file export/import, several characters), then the sheet screens and print, then the creation flow.
+4. App build: phase 0 (app skeleton and CI) done. Next: phase 1, rules data for character creation.
 
 Open questions are listed at the end of the spec.
