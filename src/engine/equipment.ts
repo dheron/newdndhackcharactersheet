@@ -10,6 +10,7 @@ import { armour, startingOptions, weapons, type Armour, type ClassName, type Wea
  * - Names in the options are matched to the tables: "Chain Mail" = Chain / Banded Mail,
  *   "Scale Mail" = Scale Mail / Brigandine, "Learther Armour" = Leather, "Light Cross" = Light Crossbow,
  *   "Longsword" = Long Sword, "Shortsword" = Short Sword, "Shortbow" = Short Bow.
+ * - Ranger's "One-Handed Martial" is melee only (David).
  * - Druid and Wizard weapons are the class weapon lists in Classes v4.
  */
 const RANGED_ONLY = new Set(["Short Bow", "Light Crossbow", "Sling", "Dart", "Long Bow", "Hand Crossbow", "Heavy Crossbow"]);
@@ -24,7 +25,6 @@ const isTwoHanded = (w: Weapon) => w.traits.includes("Two-Handed");
 export const WEAPON_FILTERS = {
   twoHandedMartialMelee: { label: "Two-Handed Martial Melee weapon", test: (w: Weapon) => w.category === "Martial" && isMelee(w) && isTwoHanded(w) },
   oneHandedMartialMelee: { label: "One-Handed Martial Melee weapon", test: (w: Weapon) => w.category === "Martial" && isMelee(w) && !isTwoHanded(w) },
-  oneHandedMartial: { label: "One-Handed Martial weapon", test: (w: Weapon) => w.category === "Martial" && !isTwoHanded(w) },
   martialMelee: { label: "Martial Melee weapon", test: (w: Weapon) => w.category === "Martial" && isMelee(w) },
   thrown: { label: "thrown weapon", test: (w: Weapon) => w.traits.includes("Thrown") },
   lightOrThrown: { label: "light or thrown weapon", test: (w: Weapon) => w.traits.includes("Light") || w.traits.includes("Thrown") },
@@ -51,7 +51,7 @@ export const OPTION_SLOTS: Record<string, Slot[]> = {
   "Chain Mail": [wear("Chain / Banded Mail")],
   "Chain Shirt and Shield": [wear("Chain Shirt"), shield],
   "Leather and Long Bow": [wear("Leather"), weapon("Long Bow")],
-  "Scale Mail / Brigandine / Chain Shirt and One-Handed Martial": [wear("Scale Mail / Brigandine", "Chain Shirt"), pick("oneHandedMartial")],
+  "Scale Mail / Brigandine / Chain Shirt and One-Handed Martial": [wear("Scale Mail / Brigandine", "Chain Shirt"), pick("oneHandedMartialMelee")],
   "Learther Armour and Long Bow": [wear("Leather"), weapon("Long Bow")],
   "One Handed Martial Melee and Shield": [pick("oneHandedMartialMelee"), shield],
   "Shortbow and Dagger": [weapon("Short Bow"), weapon("Dagger")],

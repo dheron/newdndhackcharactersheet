@@ -38,7 +38,7 @@ const gaps = [
   "Armour: the sheet writes AC as '11 + Dex. Mod.'. The app uses the DEX AC Bonus from Ability Score Tables v4 as the Dex. Mod.",
   "Armour: Heavy armour lists a flat AC. The app adds no DEX bonus to Heavy armour.",
   "Starting equipment names are matched to the tables: 'Chain Mail' = Chain / Banded Mail, 'Light Cross' = Light Crossbow, 'Longsword' = Long Sword, 'Shortsword' = Short Sword, 'Shortbow' = Short Bow, 'Learther Armour' = Leather, 'Scale Mail' = Scale Mail / Brigandine.",
-  "Starting equipment: 'Thrown weapon' means a weapon with the Thrown trait; 'One-Handed' means a weapon without the Two-Handed trait; 'Melee' means any weapon that is not a bow, crossbow, sling or dart. Ranger's 'One-Handed Martial' (no 'Melee') also allows the Hand Crossbow. 'Druid weapon' and 'Wizard Weapons' are the class weapon lists in Classes v4. The full mapping is in src/engine/equipment.ts.",
+  "Starting equipment: 'Thrown weapon' means a weapon with the Thrown trait; 'One-Handed' means a weapon without the Two-Handed trait; 'Melee' means any weapon that is not a bow, crossbow, sling or dart. Ranger's 'One-Handed Martial' is melee only (David). 'Druid weapon' and 'Wizard Weapons' are the class weapon lists in Classes v4. The full mapping is in src/engine/equipment.ts.",
   "Attacks: bows, crossbows, slings and darts use DEX to hit and add no damage bonus; every other weapon, including thrown ones, uses STR to hit and adds STR damage (as in the original app).",
   "AC with no armour: 10 + DEX AC bonus (Barbarian: 10 + double). The 10 comes from the original app, not a doc.",
   "Fighter Weapon Specialization (+2 damage, melee or ranged) is chosen during creation and added to that weapon type's damage.",

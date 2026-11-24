@@ -105,6 +105,8 @@ describe("starting equipment", () => {
   it("splits melee and ranged weapons", () => {
     expect(weaponsFor("twoHandedMartialMelee").map((w) => w.name)).not.toContain("Long Bow");
     expect(weaponsFor("oneHandedMartialMelee").map((w) => w.name)).toContain("Long Sword");
+    expect(weaponsFor("oneHandedMartialMelee").map((w) => w.name)).not.toContain("Hand Crossbow");
+    expect(slotsFor("Scale Mail / Brigandine / Chain Shirt and One-Handed Martial")).toContainEqual({ kind: "pick", filter: "oneHandedMartialMelee", count: 1 });
     expect(weaponsFor("wizardWeapon").map((w) => w.name)).toEqual(["Dagger", "Quarterstaff", "Sickle", "Light Crossbow", "Sling", "Dart"]);
   });
 });
