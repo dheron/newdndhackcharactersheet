@@ -98,7 +98,8 @@ describe("classes", () => {
     expect(spellSlots("Paladin", 1)).toEqual([]);
     expect(spellSlots("Cleric", 20)).toEqual([9, 9, 9, 8, 7, 5, 2]);
     expect(classes.Wizard.spellAttack?.[0]).toBe(0);
-    expect(classes.Barbarian.xp[1]).toBe(2000);
+    // Barbarian uses the Fighter XP table (Classes v4, corrected by David).
+    expect(classes.Barbarian.xp).toEqual(classes.Fighter.xp);
     expect(classes.Thief.experiences.total).toBe(9);
     expect(classes.Paladin.armour).toBe("Any armour, Shields");
     expect(classes.Paladin.experiences).toEqual({ docText: "Religion, 3 others", fixed: ["Religion"], total: 4 });

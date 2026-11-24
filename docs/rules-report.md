@@ -122,25 +122,25 @@ Source: Classes v4 (1UDB0LV9BfAtNSdZ3lAkDJWmv1Wi6RIQGlaXwbqs3rpg)
 | Level | XP | Attack | HP | Abilities |
 |---|---|---|---|---|
 | 1 | 0 | 1 | 1d12 | Double Con bonus to HP. Double Dex bonus to AC; Reckless Attack: Can attack with advantage, enemies get advantage to attack PC |
-| 2 | 2,000 | 1 | 2d12 |   |
-| 3 | 4,000 | 2 | 3d12 | Danger Sense: Double Dex bonus to save vs Blast/Barrage. Dex bonus to an save vs traps |
-| 4 | 8,000 | 2 | 4d12 |   |
-| 5 | 16,000 | 3 | 5d12 | Extra Attack |
-| 6 | 32,000 | 3 | 6d12 |   |
-| 7 | 64,000 | 4 | 7d12 |   |
-| 8 | 125,000 | 5 | 8d12 |   |
-| 9 | 250,000 | 5 | 9d12 | Brutal Critical: 1 Extra Damage dice on Crit (note: maybe this should be exploding damage and avoid crit trigger) |
-| 10 | 500,000 | 6 | 10d12 |   |
-| 11 | 750,000 | 6 | 10d12+3 |   |
-| 12 | 1,000,000 | 7 | 10d12+6 | Extra Attack |
-| 13 | 1,250,000 | 7 | 10d12+9 | Brutal Critical: 2 Extra Damage dice on Crit |
-| 14 | 1,500,000 | 8 | 10d12+12 |   |
-| 15 | 1,750,000 | 9 | 10d12+15 |   |
-| 16 | 2,000,000 | 9 | 10d12+18 |   |
-| 17 | 2,250,000 | 10 | 10d12+21 | Brutal Critical: 3 Extra Damage dice on Crit |
-| 18 | 2,500,000 | 10 | 10d12+24 |   |
-| 19 | 2,750,000 | 11 | 10d12+27 |   |
-| 20 | 3,000,000 | 12 | 10d12+30 |   |
+| 2 | 300 | 1 | 2d12 |   |
+| 3 | 700 | 2 | 3d12 | Danger Sense: Double Dex bonus to save vs Blast/Barrage. Dex bonus to an save vs traps |
+| 4 | 1,300 | 2 | 4d12 |   |
+| 5 | 2,500 | 3 | 5d12 | Extra Attack |
+| 6 | 4,450 | 3 | 6d12 |   |
+| 7 | 7,300 | 4 | 7d12 |   |
+| 8 | 11,200 | 5 | 8d12 |   |
+| 9 | 16,300 | 5 | 9d12 | Brutal Critical: 1 Extra Damage dice on Crit (note: maybe this should be exploding damage and avoid crit trigger) |
+| 10 | 22,750 | 6 | 10d12 |   |
+| 11 | 30,700 | 6 | 10d12+3 |   |
+| 12 | 44,200 | 7 | 10d12+6 | Extra Attack |
+| 13 | 67,400 | 7 | 10d12+9 | Brutal Critical: 2 Extra Damage dice on Crit |
+| 14 | 95,150 | 8 | 10d12+12 |   |
+| 15 | 140,800 | 9 | 10d12+15 |   |
+| 16 | 223,650 | 9 | 10d12+18 |   |
+| 17 | 325,900 | 10 | 10d12+21 | Brutal Critical: 3 Extra Damage dice on Crit |
+| 18 | 467,600 | 10 | 10d12+24 |   |
+| 19 | 609,300 | 11 | 10d12+27 |   |
+| 20 | 751,000 | 12 | 10d12+30 |   |
 
 ### Paladin
 
