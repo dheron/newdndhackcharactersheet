@@ -24,8 +24,8 @@ Google's screens get renamed from time to time; the steps below give the idea ev
    - Authorized JavaScript origins: `https://dheron.github.io` and, for testing on a computer, `http://localhost:1420`.
    - No redirect URIs are needed.
    - Copy the **Client ID** (it ends in `.apps.googleusercontent.com`). It is a public identifier, not a secret.
-6. Give it to the web build: on GitHub, the repository's **Settings**, **Secrets and variables**, **Actions**,
-   **Variables** tab, **New repository variable**: name `GOOGLE_CLIENT_ID`, value the Client ID.
+6. Give it to the web build: it is set as `DEFAULT_CLIENT_ID` in `src/sync/drive.ts` (done for
+   https://dheron.github.io). A `GOOGLE_CLIENT_ID` repository variable overrides it.
 7. Republish: **Actions**, **Web version**, **Run workflow** (or push any change).
 
 After that the start screen of the web version shows **Connect Google Drive**.

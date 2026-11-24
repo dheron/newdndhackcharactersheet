@@ -8,7 +8,12 @@
 import { inTauri } from "../storage";
 import type { RemoteEntry } from "./merge";
 
-const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined;
+/**
+ * The Google OAuth client ID for https://dheron.github.io (David's Google Cloud project). It is a
+ * public identifier, not a secret. VITE_GOOGLE_CLIENT_ID overrides it, e.g. for another site.
+ */
+const DEFAULT_CLIENT_ID = "787417531402-1e30c7fbdgpb08sl5fqrjqhh9b0e7n9r.apps.googleusercontent.com";
+const CLIENT_ID = (import.meta.env.VITE_GOOGLE_CLIENT_ID as string | undefined) || DEFAULT_CLIENT_ID;
 const SCOPE = "https://www.googleapis.com/auth/drive.file";
 const FOLDER = "Character Sheets";
 const API = "https://www.googleapis.com/drive/v3";
