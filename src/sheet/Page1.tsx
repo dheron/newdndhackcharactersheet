@@ -2,10 +2,9 @@
 // (design/wireframes/page1-print.dc.html). Worked-out values are plain text; things
 // that change in play are inputs.
 import type { JSX } from "preact";
-import { armour as armourList, weapons as weaponList, type SaveKey } from "../rules";
-import { isRangedWeapon } from "../engine/equipment";
+import type { SaveKey } from "../rules";
 import { EXPERIENCE_LINES, type Character, type PlayState, type WeaponRow } from "../model/character";
-import { alignmentShort, classAndLevel, type SheetView, type WeaponRowView } from "./derived";
+import { alignmentShort, classAndLevel, equipBlocked, equippable, inventoryOf, isEquipped, toggleEquip, type SheetView, type WeaponRowView } from "./derived";
 
 export type Update = (fn: (c: Character) => Character) => void;
 
@@ -18,9 +17,6 @@ const SAVE_ROWS: { key: SaveKey; label: string }[] = [
   { key: "magicItem", label: "Magic Item" },
   { key: "deathParalyze", label: "Death / Paralyze" },
 ];
-
-const MELEE_WEAPONS = weaponList.filter((w) => !isRangedWeapon(w)).map((w) => w.name);
-const RANGED_WEAPONS = weaponList.filter((w) => isRangedWeapon(w)).map((w) => w.name);
 
 /** A text input that holds a whole number (or blank). */
 function NumInput({ value, onChange, label, class: cls, placeholder }: { value: number | null; onChange: (v: number | null) => void; label: string; class?: string; placeholder?: string }) {
@@ -73,7 +69,7 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
         </div>
         <div>
           <div class="l">XP</div>
-          <NumInput label="XP" value={c.xp} onChange={(v) => update((ch) => ({ ...ch, xp: v ?? 0 }))} />
+          <NumInput label="XP" value={c.xp || null} onChange={(v) => update((ch) => ({ ...ch, xp: v ?? 0 }))} />
         </div>
         <div>
           <div class="l">Align</div>
@@ -118,7 +114,7 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
           </div>
           <div>
             <div class="l">Current</div>
-            <NumInput label="Current HP" class="current" value={c.play.hpCurrent} placeholder={view.hpMax === null ? "" : String(view.hpMax)} onChange={(v) => play({ hpCurrent: v })} />
+            <NumInput label="Current HP" class="current" value={c.play.hpCurrent} onChange={(v) => play({ hpCurrent: v })} />
           </div>
           <div>
             <div class="l">Temp HP</div>
@@ -224,15 +220,24 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
         <div class="op">=</div>
         <div class="w190">
           <div class="l">Armour</div>
-          <select class="b in" aria-label="Armour" value={c.play.armour ?? ""} onChange={(e) => play({ armour: (e.target as HTMLSelectElement).value || null })}>
+          <select
+            class="b in"
+            aria-label="Armour"
+            value={c.play.armour ?? ""}
+            onChange={(e) => {
+              const name = (e.target as HTMLSelectElement).value;
+              update((ch) => (name ? toggleEquip({ ...ch, play: { ...ch.play, armour: null } }, { kind: "armour", name }) : { ...ch, play: { ...ch.play, armour: null } }));
+            }}
+          >
             <option value="">None</option>
-            {armourList
-              .filter((a) => a.baseAC !== null)
-              .map((a) => (
-                <option key={a.name} value={a.name}>
-                  {a.name}
+            {[...new Set([...inventoryOf(c, "armour"), ...(c.play.armour ? [c.play.armour] : [])])].map((name) => {
+              const why = c.play.armour === name ? null : equipBlocked(c, { kind: "armour", name });
+              return (
+                <option key={name} value={name} disabled={why !== null}>
+                  {why ? `${name} (${why})` : name}
                 </option>
-              ))}
+              );
+            })}
           </select>
         </div>
         <div class="w36">
@@ -242,8 +247,14 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
         <div class="op">+</div>
         <div class="w36">
           <div class="l">Shield</div>
-          <label class="b val check">
-            <input type="checkbox" aria-label="Shield" checked={c.play.shield} onChange={(e) => play({ shield: (e.target as HTMLInputElement).checked })} />
+          <label class="b val check" title={(c.play.shield ? null : inventoryOf(c, "shield").length === 0 ? "No shield in the inventory" : equipBlocked(c, { kind: "shield", name: "Shield" })) ?? ""}>
+            <input
+              type="checkbox"
+              aria-label="Shield equipped"
+              checked={c.play.shield}
+              disabled={(c.play.shield ? null : inventoryOf(c, "shield").length === 0 ? "No shield in the inventory" : equipBlocked(c, { kind: "shield", name: "Shield" })) !== null}
+              onChange={() => update((ch) => toggleEquip(ch, { kind: "shield", name: "Shield" }))}
+            />
             {view.ac.shield ? String(view.ac.shield) : ""}
           </label>
         </div>
@@ -267,14 +278,14 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
         title="Melee weapons"
         ranged={false}
         rows={view.melee}
-        options={MELEE_WEAPONS}
+        options={inventoryOf(c, "melee")}
         onChange={(i, row) => play({ melee: c.play.melee.map((r, j) => (j === i ? row : r)) })}
       />
       <WeaponTable
         title="Ranged weapons"
         ranged
         rows={view.ranged}
-        options={RANGED_WEAPONS}
+        options={inventoryOf(c, "ranged")}
         onChange={(i, row) => play({ ranged: c.play.ranged.map((r, j) => (j === i ? row : r)) })}
       />
 
@@ -284,16 +295,68 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
         <div class="abilities">
           <ul>
             {view.abilities.map((a) => (
-              <li key={a}>{a}</li>
+              <li key={a.text} class={a.off ? "off" : ""}>
+                {a.text}
+                {a.off && <span class="why"> ({a.off})</span>}
+              </li>
             ))}
           </ul>
           <div class="l left">Languages ({view.bonuses.languages})</div>
           {view.languages.length > 0 && <div class="known-langs">{view.languages.join(", ")}</div>}
           <LinedText small label="Languages" value={c.play.languages} onChange={(v) => play({ languages: v })} />
         </div>
-        <LinedText label="Inventory" value={c.play.inventory} onChange={(v) => play({ inventory: v })} />
+        <Inventory c={c} update={update} />
         <LinedText label="Notes" value={c.play.notes} onChange={(v) => play({ notes: v })} />
       </div>
+    </div>
+  );
+}
+
+const INVENTORY_LINES = 9;
+
+/**
+ * The inventory, one item per line. Armour, shields and weapons have a tick box to equip or
+ * unequip them; equipped armour sets the AC row and equipped weapons fill the weapon rows.
+ */
+function Inventory({ c, update }: { c: Character; update: Update }) {
+  const lines = [...c.play.inventory];
+  const shown = Math.max(INVENTORY_LINES, lines.length + 1);
+  const setLine = (i: number, text: string) =>
+    update((ch) => {
+      const next = [...ch.play.inventory];
+      next[i] = text;
+      while (next.length > 0 && next[next.length - 1]!.trim() === "") next.pop();
+      return { ...ch, play: { ...ch.play, inventory: next.map((l) => l ?? "") } };
+    });
+  return (
+    <div class="lined inventory">
+      <div class="no-print">
+        {Array.from({ length: shown }, (_, i) => {
+          const line = lines[i] ?? "";
+          const item = equippable(line);
+          const on = item ? isEquipped(c, item) : false;
+          const why = item ? equipBlocked(c, item) : null;
+          return (
+            <div key={i} class={on ? "inv-row on" : "inv-row"}>
+              {item ? (
+                <input
+                  type="checkbox"
+                  class="ck"
+                  aria-label={`${item.name} equipped`}
+                  title={why ?? (on ? "Equipped: untick to unequip" : "Tick to equip")}
+                  checked={on}
+                  disabled={why !== null}
+                  onChange={() => update((ch) => toggleEquip(ch, item))}
+                />
+              ) : (
+                <span class="ck-pad" />
+              )}
+              <input class="in ln" type="text" aria-label={`Inventory line ${i + 1}`} value={line} onInput={(e) => setLine(i, (e.target as HTMLInputElement).value)} />
+            </div>
+          );
+        })}
+      </div>
+      <div class="print-only lines-text">{lines.join("\n")}</div>
     </div>
   );
 }
@@ -342,7 +405,7 @@ function WeaponTable({ title, ranged, rows, options, onChange }: { title: string
         {rows.map(({ row, line }, i) => [
           <select key={`n${i}`} class="b in" aria-label={`${title} ${i + 1}`} value={row.name} onChange={(e) => onChange(i, { ...row, name: (e.target as HTMLSelectElement).value })}>
             <option value="" />
-            {options.map((o) => (
+            {[...new Set([...options.filter((o) => !rows.some((r, j) => j !== i && r.row.name === o)), ...(row.name ? [row.name] : [])])].map((o) => (
               <option key={o} value={o}>
                 {o}
               </option>

@@ -13,7 +13,7 @@ import {
   type Stat,
 } from "../rules";
 import { finalScores, racialModifiers, type StatRoll } from "../engine/abilities";
-import { optionsFor, slotsFor, weaponsFor, type Slot } from "../engine/equipment";
+import { optionAvailable, optionsFor, slotsFor, weaponsFor, type Slot } from "../engine/equipment";
 import { multiclassOptions } from "../engine/multiclass";
 import { initialPlay, newId, rolledScores, CHARACTER_FORMAT, type Character, type CharacterEquipment } from "../model/character";
 
@@ -153,6 +153,12 @@ function slotComplete(slot: Slot, picks: string[] | undefined): boolean {
   return true;
 }
 
+/** A chosen option the character may not take (armour too heavy or not allowed for their classes). */
+function optionBlocked(d: Draft, option: string | null): boolean {
+  const s = scores(d);
+  return option !== null && s !== null && !optionAvailable(option, s.STR, d.classes);
+}
+
 export function equipmentFor(d: Draft): CharacterEquipment {
   const result: CharacterEquipment = { armour: null, shield: false, weapons: [] };
   for (const { key, slot } of [...slotsWithKeys("one", d.choiceOne), ...slotsWithKeys("two", d.choiceTwo)]) {
@@ -188,6 +194,7 @@ export function stepComplete(d: Draft, step: StepId): boolean {
       if (!d.equipmentClass) return false;
       const needsTwo = optionsFor(d.equipmentClass).choiceTwo.length > 0;
       if (!d.choiceOne || (needsTwo && !d.choiceTwo) || !d.gold) return false;
+      if (optionBlocked(d, d.choiceOne) || optionBlocked(d, d.choiceTwo)) return false;
       return [...slotsWithKeys("one", d.choiceOne), ...slotsWithKeys("two", d.choiceTwo)].every(({ key, slot }) => slotComplete(slot, d.slotPicks[key]));
     }
     case "spells":

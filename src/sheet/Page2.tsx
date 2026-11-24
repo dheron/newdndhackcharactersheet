@@ -11,7 +11,7 @@ import type { Update } from "./Page1";
 const sign = (n: number) => (n > 0 ? `+${n}` : `${n}`);
 const ordinal = (n: number) => `${n}${n === 1 ? "st" : n === 2 ? "nd" : n === 3 ? "rd" : "th"}`;
 
-export function Page2({ c, caster, update }: { c: Character; caster: Caster; update: Update }) {
+export function Page2({ c, caster, castingOff, update }: { c: Character; caster: Caster; castingOff?: string; update: Update }) {
   const cls = caster.cls;
   const list = spells[cls]?.levels ?? {};
   const layout = PAGE2_LAYOUT[cls];
@@ -176,6 +176,11 @@ export function Page2({ c, caster, update }: { c: Character; caster: Caster; upd
         </div>
       </div>
 
+      {castingOff && (
+        <div class="banner" role="status">
+          No spellcasting: {castingOff}
+        </div>
+      )}
       <div class={showTurnUndead ? "levels with-tu" : "levels"} style={`grid-template-columns:repeat(${layout.columns.length},minmax(0,1fr))`}>
         {layout.columns.map((col, k) => (
           <div key={k} class={isWizard ? "lcol wide" : "lcol"}>

@@ -8,7 +8,8 @@ Where the docs are silent or the app has to read them a certain way. Each needs 
 
 - Armour: the sheet writes AC as '11 + Dex. Mod.'. The app uses the DEX AC Bonus from Ability Score Tables v4 as the Dex. Mod.
 - Armour: Heavy armour lists a flat AC. The app adds no DEX bonus to Heavy armour.
-- Starting equipment names are matched to the tables: 'Chain Mail' = Chain / Banded Mail, 'Light Cross' = Light Crossbow, 'Longsword' = Long Sword, 'Shortsword' = Short Sword, 'Shortbow' = Short Bow, 'Learther Armour' = Leather, 'Scale Mail' = Scale Mail / Brigandine.
+- Starting equipment names are matched to the tables: 'Light Cross' = Light Crossbow, 'Longsword' = Long Sword, 'Shortsword' = Short Sword, 'Shortbow' = Short Bow, 'Learther Armour' = Leather.
+- A name with a slash is two items sharing a row (David): Chain Mail and Banded Mail, Scale Mail and Brigandine, Ranseur and Pike are separate items with the row's values.
 - Starting equipment: 'Thrown weapon' means a weapon with the Thrown trait; 'One-Handed' means a weapon without the Two-Handed trait; 'Melee' means any weapon that is not a bow, crossbow, sling or dart. Ranger's 'One-Handed Martial' is melee only (David). 'Druid weapon' and 'Wizard Weapons' are the class weapon lists in Classes v4. The full mapping is in src/engine/equipment.ts.
 - Attacks: bows, crossbows, slings and darts use DEX to hit and add no damage bonus; every other weapon, including thrown ones, uses STR to hit and adds STR damage (as in the original app).
 - AC with no armour: 10 + DEX AC bonus (Barbarian: 10 + double). The 10 comes from the original app, not a doc.
@@ -33,6 +34,10 @@ Source: David, in chat (not yet in the Drive docs). Kept in `src/rules/data/deci
 - Multiclass starting equipment: The player picks one of their classes and uses that class's starting equipment options.
 - Multiclass level 1 HP: The maximum of each class's hit die, averaged (rounded down), plus the CON bonus.
 - Multiclass HP per class level: HP for a class level is what that class would get (hit die plus that class's own CON bonus: warrior column for warriors, doubled for Barbarian), divided by the number of classes, rounded down, never less than 1. At 1st level every class gains a level at once, using the maximum of each hit die.
+- Class armour: Armour each class may wear, read from the Classes v4 armour text. A multiclass character may wear what any of their classes allows; multiclass restrictions then switch abilities off (Classes v4). Druid non-metal armour: Padded, Leather, Hide and Shield (David).
+  - Fighter: Light, Medium, Heavy, Shield; Barbarian: none, Shield; Paladin: Light, Medium, Heavy, Shield; Ranger: Light, Medium, Shield; Cleric: Light, Medium, Heavy, Shield; Druid: Padded, Leather, Hide, Shield; Bard: Light, Medium, Ring Mail, Chain Mail; Thief: Light; Wizard: none
+- Multiclass restrictions on the sheet: How the sheet applies the Classes v4 multiclass restrictions (David: allow the armour, flag what stops working). Unarmoured means no armour; a shield is not armour.
+  - Ranger: Two-Handed Fighting, Natural Explorer, spellcasting off in Heavy armour; Barbarian: all class abilities off in Light, Medium, Heavy armour; Thief: Backstab, Evasion off in Medium, Heavy armour; Bard: spellcasting off in Heavy armour; Wizard: spellcasting off in Light, Medium, Heavy armour
 - Not on the Abilities list: Class abilities and race traits that are rules rather than abilities are left off the Abilities list (David): Expertise, bonus Experiences, multiclass restrictions, and (applying the same idea) ability score picks, cantrip counts (shown on page 2), and Barbarian's doubled CON and DEX (already in HP and AC). Save bonus traits and the Human XP bonus stay on the list (David). Thieves' Cant is a language.
   - Left off as rules: "Expertise (Pick two experiences, you may double the bonus)"; "Expertise (Pick two more)"; "Expertise (Pick 2 more)"; "2 Cantrips"; "3 Cantrips"; "3rd Cantrip"; "Third Cantrip"; "4th Cantrip"; "5th Cantrips"; "Double Con bonus to HP. Double Dex bonus to AC"; "Bonus Experience Stonecunning: things regarding slopes, new construction, stone traps, and gauging depth underground."; "Gains bonus Experiences in Woodland Stealth and Tracking."; "Gains bonus Experience in Mountain Survival."; "+1 to any two ability scores."; "Two Bonus Experiences."; "+1 to any two ability scores, plus one bonus Experience."
   - Shown as languages: "Thieves Cant’"
@@ -639,7 +644,8 @@ Source: Weapons and Armour (12wbQbJ4gk696MVNLaP_taK80j9Xb374qkDi8E90CU_E)
 | Great Axe | Martial | 50 | S | 1d12 |   | Heavy, Two-Handed |
 | Halberd | Martial | 15 | P/S | 1d10 |   | Heavy, Two-Handed, Reach |
 | Glaive | Martial | 8 | S | 1d10 |   | Heavy, Two-Handed, Reach |
-| Ranseur/Pike | Martial | 7 | P | 1d10 |   | Heavy, Two-Handed, Reach |
+| Ranseur | Martial | 7 | P | 1d10 |   | Heavy, Two-Handed, Reach |
+| Pike | Martial | 7 | P | 1d10 |   | Heavy, Two-Handed, Reach |
 | Bec de Corbin | Martial | 10 | P/B | 1d10 |   | Heavy, Two-Handed, Reach |
 | Long Bow | Martial | 75 | P | 1d8 | 150/600 | Two-Handed |
 | Hand Crossbow | Martial | 300 | P | 1d6 | 30/120 | Light, Loading |
@@ -655,11 +661,13 @@ Source: Weapons and Armour (12wbQbJ4gk696MVNLaP_taK80j9Xb374qkDi8E90CU_E)
 | Studded Leather | Light | 45 | 12 +Dex. Mod. |   |   |
 | Hide | Medium | 10 | 12 + Dex. Mod. (max +2) |   |   |
 | Chain Shirt | Medium | 50 | 13 + Dex. Mod. (max +2) |   |   |
-| Scale Mail / Brigandine | Medium | 50 | 14 + Dex. Mod. (max +2) |   | Disadvantage on Stealth |
+| Scale Mail | Medium | 50 | 14 + Dex. Mod. (max +2) |   | Disadvantage on Stealth |
+| Brigandine | Medium | 50 | 14 + Dex. Mod. (max +2) |   | Disadvantage on Stealth |
 | Breastplate | Medium | 400 | 14 + Dex. Mod. (max +2) |   |   |
 | Halfplate | Medium | 750 | 15 + Dex. Mod. (max +2) |   | Disadvantage on Stealth |
 | Ring Mail | Heavy | 30 | 14 |   | Disadvantage on Stealth |
-| Chain / Banded Mail | Heavy | 75 | 16 | 13 | Disadvantage on Stealth |
+| Chain Mail | Heavy | 75 | 16 | 13 | Disadvantage on Stealth |
+| Banded Mail | Heavy | 75 | 16 | 13 | Disadvantage on Stealth |
 | Splint | Heavy | 200 | 17 | 15 | Disadvantage on Stealth |
 | Plate | Heavy | 1500 | 18 | 15 | Disadvantage on Stealth |
 

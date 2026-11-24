@@ -3,7 +3,7 @@ import { CLASS_NAMES, STATS, raceByName, races, type Stat } from "../src/rules";
 import { multiclassOptions } from "../src/engine/multiclass";
 import { EXPECTED_ROLL, ROLL_METHODS, capWasteChance, clampScore, finalScores, racialModifiers, rollForPick } from "../src/engine/abilities";
 import { fixedRng, seededRng } from "../src/engine/dice";
-import { OPTION_SLOTS, meetsStrength, optionAvailable, optionsFor, slotsFor, weaponByName, weaponsFor, WEAPON_FILTERS, type WeaponFilter } from "../src/engine/equipment";
+import { OPTION_SLOTS, armourChoosable, meetsStrength, optionAvailable, optionsFor, slotsFor, weaponByName, weaponsFor, WEAPON_FILTERS, type WeaponFilter } from "../src/engine/equipment";
 import { armourClass, deriveSheet, hpForClassLevel, level1Hp, statBonuses } from "../src/engine/derive";
 
 const scores = (values: number[]) => Object.fromEntries(STATS.map((s, i) => [s, values[i]!])) as Record<Stat, number>;
@@ -96,8 +96,8 @@ describe("starting equipment", () => {
   });
 
   it("enforces armour Strength requirements", () => {
-    expect(meetsStrength("Chain / Banded Mail", 12)).toBe(false);
-    expect(meetsStrength("Chain / Banded Mail", 13)).toBe(true);
+    expect(meetsStrength("Chain Mail", 12)).toBe(false);
+    expect(meetsStrength("Chain Mail", 13)).toBe(true);
     expect(meetsStrength("Leather", 6)).toBe(true);
     expect(optionAvailable("Chain Mail", 12)).toBe(false);
     expect(optionAvailable("Chain Shirt and Shield", 6)).toBe(true);
@@ -178,6 +178,26 @@ describe("derived sheet values", () => {
   it("works out Wizard spellcasting", () => {
     const sheet = deriveSheet({ race: "Elf (High)", classes: [{ cls: "Wizard", level: 1 }], scores: scores([8, 14, 12, 17, 10, 10]), armour: null, shield: false, weapons: ["Dagger"] });
     expect(sheet.casters[0]).toMatchObject({ spellAttack: 2, potency: -2, potencyKind: "arcane", slots: [2], cantrips: 3, wizardKnown: 6 });
+  });
+});
+
+describe("armour rules", () => {
+  it("splits slash names into separate items with the row's values", () => {
+    expect(weaponByName("Ranseur").damage).toBe(weaponByName("Pike").damage);
+    for (const n of ["Chain Mail", "Banded Mail", "Scale Mail", "Brigandine"]) expect(armourChoosable(n, 18, ["Fighter"]), n).toBe(true);
+    expect(slotsFor("Chain Mail")).toEqual([{ kind: "armour", options: ["Chain Mail"] }]);
+  });
+
+  it("lets every single class take its own starting options with enough STR", () => {
+    for (const cls of CLASS_NAMES) {
+      const o = optionsFor(cls);
+      for (const option of [...o.choiceOne, ...o.choiceTwo]) expect(optionAvailable(option, 18, [cls]), `${cls}: ${option}`).toBe(true);
+    }
+  });
+
+  it("stops a Fighter / Druid taking metal armour from the Fighter's options", () => {
+    expect(optionAvailable("Chain Mail", 18, ["Fighter", "Druid"])).toBe(false);
+    expect(optionAvailable("Leather and Long Bow", 18, ["Fighter", "Druid"])).toBe(true);
   });
 });
 

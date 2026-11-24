@@ -37,7 +37,8 @@ out();
 const gaps = [
   "Armour: the sheet writes AC as '11 + Dex. Mod.'. The app uses the DEX AC Bonus from Ability Score Tables v4 as the Dex. Mod.",
   "Armour: Heavy armour lists a flat AC. The app adds no DEX bonus to Heavy armour.",
-  "Starting equipment names are matched to the tables: 'Chain Mail' = Chain / Banded Mail, 'Light Cross' = Light Crossbow, 'Longsword' = Long Sword, 'Shortsword' = Short Sword, 'Shortbow' = Short Bow, 'Learther Armour' = Leather, 'Scale Mail' = Scale Mail / Brigandine.",
+  "Starting equipment names are matched to the tables: 'Light Cross' = Light Crossbow, 'Longsword' = Long Sword, 'Shortsword' = Short Sword, 'Shortbow' = Short Bow, 'Learther Armour' = Leather.",
+  "A name with a slash is two items sharing a row (David): Chain Mail and Banded Mail, Scale Mail and Brigandine, Ranseur and Pike are separate items with the row's values.",
   "Starting equipment: 'Thrown weapon' means a weapon with the Thrown trait; 'One-Handed' means a weapon without the Two-Handed trait; 'Melee' means any weapon that is not a bow, crossbow, sling or dart. Ranger's 'One-Handed Martial' is melee only (David). 'Druid weapon' and 'Wizard Weapons' are the class weapon lists in Classes v4. The full mapping is in src/engine/equipment.ts.",
   "Attacks: bows, crossbows, slings and darts use DEX to hit and add no damage bonus; every other weapon, including thrown ones, uses STR to hit and adds STR damage (as in the original app).",
   "AC with no armour: 10 + DEX AC bonus (Barbarian: 10 + double). The 10 comes from the original app, not a doc.",
@@ -65,6 +66,10 @@ out(`- Multiclass Experiences: ${decisions.multiclassCreation.experiences}`);
 out(`- Multiclass starting equipment: ${decisions.multiclassCreation.equipment}`);
 out(`- Multiclass level 1 HP: ${decisions.multiclassCreation.level1Hp}`);
 out(`- Multiclass HP per class level: ${decisions.multiclassCreation.conBonus}`);
+out(`- Class armour: ${decisions.classArmour.rule}`);
+out(`  - ${Object.entries(decisions.classArmour.allowed).map(([c, a]) => `${c}: ${[...(a.groups ?? []), ...(a.names ?? [])].join(", ") || "none"}${a.shield ? ", Shield" : ""}`).join("; ")}`);
+out(`- Multiclass restrictions on the sheet: ${decisions.multiclassRestrictions.rule}`);
+out(`  - ${Object.entries(decisions.multiclassRestrictions.classes).map(([c, r]) => `${c}: ${r.abilities === "all" ? "all class abilities" : [...r.abilities, ...(r.spellcasting ? ["spellcasting"] : [])].join(", ")} off in ${r.offIn.join(", ")} armour`).join("; ")}`);
 out(`- Not on the Abilities list: ${decisions.notOnAbilityList.rule}`);
 out(`  - Left off as rules: ${decisions.notOnAbilityList.rules.map((t) => `"${t}"`).join("; ")}`);
 out(`  - Shown as languages: ${decisions.notOnAbilityList.languages.map((t) => `"${t}"`).join("; ")}`);

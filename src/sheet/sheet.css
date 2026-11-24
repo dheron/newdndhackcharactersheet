@@ -807,6 +807,48 @@
   margin: 2px 0 0;
 }
 
+.pg .banner {
+  border: 1.5px solid #111;
+  padding: 4px 8px;
+  font: 700 12px Arial, Helvetica, sans-serif;
+}
+
+.pg .abilities li.off {
+  color: #777;
+}
+
+.pg .abilities li.off .why {
+  font-style: italic;
+}
+
+.pg .inv-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 21px;
+  border-bottom: 1px solid #777;
+  padding-left: 2px;
+}
+
+.pg .inv-row .ck,
+.pg .inv-row .ck-pad {
+  width: 11px;
+  height: 11px;
+  flex: none;
+  cursor: pointer;
+}
+
+.pg .inv-row input.in.ln {
+  border: 0;
+  height: 20px;
+  flex: 1;
+  padding: 0 2px;
+}
+
+.pg .inv-row.on input.in.ln {
+  font-weight: bold;
+}
+
 /* Printing: US Letter, one sheet page per printed page, nothing but the pages. */
 @page {
   size: letter;
@@ -878,6 +920,15 @@
 
   .pg .bx.locked .bh {
     background: #333;
+  }
+
+  /* Slot boxes print blank for the player to mark (David). */
+  .pg .sq.have {
+    background: #fff;
+  }
+
+  .pg .sq-check:checked::after {
+    display: none;
   }
 
   .pg .hdr2 .pot .l {

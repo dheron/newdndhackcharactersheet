@@ -2,7 +2,7 @@ import { useRef, useState } from "preact/hooks";
 import { CLASS_NAMES, STATS, abilitiesUpTo, classes, hitDie, multiclass as multiclassRules, raceByName, races, type ClassName, type Stat } from "../rules";
 import { EXPECTED_ROLL, ROLL_METHODS, capWasteChance, rollForPick } from "../engine/abilities";
 import { rollTotal } from "../engine/dice";
-import { WEAPON_FILTERS, armourByName, meetsStrength, optionAvailable, optionsFor, weaponsFor, type Slot } from "../engine/equipment";
+import { WEAPON_FILTERS, armourByName, armourChoosable, optionAvailable, optionsFor, weaponsFor, type Slot } from "../engine/equipment";
 import { decisions } from "../rules";
 import { classesLabel, multiclassOptions } from "../engine/multiclass";
 import { saveCharacterFileAs, type FilePath } from "../storage";
@@ -518,17 +518,18 @@ function EquipmentStep({ draft, update }: StepProps) {
       <fieldset class="field">
         <legend>{label}</legend>
         {list.map((o) => {
-          const ok = optionAvailable(o, str);
+          const ok = optionAvailable(o, str, draft.classes);
+          const why = ok ? "" : optionAvailable(o, str) ? `Armour not allowed for ${draft.classes.join(" / ")}` : "Needs more STR for the armour";
           return (
             <label key={o} class={ok ? "option" : "option disabled"}>
               <input type="radio" name={`choice-${which}`} checked={value === o} disabled={!ok} onChange={() => choose(which, o)} />
               <span>{o}</span>
-              {!ok && <span class="note"> Needs more STR for the armour</span>}
+              {!ok && <span class="note"> {why}</span>}
             </label>
           );
         })}
         {slotsWithKeys(which, value).map(({ key, slot }) => (
-          <SlotPicker key={key} slot={slot} picks={draft.slotPicks[key] ?? []} str={str} onChange={(p) => update((d) => ({ ...d, slotPicks: { ...d.slotPicks, [key]: p } }))} />
+          <SlotPicker key={key} slot={slot} picks={draft.slotPicks[key] ?? []} str={str} classes={draft.classes} onChange={(p) => update((d) => ({ ...d, slotPicks: { ...d.slotPicks, [key]: p } }))} />
         ))}
       </fieldset>
     );
@@ -554,7 +555,7 @@ function EquipmentStep({ draft, update }: StepProps) {
   );
 }
 
-function SlotPicker({ slot, picks, str, onChange }: { slot: Slot; picks: string[]; str: number; onChange: (p: string[]) => void }) {
+function SlotPicker({ slot, picks, str, classes, onChange }: { slot: Slot; picks: string[]; str: number; classes: ClassName[]; onChange: (p: string[]) => void }) {
   if (slot.kind === "shield") return <p class="slot">Shield</p>;
   if (slot.kind === "weapon") return <p class="slot">{slot.count > 1 ? `${slot.count} x ${slot.name}` : slot.name}</p>;
   if (slot.kind === "armour") {
@@ -575,7 +576,7 @@ function SlotPicker({ slot, picks, str, onChange }: { slot: Slot; picks: string[
             Choose armour
           </option>
           {slot.options.map((o) => (
-            <option key={o} value={o} disabled={!meetsStrength(o, str)}>
+            <option key={o} value={o} disabled={!armourChoosable(o, str, classes)}>
               {o} (AC {armourByName(o).acText})
             </option>
           ))}

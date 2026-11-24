@@ -80,7 +80,7 @@ export function Sheet({ initial, path: initialPath, onClose }: { initial: Charac
       <div class="pages">
         <Page1 c={c} view={view} update={update} />
         {view.casters.map((caster) => (
-          <Page2 key={caster.cls} c={c} caster={caster} update={update} />
+          <Page2 key={caster.cls} c={c} caster={caster} castingOff={view.castingOff[caster.cls]} update={update} />
         ))}
       </div>
     </div>

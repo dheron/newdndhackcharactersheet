@@ -187,7 +187,7 @@ describe("equipment", () => {
     expect(weapons.find((w) => w.name === "Dart")?.type).toBe("P");
     expect(weapons.find((w) => w.name === "Long Bow")?.range).toBe("150/600");
     expect(armour.find((a) => a.name === "Plate")?.baseAC).toBe(18);
-    expect(armour.find((a) => a.name === "Chain / Banded Mail")?.strReq).toBe(13);
+    expect(armour.find((a) => a.name === "Chain Mail")?.strReq).toBe(13);
     expect(armour.find((a) => a.name === "Hide")?.dexCap).toBe(2);
   });
 });

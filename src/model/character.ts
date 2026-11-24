@@ -41,7 +41,8 @@ export interface PlayState {
   melee: WeaponRow[];
   ranged: WeaponRow[];
   languages: string;
-  inventory: string;
+  /** Inventory, one item per line ("2 x Dagger"). Armour, shields and weapons can be equipped from here. */
+  inventory: string[];
   notes: string;
   /** Spell slots spent, per spell level (index 0 = 1st level). */
   /** Spell tracking for each casting class. */
@@ -139,11 +140,19 @@ export function initialPlay(c: Pick<Character, "equipment" | "gold">): PlayState
     melee: padRows(distinct.filter((w) => !isRanged(w)).map(row), MELEE_ROWS),
     ranged: padRows(distinct.filter(isRanged).map(row), RANGED_ROWS),
     languages: "",
-    inventory: inventory.join("\n"),
+    inventory,
     notes: "",
     casting: {},
   };
 }
+
+/** Items that were one combined row before the slash names were split (David). */
+const RENAMED: Record<string, string> = { "Chain / Banded Mail": "Chain Mail", "Scale Mail / Brigandine": "Scale Mail", "Ranseur/Pike": "Ranseur" };
+const rename = (name: string) => RENAMED[name] ?? name;
+const renameLine = (line: string) => {
+  const { count, name } = parseItem(line);
+  return RENAMED[name] ? (count > 1 ? `${count} x ${RENAMED[name]}` : RENAMED[name]!) : line;
+};
 
 type OldFields = { cls?: ClassName; level?: number; cantrips?: string[] | Partial<Record<ClassName, string[]>> };
 type OldPlay = { slotsSpent?: number[]; prepared?: string[]; spellAttackMisc?: number };
@@ -153,6 +162,7 @@ export function fromFileText(text: string): Character {
   if (data.format !== CHARACTER_FORMAT) throw new Error(`Unsupported character file format: ${String(data.format)}`);
   const classes = data.classes ?? (data.cls ? [data.cls] : null);
   if (!data.name || !data.race || !classes?.length || !Array.isArray(data.rolls) || !data.equipment) throw new Error("This file is missing character details.");
+  data.equipment = { ...data.equipment, armour: data.equipment.armour ? rename(data.equipment.armour) : null, weapons: data.equipment.weapons.map(rename) };
   // Files saved before Alignment, play tracking and multiclassing get the defaults.
   const cantrips = Array.isArray(data.cantrips) ? { [classes[0]!]: data.cantrips } : (data.cantrips ?? {});
   const { cls: _cls, level: _level, ...rest } = data;
@@ -173,6 +183,13 @@ export function fromFileText(text: string): Character {
   play.melee = padRows(play.melee, MELEE_ROWS);
   play.ranged = padRows(play.ranged, RANGED_ROWS);
   play.casting = { ...(old.casting ?? {}) };
+  // Inventory used to be one block of text.
+  const inv = old.inventory as unknown;
+  if (typeof inv === "string") play.inventory = inv.split("\n").filter((l) => l.trim() !== "");
+  play.inventory = play.inventory.map(renameLine);
+  play.armour = play.armour ? rename(play.armour) : null;
+  play.melee = play.melee.map((r) => ({ ...r, name: rename(r.name) }));
+  play.ranged = play.ranged.map((r) => ({ ...r, name: rename(r.name) }));
   if (slotsSpent || prepared || spellAttackMisc) play.casting[classes[0]!] = { slotsSpent: slotsSpent ?? [], prepared: prepared ?? [], spellAttackMisc: spellAttackMisc ?? 0 };
   return { ...c, play };
 }
@@ -180,4 +197,10 @@ export function fromFileText(text: string): Character {
 export function fileNameFor(c: Character): string {
   const safe = c.name.trim().replace(/[^\p{L}\p{N} _-]+/gu, "").replace(/\s+/g, " ") || "character";
   return `${safe}.character.json`;
+}
+
+/** "2 x Dagger" -> { count: 2, name: "Dagger" }. */
+export function parseItem(line: string): { count: number; name: string } {
+  const m = /^\s*(\d+)\s*x\s+(.+?)\s*$/i.exec(line);
+  return m ? { count: Number(m[1]), name: m[2]! } : { count: 1, name: line.trim() };
 }

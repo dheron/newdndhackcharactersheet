@@ -5,7 +5,8 @@ import { multiclassOptions } from "../src/engine/multiclass";
 import type { StatRoll } from "../src/engine/abilities";
 import { emptyDraft, toCharacter, withClass, experienceSlots, type Draft } from "../src/creation/draft";
 import { fromFileText, initialPlay, toFileText, MELEE_ROWS, RANGED_ROWS } from "../src/model/character";
-import { alignmentShort, classAndLevel, sheetFor, slotTable, turnUndeadColumn } from "../src/sheet/derived";
+import { alignmentShort, classAndLevel, equipBlocked, equippable, inventoryOf, isEquipped, sheetFor, slotTable, toggleEquip, turnUndeadColumn } from "../src/sheet/derived";
+import { canWear, cannotWearReason, restrictionsFor } from "../src/engine/equipment";
 
 const rolls = (values: number[]): StatRoll[] =>
   STATS.map((stat, pick) => ({ stat, pick, method: "test", dice: [values[pick]!], kept: [values[pick]!], total: values[pick]! }) as StatRoll);
@@ -35,13 +36,13 @@ describe("the sheet from a saved character", () => {
     const play = initialPlay({ equipment: { armour: null, shield: false, weapons: ["Dagger", "Dagger", "Light Crossbow"] }, gold: 4 });
     expect(play.melee.map((r) => r.name)).toEqual(["Dagger", "", "", ""]);
     expect(play.ranged.map((r) => r.name)).toEqual(["Light Crossbow", "", ""]);
-    expect(play.inventory).toBe("2 x Dagger\nLight Crossbow\nGold: 4 gp");
+    expect(play.inventory).toEqual(["2 x Dagger", "Light Crossbow", "Gold: 4 gp"]);
   });
 
   it("keeps the Human XP bonus on the abilities list", () => {
     const c = { ...toCharacter(fighter()), race: "Human", raceChoices: ["STR", "CON"] as ("STR" | "CON")[] };
-    expect(sheetFor(c).abilities).toContain("+20% experience points gained");
-    expect(sheetFor(c).abilities.some((a) => a.startsWith("+1 to any two"))).toBe(false);
+    expect(sheetFor(c).abilities.map((a) => a.text)).toContain("+20% experience points gained");
+    expect(sheetFor(c).abilities.some((a) => a.text.startsWith("+1 to any two"))).toBe(false);
   });
 
   it("adds magic to hit and AC misc to AC", () => {
@@ -73,7 +74,7 @@ describe("the sheet from a saved character", () => {
     expect(opened.alignment).toBe("");
     expect(opened.play.melee).toHaveLength(MELEE_ROWS);
     expect(opened.play.ranged).toHaveLength(RANGED_ROWS);
-    expect(opened.play.inventory).toBe("Chain Shirt\nShield\nLong Sword\nLight Crossbow\nGold: 7 gp");
+    expect(opened.play.inventory).toEqual(["Chain Shirt", "Shield", "Long Sword", "Light Crossbow", "Gold: 7 gp"]);
   });
 
   it("keeps play changes through a save", () => {
@@ -90,9 +91,9 @@ describe("a multiclass sheet", () => {
     expect(classAndLevel({ ...c, classes: [...c.classes] })).toBe("Cleric 1 / Wizard 1");
     expect(v.hitDice.map((h) => h.cls)).toEqual(["Cleric", "Wizard"]);
     expect(v.casters.map((x) => x.cls)).toEqual(["Cleric", "Wizard"]);
-    expect(v.abilities.some((a) => a.startsWith("Cleric: Turn Undead"))).toBe(true);
+    expect(v.abilities.some((a) => a.text.startsWith("Cleric: Turn Undead"))).toBe(true);
     // Cantrip counts are rules (shown on page 2), not abilities.
-    expect(v.abilities.some((a) => a.includes("Cantrip"))).toBe(false);
+    expect(v.abilities.some((a) => a.text.includes("Cantrip"))).toBe(false);
   });
 });
 
@@ -106,10 +107,60 @@ describe("abilities list", () => {
     const c = { ...toCharacter(fighter()), classes: ["Thief" as const], levels: [1] };
     const v = sheetFor(c);
     expect(v.languages).toEqual(["Thieves Cant\u2019"]);
-    expect(v.abilities.some((a) => a.startsWith("Thieves Cant") || a.startsWith("Expertise"))).toBe(false);
-    expect(v.abilities).toContain("Backstab (x2 damage)");
+    expect(v.abilities.some((a) => a.text.startsWith("Thieves Cant") || a.text.startsWith("Expertise"))).toBe(false);
+    expect(v.abilities.map((a) => a.text)).toContain("Backstab (x2 damage)");
     // The Dwarf bonus Experience is a rule; save bonus traits stay (David).
-    expect(v.abilities).toEqual(["Backstab (x2 damage)", "Dwarves have darkvision to 60 feet.", "+2 on saves against poison and +2 on Magic Item saves against magic items."]);
+    expect(v.abilities.map((a) => a.text)).toEqual(["Backstab (x2 damage)", "Dwarves have darkvision to 60 feet.", "+2 on saves against poison and +2 on Magic Item saves against magic items."]);
+  });
+});
+
+describe("equipping from the inventory", () => {
+  it("renames the old combined armour and weapon names when opening a file", () => {
+    const c = toCharacter(fighter());
+    const old = { ...c, equipment: { ...c.equipment, armour: "Chain / Banded Mail" }, play: { ...c.play, armour: "Chain / Banded Mail", inventory: ["Chain / Banded Mail", "2 x Ranseur/Pike"] } };
+    const opened = fromFileText(JSON.stringify(old));
+    expect(opened.equipment.armour).toBe("Chain Mail");
+    expect(opened.play.armour).toBe("Chain Mail");
+    expect(opened.play.inventory).toEqual(["Chain Mail", "2 x Ranseur"]);
+  });
+
+  it("equips and unequips armour, shields and weapons", () => {
+    let c = toCharacter(fighter());
+    c = { ...c, play: { ...c.play, inventory: [...c.play.inventory, "Plate", "2 x Dagger"] } };
+    expect(inventoryOf(c, "armour")).toEqual(["Chain Shirt", "Plate"]);
+    expect(isEquipped(c, { kind: "armour", name: "Chain Shirt" })).toBe(true);
+    c = toggleEquip(c, { kind: "armour", name: "Plate" });
+    expect(c.play.armour).toBe("Plate");
+    c = toggleEquip(c, { kind: "shield", name: "Shield" });
+    expect(c.play.shield).toBe(false);
+    const dagger = equippable("2 x Dagger")!;
+    expect(dagger).toEqual({ kind: "melee", name: "Dagger" });
+    c = toggleEquip(c, dagger);
+    expect(c.play.melee.map((r) => r.name)).toEqual(["Long Sword", "Dagger", "", ""]);
+    c = toggleEquip(c, dagger);
+    expect(c.play.melee.map((r) => r.name)).toEqual(["Long Sword", "", "", ""]);
+    expect(equippable("Rope")).toBeNull();
+  });
+
+  it("blocks armour the classes cannot wear, and Druids never wear metal", () => {
+    const wiz = { ...toCharacter(fighter()), classes: ["Wizard" as const], levels: [1] };
+    expect(equipBlocked(wiz, { kind: "armour", name: "Leather" })).not.toBeNull();
+    const fd = { ...toCharacter(fighter()), classes: ["Fighter" as const, "Druid" as const], levels: [1, 1] };
+    expect(canWear(fd.classes, "Chain Mail")).toBe(false);
+    expect(canWear(fd.classes, "Hide")).toBe(true);
+    expect(canWear(fd.classes, "Shield")).toBe(true);
+    expect(cannotWearReason(fd.classes, "Plate")).toMatch(/non-metal/);
+  });
+
+  it("flags abilities and spellcasting a multiclass restriction switches off", () => {
+    const base = toCharacter(fighter());
+    const fw = { ...base, classes: ["Fighter" as const, "Wizard" as const], levels: [1, 1], play: { ...base.play, armour: "Chain Mail" } };
+    expect(sheetFor(fw).castingOff.Wizard).toMatch(/heavy armour/);
+    expect(sheetFor({ ...fw, play: { ...fw.play, armour: null } }).castingOff.Wizard).toBeUndefined();
+    const ft = { ...base, classes: ["Fighter" as const, "Thief" as const], levels: [1, 1], play: { ...base.play, armour: "Chain Shirt" } };
+    const backstab = sheetFor(ft).abilities.find((a) => a.text.startsWith("Thief: Backstab"))!;
+    expect(backstab.off).toMatch(/medium armour/);
+    expect(restrictionsFor(["Fighter"], "Plate")).toEqual([]);
   });
 });
 

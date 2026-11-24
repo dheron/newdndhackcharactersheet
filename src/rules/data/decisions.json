@@ -20,6 +20,30 @@
     "level1Hp": "The maximum of each class's hit die, averaged (rounded down), plus the CON bonus.",
     "conBonus": "HP for a class level is what that class would get (hit die plus that class's own CON bonus: warrior column for warriors, doubled for Barbarian), divided by the number of classes, rounded down, never less than 1. At 1st level every class gains a level at once, using the maximum of each hit die."
   },
+  "classArmour": {
+    "rule": "Armour each class may wear, read from the Classes v4 armour text. A multiclass character may wear what any of their classes allows; multiclass restrictions then switch abilities off (Classes v4). Druid non-metal armour: Padded, Leather, Hide and Shield (David).",
+    "allowed": {
+      "Fighter": { "groups": ["Light", "Medium", "Heavy"], "shield": true },
+      "Barbarian": { "groups": [], "shield": true },
+      "Paladin": { "groups": ["Light", "Medium", "Heavy"], "shield": true },
+      "Ranger": { "groups": ["Light", "Medium"], "shield": true },
+      "Cleric": { "groups": ["Light", "Medium", "Heavy"], "shield": true },
+      "Druid": { "names": ["Padded", "Leather", "Hide"], "shield": true },
+      "Bard": { "groups": ["Light", "Medium"], "names": ["Ring Mail", "Chain Mail"], "shield": false },
+      "Thief": { "groups": ["Light"], "shield": false },
+      "Wizard": { "groups": [], "shield": false }
+    }
+  },
+  "multiclassRestrictions": {
+    "rule": "How the sheet applies the Classes v4 multiclass restrictions (David: allow the armour, flag what stops working). Unarmoured means no armour; a shield is not armour.",
+    "classes": {
+      "Ranger": { "abilities": ["Two-Handed Fighting", "Natural Explorer"], "spellcasting": true, "offIn": ["Heavy"] },
+      "Barbarian": { "abilities": "all", "spellcasting": false, "offIn": ["Light", "Medium", "Heavy"] },
+      "Thief": { "abilities": ["Backstab", "Evasion"], "spellcasting": false, "offIn": ["Medium", "Heavy"] },
+      "Bard": { "abilities": [], "spellcasting": true, "offIn": ["Heavy"] },
+      "Wizard": { "abilities": [], "spellcasting": true, "offIn": ["Light", "Medium", "Heavy"] }
+    }
+  },
   "notOnAbilityList": {
     "rule": "Class abilities and race traits that are rules rather than abilities are left off the Abilities list (David): Expertise, bonus Experiences, multiclass restrictions, and (applying the same idea) ability score picks, cantrip counts (shown on page 2), and Barbarian's doubled CON and DEX (already in HP and AC). Save bonus traits and the Human XP bonus stay on the list (David). Thieves' Cant is a language.",
     "rules": [

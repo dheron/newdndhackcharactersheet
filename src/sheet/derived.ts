@@ -4,7 +4,70 @@ import { finalScores, racialModifiers } from "../engine/abilities";
 import { armourClass, deriveSheet, weaponLine, type ClassLevel } from "../engine/derive";
 import { classesLabel } from "../engine/multiclass";
 import { experienceSlotsFor } from "../creation/draft";
-import { rolledScores, type Character, type WeaponRow } from "../model/character";
+import { parseItem, rolledScores, type Character, type WeaponRow } from "../model/character";
+import { armour as armourList, weapons as weaponList } from "../rules";
+import { cannotWearReason, isRangedWeapon, restrictionsFor, type Restriction } from "../engine/equipment";
+
+export type ItemKind = "armour" | "shield" | "melee" | "ranged";
+
+const lower = (s: string) => s.trim().toLowerCase();
+
+/** What an inventory line is, if it is something the character can equip. */
+export function equippable(line: string): { kind: ItemKind; name: string } | null {
+  const { name } = parseItem(line);
+  const a = armourList.find((x) => lower(x.name) === lower(name) && (x.baseAC !== null || x.group === "Shield"));
+  if (a) return { kind: a.group === "Shield" ? "shield" : "armour", name: a.name };
+  const w = weaponList.find((x) => lower(x.name) === lower(name));
+  if (w) return { kind: isRangedWeapon(w) ? "ranged" : "melee", name: w.name };
+  return null;
+}
+
+export function isEquipped(c: Character, item: { kind: ItemKind; name: string }): boolean {
+  if (item.kind === "armour") return c.play.armour === item.name;
+  if (item.kind === "shield") return c.play.shield;
+  return (item.kind === "melee" ? c.play.melee : c.play.ranged).some((r) => r.name === item.name);
+}
+
+/** Equip or unequip an inventory item. Equipping a weapon uses the first empty row of its kind. */
+export function toggleEquip(c: Character, item: { kind: ItemKind; name: string }): Character {
+  const play = { ...c.play };
+  const on = isEquipped(c, item);
+  if (item.kind === "armour") play.armour = on ? null : item.name;
+  else if (item.kind === "shield") play.shield = !on;
+  else {
+    const key = item.kind;
+    const rows = play[key].map((r) => ({ ...r }));
+    if (on) {
+      const i = rows.findIndex((r) => r.name === item.name);
+      rows[i] = { name: "", magic: 0, note: "" };
+    } else {
+      const i = rows.findIndex((r) => !r.name);
+      if (i < 0) return c;
+      rows[i] = { name: item.name, magic: 0, note: "" };
+    }
+    play[key] = rows;
+  }
+  return { ...c, play };
+}
+
+/** Why an item cannot be equipped right now, or null. */
+export function equipBlocked(c: Character, item: { kind: ItemKind; name: string }): string | null {
+  if (isEquipped(c, item)) return null;
+  if (item.kind === "armour" || item.kind === "shield") return cannotWearReason(c.classes, item.name);
+  const rows = item.kind === "melee" ? c.play.melee : c.play.ranged;
+  return rows.some((r) => !r.name) ? null : `No free ${item.kind} weapon row`;
+}
+
+/** Inventory items of a kind, for the armour and weapon dropdowns (each name once). */
+export function inventoryOf(c: Character, kind: ItemKind): string[] {
+  const names = c.play.inventory.map(equippable).filter((x): x is { kind: ItemKind; name: string } => x !== null && x.kind === kind).map((x) => x.name);
+  return [...new Set(names)];
+}
+
+function abilityOff(restrictions: Restriction[], cls: ClassName, text: string): string | null {
+  const r = restrictions.find((x) => x.cls === cls && (x.abilities === "all" || x.abilities.some((name) => text.startsWith(name))));
+  return r ? r.reason : null;
+}
 
 export function characterScores(c: Character): Record<Stat, number> {
   return finalScores(rolledScores(c.rolls), racialModifiers(raceByName(c.race), c.raceChoices));
@@ -54,6 +117,7 @@ export function sheetFor(c: Character) {
   // The CON column(s) the character's classes use, for the HP per hit die box.
   const conColumns = [...new Set(c.classes.map((cls) => (isWarrior(cls) ? sheet.bonuses.hpPerHitDieWarrior : sheet.bonuses.hpPerHitDie)))];
   const multi = c.classes.length > 1;
+  const restrictions = restrictionsFor(c.classes, c.play.armour);
   return {
     scores,
     ...sheet,
@@ -63,7 +127,12 @@ export function sheetFor(c: Character) {
     melee: rows(c.play.melee),
     ranged: rows(c.play.ranged),
     experiences: [...fixed, ...c.experiences],
-    abilities: [...sheet.classAbilities.filter((a) => isAbility(a.text)).map((a) => (multi ? `${a.cls}: ${a.text}` : a.text)), ...sheet.raceTraits.filter(isAbility)],
+    abilities: [
+      ...sheet.classAbilities.filter((a) => isAbility(a.text)).map((a) => ({ text: multi ? `${a.cls}: ${a.text}` : a.text, off: abilityOff(restrictions, a.cls, a.text) })),
+      ...sheet.raceTraits.filter(isAbility).map((text) => ({ text, off: null as string | null })),
+    ],
+    /** Spellcasting switched off by armour, per class, with the reason. */
+    castingOff: Object.fromEntries(restrictions.filter((r) => r.spellcasting).map((r) => [r.cls, r.reason])) as Partial<Record<ClassName, string>>,
     /** Languages that come from class abilities (Thieves' Cant). */
     languages: sheet.classAbilities.map((a) => a.text).filter((t) => LANGUAGES.has(t)),
   };

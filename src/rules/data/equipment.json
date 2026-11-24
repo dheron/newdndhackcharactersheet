@@ -1,6 +1,6 @@
 {
   "source": "Weapons and Armour (12wbQbJ4gk696MVNLaP_taK80j9Xb374qkDi8E90CU_E)",
-  "note": "Copied from the sheet. null means the cell is empty in the sheet. Damage with a slash is one-handed/two-handed for Versatile weapons. AC is written as in the sheet; the app reads 'Dex. Mod.' as the DEX AC Bonus from Ability Score Tables v4.",
+  "note": "Copied from the sheet. null means the cell is empty in the sheet. Damage with a slash is one-handed/two-handed for Versatile weapons. A name with a slash is two items sharing a row (David): 'Chain / Banded Mail', 'Scale Mail / Brigandine' and 'Ranseur/Pike' are split into separate items with the row's values; sheetRow keeps the sheet's text. AC is written as in the sheet; the app reads 'Dex. Mod.' as the DEX AC Bonus from Ability Score Tables v4.",
   "weapons": [
     { "name": "Club", "category": "Simple", "cost": 3, "type": "B", "damage": "1d6", "range": null, "traits": [] },
     { "name": "Dagger", "category": "Simple", "cost": 2, "type": "P/S", "damage": "1d4", "range": "20/60", "traits": ["Light", "Thrown"] },
@@ -34,7 +34,8 @@
     { "name": "Great Axe", "category": "Martial", "cost": 50, "type": "S", "damage": "1d12", "range": null, "traits": ["Heavy", "Two-Handed"] },
     { "name": "Halberd", "category": "Martial", "cost": 15, "type": "P/S", "damage": "1d10", "range": null, "traits": ["Heavy", "Two-Handed", "Reach"] },
     { "name": "Glaive", "category": "Martial", "cost": 8, "type": "S", "damage": "1d10", "range": null, "traits": ["Heavy", "Two-Handed", "Reach"] },
-    { "name": "Ranseur/Pike", "category": "Martial", "cost": 7, "type": "P", "damage": "1d10", "range": null, "traits": ["Heavy", "Two-Handed", "Reach"] },
+    { "name": "Ranseur", "sheetRow": "Ranseur/Pike", "category": "Martial", "cost": 7, "type": "P", "damage": "1d10", "range": null, "traits": ["Heavy", "Two-Handed", "Reach"] },
+    { "name": "Pike", "sheetRow": "Ranseur/Pike", "category": "Martial", "cost": 7, "type": "P", "damage": "1d10", "range": null, "traits": ["Heavy", "Two-Handed", "Reach"] },
     { "name": "Bec de Corbin", "category": "Martial", "cost": 10, "type": "P/B", "damage": "1d10", "range": null, "traits": ["Heavy", "Two-Handed", "Reach"] },
     { "name": "Long Bow", "category": "Martial", "cost": 75, "type": "P", "damage": "1d8", "range": "150/600", "traits": ["Two-Handed"] },
     { "name": "Hand Crossbow", "category": "Martial", "cost": 300, "type": "P", "damage": "1d6", "range": "30/120", "traits": ["Light", "Loading"] },
@@ -47,11 +48,13 @@
     { "name": "Studded Leather", "group": "Light", "cost": 45, "acText": "12 +Dex. Mod.", "baseAC": 12, "acBonus": null, "dexCap": null, "strReq": null, "notes": null },
     { "name": "Hide", "group": "Medium", "cost": 10, "acText": "12 + Dex. Mod. (max +2)", "baseAC": 12, "acBonus": null, "dexCap": 2, "strReq": null, "notes": null },
     { "name": "Chain Shirt", "group": "Medium", "cost": 50, "acText": "13 + Dex. Mod. (max +2)", "baseAC": 13, "acBonus": null, "dexCap": 2, "strReq": null, "notes": null },
-    { "name": "Scale Mail / Brigandine", "group": "Medium", "cost": 50, "acText": "14 + Dex. Mod. (max +2)", "baseAC": 14, "acBonus": null, "dexCap": 2, "strReq": null, "notes": "Disadvantage on Stealth" },
+    { "name": "Scale Mail", "sheetRow": "Scale Mail / Brigandine", "group": "Medium", "cost": 50, "acText": "14 + Dex. Mod. (max +2)", "baseAC": 14, "acBonus": null, "dexCap": 2, "strReq": null, "notes": "Disadvantage on Stealth" },
+    { "name": "Brigandine", "sheetRow": "Scale Mail / Brigandine", "group": "Medium", "cost": 50, "acText": "14 + Dex. Mod. (max +2)", "baseAC": 14, "acBonus": null, "dexCap": 2, "strReq": null, "notes": "Disadvantage on Stealth" },
     { "name": "Breastplate", "group": "Medium", "cost": 400, "acText": "14 + Dex. Mod. (max +2)", "baseAC": 14, "acBonus": null, "dexCap": 2, "strReq": null, "notes": null },
     { "name": "Halfplate", "group": "Medium", "cost": 750, "acText": "15 + Dex. Mod. (max +2)", "baseAC": 15, "acBonus": null, "dexCap": 2, "strReq": null, "notes": "Disadvantage on Stealth" },
     { "name": "Ring Mail", "group": "Heavy", "cost": 30, "acText": "14", "baseAC": 14, "acBonus": null, "dexCap": 0, "strReq": null, "notes": "Disadvantage on Stealth" },
-    { "name": "Chain / Banded Mail", "group": "Heavy", "cost": 75, "acText": "16", "baseAC": 16, "acBonus": null, "dexCap": 0, "strReq": 13, "notes": "Disadvantage on Stealth" },
+    { "name": "Chain Mail", "sheetRow": "Chain / Banded Mail", "group": "Heavy", "cost": 75, "acText": "16", "baseAC": 16, "acBonus": null, "dexCap": 0, "strReq": 13, "notes": "Disadvantage on Stealth" },
+    { "name": "Banded Mail", "sheetRow": "Chain / Banded Mail", "group": "Heavy", "cost": 75, "acText": "16", "baseAC": 16, "acBonus": null, "dexCap": 0, "strReq": 13, "notes": "Disadvantage on Stealth" },
     { "name": "Splint", "group": "Heavy", "cost": 200, "acText": "17", "baseAC": 17, "acBonus": null, "dexCap": 0, "strReq": 15, "notes": "Disadvantage on Stealth" },
     { "name": "Plate", "group": "Heavy", "cost": 1500, "acText": "18", "baseAC": 18, "acBonus": null, "dexCap": 0, "strReq": 15, "notes": "Disadvantage on Stealth" }
   ],
