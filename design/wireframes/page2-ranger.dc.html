@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Ranger page two</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#fff}
+a{color:#111}a:hover{color:#444}
+.pg *{box-sizing:border-box}
+.pg > div{flex-shrink:0}
+.l{font:400 10px/12px Arial,Helvetica,sans-serif;color:#444;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-align:center}
+.b{border:1.5px solid #111;background:#fff}
+.op{font:700 15px Arial,Helvetica,sans-serif;padding-top:14px;width:10px;text-align:center}
+.sh{background:#333;color:#fff;font:700 12px/22px Arial,Helvetica,sans-serif;letter-spacing:.06em;text-transform:uppercase;padding:0 8px;height:22px;text-align:center}
+.bx{border:1.5px solid #111;display:flex;flex-direction:column}
+.bh{background:#333;color:#fff;padding:0 6px;height:24px;font:700 12px/24px Arial,Helvetica,sans-serif;letter-spacing:.06em;text-transform:uppercase}
+.sb2{padding:2px 6px;border-bottom:1px solid #111;height:30px;display:flex;flex-direction:column;justify-content:center;gap:2px}
+.sb1{padding:0 6px;border-bottom:1px solid #111;height:18px;display:flex;align-items:center;gap:3px;font:400 9px Arial,Helvetica,sans-serif;text-transform:uppercase;color:#444}
+.sbr{display:flex;align-items:center;gap:3px;font:400 9px/11px Arial,Helvetica,sans-serif;text-transform:uppercase;color:#444}
+.sbr .t{width:32px}
+.sq{width:10px;height:10px;border:1.2px solid #111}
+.rw{display:flex;align-items:center;gap:5px;padding:0 6px;font:400 11px Arial,Helvetica,sans-serif;white-space:nowrap;overflow:hidden;border-bottom:1px solid #e2e2e2}
+.ck{width:9px;height:9px;border:1px solid #111;flex:none}
+.wl{display:flex;align-items:flex-end;height:18px;padding:0 6px}
+.wl .nm{flex:1;border-bottom:1px solid #999;height:17px}
+.tu{width:100%;border-collapse:collapse;font:400 11px/14px Arial,Helvetica,sans-serif;text-align:center}
+.tu th{font:700 10px/14px Arial,Helvetica,sans-serif;border-bottom:1.5px solid #111;padding:1px 0}
+.tu td{border-bottom:1px solid #ccc;padding:0;height:14px}
+.tu td:first-child,.tu th:first-child{text-align:left;padding-left:4px;font-weight:700}
+</style>
+</helmet>
+<div class="pg" style="width:816px;height:1056px;box-sizing:border-box;padding:40px;display:flex;flex-direction:column;gap:12px;background:#fff;color:#111;font-family:Arial,Helvetica,sans-serif">
+
+<div style="border:1.5px solid #111;padding:6px 8px;display:flex;align-items:flex-start;gap:6px">
+<div style="flex:2"><div class="l">Name</div><div class="b" style="height:30px"></div></div>
+<div style="flex:1.6"><div class="l">Class and level</div><div class="b" style="height:30px"></div></div>
+<div style="width:10px"></div>
+<div style="width:48px"><div class="l">Spell atk</div><div class="b" style="height:30px;border-width:3px"></div></div>
+<div class="op">=</div>
+<div style="width:36px"><div class="l">Base</div><div class="b" style="height:30px"></div></div>
+<div class="op">+</div>
+<div style="width:36px"><div class="l">Misc</div><div class="b" style="height:30px"></div></div>
+<div style="width:10px"></div>
+<div style="width:84px"><div class="l">{{potency}}</div><div class="b" style="height:30px;border-width:3px"></div></div>
+</div>
+
+<div style="{{gridStyle}}">
+<sc-for list="{{cols}}" as="c" hint-placeholder-count="3">
+<div style="display:flex;flex-direction:column;gap:8px">
+<sc-for list="{{c.boxes}}" as="bx" hint-placeholder-count="3">
+<div class="bx">
+<div class="bh">{{bx.title}}</div>
+<sc-if value="{{bx.two}}" hint-placeholder-val="{{true}}"><div class="sb2"><div class="sbr"><span class="t">Slots</span><sc-for list="{{bx.slots}}" as="s" hint-placeholder-count="5"><div class="sq"></div></sc-for></div><div class="sbr"><span class="t">Spent</span><sc-for list="{{bx.slots}}" as="s" hint-placeholder-count="5"><div class="sq"></div></sc-for></div></div></sc-if>
+<sc-if value="{{bx.one}}" hint-placeholder-val="{{false}}"><div class="sb1"><span>Slots</span><sc-for list="{{bx.slots}}" as="s" hint-placeholder-count="4"><div class="sq"></div></sc-for><span style="margin-left:12px">Spent</span><sc-for list="{{bx.slots}}" as="s" hint-placeholder-count="4"><div class="sq"></div></sc-for></div></sc-if>
+<div style="padding:3px 0">
+<sc-for list="{{bx.blank}}" as="w" hint-placeholder-count="0"><div class="wl"><div class="nm"></div></div></sc-for>
+<sc-for list="{{bx.spells}}" as="sp" hint-placeholder-count="10"><div class="rw" style="{{rowStyle}}"><div class="ck"></div><span>{{sp.n}}</span></div></sc-for>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-for>
+</div>
+
+<sc-if value="{{showTU}}" hint-placeholder-val="{{false}}">
+<div style="flex:1;min-height:0;overflow:hidden">
+<div class="sh">Turn undead</div>
+<table class="tu">
+<thead><tr><th>DL</th><sc-for list="{{tuHead}}" as="h" hint-placeholder-count="12"><th>{{h}}</th></sc-for></tr></thead>
+<tbody>
+<sc-for list="{{tuRows}}" as="r" hint-placeholder-count="12"><tr><td>{{r.dl}}</td><sc-for list="{{r.v}}" as="x" hint-placeholder-count="12"><td>{{x}}</td></sc-for></tr></sc-for>
+</tbody>
+</table>
+<div style="font:400 10px/13px Arial;color:#444;margin-top:4px">Roll 1d20, meet or beat the number. T: turned. D: destroyed. -: cannot turn. A success affects 2d6 undead, lowest DL first. *: 2d4 more are turned. One attempt per encounter. Paladins use the column two levels lower.</div>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":816,"height":1056}}'>
+class Component extends DCLogic {
+renderVals() {
+// CONFIG: Ranger. Spell lists copied from the Ranger Spellbook. Max slots per level from the Classes doc.
+const CFG = {
+potency: 'Divine potency', columns: 2, rowH: 20, showTU: false, twoLineSlots: false,
+cols: [
+[['1st level', 4, ['Absorb Elements', 'Alarm', 'Beast Bond', 'Cure Wounds', 'Detect Magic', 'Detect Poison and Disease', 'Enhance Ability', 'Ensnaring Strike', 'Entangle', 'Fog Cloud', 'Hail of Thorns', "Hunter's Mark", 'Invisibility to Animals', 'Jump', 'Locate Animals or Plants', 'Longstrider', 'Speak with Animals', 'Zephyr Strike']], ['2nd level', 3, ['Aid', 'Animal Messenger', 'Barkskin', 'Charm Person or Mammal', 'Cordon of Arrows', 'Darkvision', 'Find Traps', 'Goodberry', 'Gust of Wind', 'Lesser Restoration', 'Magic Weapon', 'Protection from Poison', 'Silence']]],
+[['3rd level', 3, ['Conjure Animals', 'Conjure Barrage', 'Daylight', 'Elemental Weapon', 'Flame Arrows', 'Hold Animal', 'Lightning Arrow', 'Meld into Stone', 'Nondetection', 'Plant Growth', 'Protection from Energy', 'Snare', 'Speak with Plants', 'Spike Growth', 'Water Breathing', 'Water Walk', 'Wind Wall']], ['4th level', 3, ['Conjure Woodland Beings', 'Dominate Beast', 'Freedom of Movement', 'Grasping Vine', 'Locate Creature', 'Stoneskin']], ['5th level', 2, ['Commune with Nature', 'Conjure Volley', 'Greater Restoration', 'Steel Wind Strike', 'Swift Quiver', 'Tree Stride', 'Wrath of Nature']]]
+]
+};
+const arr = (n) => Array.from({ length: n }, (_, i) => ({ i }));
+const cols = CFG.cols.map((boxes) => ({
+boxes: boxes.map(([title, slots, spells, blank]) => ({
+title,
+slots: arr(slots),
+two: slots > 0 && CFG.twoLineSlots,
+one: slots > 0 && !CFG.twoLineSlots,
+spells: spells.map((n) => ({ n })),
+blank: arr(blank || 0)
+}))
+}));
+const gridStyle = 'display:grid;grid-template-columns:repeat(' + CFG.columns + ',minmax(0,1fr));gap:12px;align-items:start;' + (CFG.showTU ? 'height:663px' : 'flex:1;min-height:0');
+const rowStyle = 'height:' + CFG.rowH + 'px';
+const tuHead = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10-11', '12-13', '14+'];
+const d = '-';
+const tuRows = [
+['1/4 & 1/2', ['10', '7', '4', 'T', 'T', 'D', 'D', 'D*', 'D*', 'D*', 'D*', 'D*']],
+['1', ['13', '10', '7', '4', 'T', 'T', 'D', 'D', 'D*', 'D*', 'D*', 'D*']],
+['2', ['16', '13', '10', '7', '4', 'T', 'T', 'D', 'D', 'D*', 'D*', 'D*']],
+['3', ['19', '16', '13', '10', '7', '4', 'T', 'T', 'D', 'D', 'D*', 'D*']],
+['4', ['20', '19', '16', '13', '10', '7', '4', 'T', 'T', 'D', 'D', 'D*']],
+['5', [d, '20', '19', '16', '13', '10', '7', '4', 'T', 'T', 'D', 'D']],
+['6', [d, d, '20', '19', '16', '13', '10', '7', '4', 'T', 'T', 'D']],
+['7', [d, d, d, '20', '19', '16', '13', '10', '7', '4', 'T', 'T']],
+['8', [d, d, d, d, '20', '19', '16', '13', '10', '7', '4', 'T']],
+['9', [d, d, d, d, d, '20', '19', '16', '13', '10', '7', '4']],
+['10', [d, d, d, d, d, d, '20', '19', '16', '13', '10', '7']],
+['11+', [d, d, d, d, d, d, d, '20', '19', '16', '13', '10']]
+].map(([dl, v]) => ({ dl, v }));
+return { potency: CFG.potency, cols, gridStyle, rowStyle, showTU: CFG.showTU, tuHead, tuRows };
+}
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Character Generator</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#1a1612;--surface:#241f19;--surface2:#2e2720;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --gold:#c9a84c;--gold-light:#e8c97a;--gold-dim:rgba(201,168,76,0.15);--gold-dim2:rgba(201,168,76,0.25);
+  --text:#f0e8d8;--text2:#a89880;--text3:#6b5f52;
+  --red:#c0392b;--amber:#c07830;--green:#4a9c6a;--green-bg:rgba(74,156,106,0.15);
+  --radius:10px;--radius-sm:6px;
+  --font:'Georgia',serif;--font-ui:system-ui,-apple-system,sans-serif;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-ui);min-height:100vh;}
+.page-header{background:var(--surface);border-bottom:1px solid var(--border2);padding:1.25rem 1rem 1rem;text-align:center;}
+.page-title{font-family:var(--font);font-size:clamp(20px,5vw,30px);color:var(--gold);letter-spacing:0.04em;font-weight:normal;}
+.page-subtitle{font-size:13px;color:var(--text2);margin-top:4px;}
+.container{max-width:560px;margin:0 auto;padding:1rem;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1rem;margin-bottom:0.75rem;}
+.card-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);margin-bottom:0.75rem;}
+.step-indicator{display:flex;gap:5px;margin-bottom:1rem;padding-top:0.25rem;}
+.step-dot{flex:1;height:3px;border-radius:2px;background:var(--border2);}
+.step-dot.done{background:var(--gold);}.step-dot.active{background:var(--gold-light);}
+.summary-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:0.65rem 1rem;margin-bottom:0.5rem;display:flex;justify-content:space-between;align-items:flex-start;cursor:pointer;}
+.summary-card:hover{border-color:var(--border2);}
+.summary-left .summary-label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:2px;}
+.summary-left .summary-value{font-size:13px;color:var(--text);line-height:1.4;}
+.summary-edit{font-size:11px;color:var(--text3);padding-top:2px;flex-shrink:0;margin-left:8px;}
+select,input[type=text]{width:100%;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-ui);font-size:15px;padding:10px 12px;}
+select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a89880' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;cursor:pointer;}
+select:focus,input[type=text]:focus{outline:2px solid var(--gold);outline-offset:2px;}
+input[type=text]::placeholder{color:var(--text3);}
+.race-desc{font-size:13px;color:var(--text2);margin-top:0.6rem;line-height:1.5;}
+.race-abilities{margin-top:0.5rem;display:flex;flex-wrap:wrap;gap:6px;}
+.ability-tag{font-size:11px;background:var(--gold-dim);color:var(--gold);border:1px solid rgba(201,168,76,0.2);border-radius:20px;padding:2px 10px;white-space:nowrap;cursor:default;position:relative;user-select:none;}
+.ability-tag:hover .ability-tooltip,.ability-tag.tooltip-open .ability-tooltip{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0);}
+.ability-tooltip{position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%) translateY(4px);background:#1a1612;border:1px solid var(--border2);border-radius:var(--radius-sm);padding:7px 10px;font-size:12px;color:var(--text);line-height:1.5;width:220px;white-space:normal;opacity:0;pointer-events:none;transition:opacity 0.15s,transform 0.15s;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,0.5);}
+.ability-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:var(--border2);}
+.abilities-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-top:0.5rem;margin-bottom:4px;}
+.btn-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:0.5rem;}
+.stat-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-ui);font-size:14px;font-weight:500;padding:10px 8px;cursor:pointer;transition:background 0.15s,border-color 0.15s;letter-spacing:0.04em;text-align:center;}
+.stat-btn:hover:not(:disabled){background:var(--gold-dim);border-color:var(--gold);color:var(--gold-light);}
+.stat-btn:disabled{opacity:0.25;cursor:not-allowed;}
+.stat-btn.bonus-selected{background:var(--green-bg);border-color:var(--green);color:var(--green);}
+.stat-btn.pending{background:var(--gold-dim2);border-color:var(--gold);color:var(--gold-light);}
+.roll-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.75rem;gap:8px;}
+.badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;letter-spacing:0.04em;white-space:nowrap;flex-shrink:0;}
+.badge-active{background:var(--gold-dim2);color:var(--gold);border:1px solid rgba(201,168,76,0.3);}
+.badge-done{background:var(--green-bg);color:var(--green);border:1px solid rgba(74,156,106,0.3);}
+.reset-btn{background:transparent;border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text2);font-family:var(--font-ui);font-size:13px;padding:6px 12px;cursor:pointer;flex-shrink:0;}
+.reset-btn:hover{border-color:var(--text2);color:var(--text);}
+.next-btn{width:100%;background:var(--gold-dim2);border:1px solid var(--gold);border-radius:var(--radius-sm);color:var(--gold-light);font-family:var(--font-ui);font-size:14px;font-weight:600;padding:12px;cursor:pointer;letter-spacing:0.04em;margin-top:0.75rem;}
+.next-btn:hover{background:rgba(201,168,76,0.35);}.next-btn:disabled{opacity:0.3;cursor:not-allowed;}
+.roll-result{margin-top:1rem;background:var(--surface2);border-radius:var(--radius-sm);padding:0.75rem;}
+.roll-desc{font-size:12px;color:var(--text2);margin-bottom:8px;text-align:center;}
+.dice-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;}
+.die{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border-radius:6px;font-size:14px;font-weight:600;border:1px solid var(--border2);color:var(--text3);background:var(--surface);}
+.die.kept{background:var(--gold-dim2);color:var(--gold-light);border-color:rgba(201,168,76,0.4);}
+.roll-summary{text-align:center;font-size:12px;color:var(--text2);margin-top:8px;}
+.capped-note{text-align:center;font-size:12px;color:var(--amber);margin-top:4px;}
+.stat-preview{min-height:36px;margin-bottom:0.5rem;font-size:13px;line-height:1.5;}
+.preview-main{color:var(--text2);}
+.preview-warn{color:var(--amber);margin-top:2px;font-size:12px;}
+.step-hint{font-size:13px;color:var(--text2);margin-bottom:0.5rem;line-height:1.5;}
+.stat-mini-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:0.75rem;}
+.stat-mini{background:var(--surface2);border-radius:var(--radius-sm);padding:0.6rem 0.5rem;text-align:center;}
+.stat-mini .label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--text3);margin-bottom:2px;}
+.stat-mini .value{font-size:24px;font-weight:500;color:var(--text);font-family:var(--font);line-height:1.1;}
+.stat-mini .bonus{font-size:11px;margin-top:1px;}
+.pos{color:var(--green);}.neg{color:var(--red);}
+.class-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:0.5rem;}
+.class-btn{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-family:var(--font-ui);font-size:13px;font-weight:500;padding:10px 6px;cursor:pointer;text-align:center;transition:background 0.15s,border-color 0.15s;}
+.class-btn:hover{background:var(--gold-dim);border-color:var(--gold);color:var(--gold-light);}
+.class-btn.selected{background:var(--gold-dim2);border-color:var(--gold);color:var(--gold-light);}
+.class-detail{background:var(--surface2);border-radius:var(--radius-sm);padding:0.75rem;margin-top:0.75rem;font-size:13px;color:var(--text2);line-height:1.6;}
+.exp-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:0.5rem;}
+.exp-tag{font-size:12px;background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;cursor:pointer;color:var(--text2);}
+.exp-tag:hover{border-color:var(--gold);color:var(--gold);}
+.exp-tag.selected{background:var(--gold-dim2);border-color:var(--gold);color:var(--gold-light);}
+.exp-custom{display:flex;gap:8px;margin-top:0.75rem;}
+.exp-custom input{flex:1;}
+.exp-custom button{background:var(--gold-dim2);border:1px solid var(--gold);border-radius:var(--radius-sm);color:var(--gold-light);font-family:var(--font-ui);font-size:13px;padding:8px 14px;cursor:pointer;white-space:nowrap;}
+.exp-count{font-size:12px;color:var(--text3);margin-top:6px;}
+.equip-option{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:0.75rem;margin-bottom:0.5rem;cursor:pointer;}
+.equip-option.selected{border-color:var(--gold);background:var(--gold-dim);}
+.equip-option .eq-name{font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px;}
+.equip-option .eq-detail{font-size:12px;color:var(--text2);line-height:1.6;}
+.sheet-header{text-align:center;padding-bottom:0.75rem;margin-bottom:0.75rem;border-bottom:1px solid var(--border2);}
+.sheet-name{font-family:var(--font);font-size:26px;color:var(--gold-light);font-weight:normal;}
+.sheet-sub{font-size:13px;color:var(--text2);margin-top:2px;}
+.sheet-section{margin-bottom:1rem;}
+.sheet-section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--gold);margin-bottom:0.5rem;padding-bottom:4px;border-bottom:1px solid var(--border);}
+.stat-sheet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+.stat-sheet-card{background:var(--surface2);border-radius:var(--radius-sm);padding:0.6rem 0.4rem;text-align:center;border:1px solid var(--border);}
+.stat-sheet-card .sname{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);margin-bottom:2px;}
+.stat-sheet-card .sval{font-size:28px;font-family:var(--font);line-height:1;}
+.stat-sheet-card .sracial{font-size:11px;margin-top:1px;}
+.stat-sheet-card .sbonus{font-size:11px;color:var(--text3);margin-top:1px;}
+.derived-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:6px;}
+.derived-item{background:var(--surface2);border-radius:var(--radius-sm);padding:0.5rem 0.75rem;display:flex;justify-content:space-between;align-items:center;}
+.derived-item .dlabel{font-size:12px;color:var(--text2);}
+.derived-item .dval{font-size:16px;font-weight:500;font-family:var(--font);}
+.derived-item .dval.pos{color:var(--green);}.derived-item .dval.neg{color:var(--red);}
+.saves-grid{display:grid;grid-template-columns:1fr;gap:4px;}
+.save-row{background:var(--surface2);border-radius:var(--radius-sm);padding:6px 10px;display:flex;justify-content:space-between;align-items:center;}
+.save-row .slabel{font-size:12px;color:var(--text2);}
+.save-row .sright{display:flex;align-items:center;gap:6px;}
+.save-row .snum{font-size:15px;font-weight:500;font-family:var(--font);color:var(--text);}
+.save-row .smod{font-size:11px;color:var(--text3);}
+.class-ability-list{list-style:none;display:flex;flex-direction:column;gap:4px;}
+.class-ability-list li{background:var(--surface2);border-radius:var(--radius-sm);padding:6px 10px;font-size:12px;color:var(--text2);line-height:1.5;}
+.class-ability-list li strong{color:var(--text);display:block;font-size:12px;margin-bottom:1px;}
+.exp-list{display:flex;flex-wrap:wrap;gap:6px;}
+.hp-big{text-align:center;background:var(--surface2);border-radius:var(--radius-sm);padding:0.75rem;border:1px solid var(--border);}
+.hp-num{font-family:var(--font);font-size:48px;color:var(--gold-light);line-height:1;}
+.hp-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;}
+.hp-detail{font-size:12px;color:var(--text3);margin-top:4px;}
+.weapon-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:0.75rem;margin-top:0.5rem;}
+.weapon-name{font-size:14px;font-weight:500;color:var(--text);margin-bottom:6px;}
+.weapon-stats{display:flex;gap:8px;flex-wrap:wrap;}
+.weapon-stat{background:var(--surface);border-radius:var(--radius-sm);padding:4px 10px;text-align:center;}
+.weapon-stat .wlabel{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;}
+.weapon-stat .wval{font-size:15px;font-weight:500;color:var(--gold-light);font-family:var(--font);}
+.ac-display{background:var(--surface2);border-radius:var(--radius-sm);padding:0.75rem;display:flex;justify-content:space-between;align-items:center;margin-top:0.5rem;}
+.ac-num{font-family:var(--font);font-size:36px;color:var(--gold-light);}
+.ac-detail{font-size:12px;color:var(--text2);text-align:right;line-height:1.6;}
+.race-applied{font-size:12px;color:var(--text2);margin-bottom:0.5rem;line-height:1.5;}
+.new-char-btn{width:100%;background:transparent;border:1px solid var(--border2);border-radius:var(--radius-sm);color:var(--text2);font-family:var(--font-ui);font-size:14px;padding:12px;cursor:pointer;margin-top:0.75rem;}
+.new-char-btn:hover{border-color:var(--text2);color:var(--text);}
+@media(max-width:360px){.btn-row,.class-grid{grid-template-columns:repeat(2,1fr);}.die{width:28px;height:28px;font-size:12px;}}
+</style>
+</head>
+<body>
+<div class="page-header">
+  <div class="page-title">Character Generator</div>
+  <div class="page-subtitle" id="page-subtitle">Step 1 of 6</div>
+</div>
+<div class="container" id="app"></div>
+<script>
+var STAT_ORDER=["STR","CON","DEX","WIS","INT","CHA"];
+var STAT_NAMES={STR:"Strength",CON:"Constitution",DEX:"Dexterity",WIS:"Wisdom",INT:"Intelligence",CHA:"Charisma"};
+var DICE_COUNTS=[7,6,5,4,3,"2x2"];
+var STAT_MIN=6,STAT_MAX=18;
+var EXPECTED={3:10.5,4:12.245,5:13.43,6:14.274,7:14.903,"2x2":8.372};
+
+var RACES=[
+  {name:"Dwarf (Duergar)",desc:"+1 CON, +1 WIS, -2 CHA.",bonuses:{CON:1,WIS:1,CHA:-2},abilities:[
+    {name:"Darkvision 60ft",detail:"Can see in darkness up to 60 feet."},
+    {name:"+2 saves vs poison",detail:"Add +2 to any saving throw against poison."},
+    {name:"+2 Magic Item saves",detail:"Add +2 to saving throws against magic items."},
+    {name:"Bonus Exp: Stonecunning",detail:"Bonus XP for identifying slopes, new construction, stone traps, depth underground."},
+    {name:"Enlarge self 1/day",detail:"Cast Enlarge on self once per day from 1st level."},
+    {name:"Invisibility self 1/day",detail:"Cast Invisibility on self once per day from 5th level."}]},
+  {name:"Dwarf (Hill)",desc:"+1 CON, +1 WIS, -1 CHA.",bonuses:{CON:1,WIS:1,CHA:-1},abilities:[
+    {name:"Darkvision 60ft",detail:"Can see in darkness up to 60 feet."},
+    {name:"+2 saves vs poison",detail:"Add +2 to saving throws against poison."},
+    {name:"+2 Magic Item saves",detail:"Add +2 to saving throws against magic items."},
+    {name:"Bonus Exp: Stonecunning",detail:"Bonus XP for stonework identification and depth underground."}]},
+  {name:"Dwarf (Mountain)",desc:"+1 STR, +1 CON, -1 CHA.",bonuses:{STR:1,CON:1,CHA:-1},abilities:[
+    {name:"Darkvision 60ft",detail:"Can see in darkness up to 60 feet."},
+    {name:"+2 saves vs poison",detail:"Add +2 to saving throws against poison."},
+    {name:"+2 Magic Item saves",detail:"Add +2 to saving throws against magic items."},
+    {name:"Bonus Exp: Stonecunning",detail:"Bonus XP for stonework identification and depth underground."}]},
+  {name:"Dragonborn",desc:"+1 STR, -1 DEX, +1 CHA.",bonuses:{STR:1,DEX:-1,CHA:1},abilities:[
+    {name:"Breath weapon",detail:"15ft cone of fire, 1/short rest. 2d6 (1-5), 3d6 (6-10), 4d6 (11-15), 5d6 (16-20)."}]},
+  {name:"Elf (High)",desc:"+1 DEX, -1 CON, +1 INT.",bonuses:{DEX:1,CON:-1,INT:1},abilities:[
+    {name:"Immunity: sleep/charm",detail:"Cannot be magically put to sleep or charmed."},
+    {name:"Longsword/longbow proficiency",detail:"May use longswords and longbows regardless of class."},
+    {name:"Secret door detection",detail:"Passive chance to spot secret doors. Roll under WIS."}]},
+  {name:"Elf (Wood)",desc:"+1 DEX, -1 CON, +1 WIS.",bonuses:{DEX:1,CON:-1,WIS:1},abilities:[
+    {name:"Immunity: sleep/charm",detail:"Cannot be magically put to sleep or charmed."},
+    {name:"Longsword/longbow proficiency",detail:"May use longswords and longbows regardless of class."},
+    {name:"Secret door detection",detail:"Passive chance to spot secret doors. Roll under WIS."},
+    {name:"Bonus Exp: Woodland Stealth",detail:"Bonus XP for moving unseen through woodland."},
+    {name:"Bonus Exp: Tracking",detail:"Bonus XP for tracking creatures in wilderness."}]},
+  {name:"Elf (Drow)",desc:"+2 DEX, -1 CON, +1 INT, -2 CHA.",bonuses:{DEX:2,CON:-1,INT:1,CHA:-2},abilities:[
+    {name:"Immunity: sleep/charm",detail:"Cannot be magically put to sleep or charmed."},
+    {name:"Longsword/longbow proficiency",detail:"May use longswords and longbows regardless of class."},
+    {name:"Secret door detection",detail:"Passive chance to spot secret doors. Roll under WIS."},
+    {name:"Darkvision 120ft",detail:"Can see in darkness up to 120 feet."},
+    {name:"Light sensitivity",detail:"-2 to attacks and sight checks in bright light."},
+    {name:"Dancing Lights at will",detail:"Cast Dancing Lights at will from 1st level."},
+    {name:"Faerie Fire 1/day",detail:"Cast Faerie Fire once per day from 3rd level."},
+    {name:"Darkness 1/day",detail:"Cast Darkness once per day from 5th level."}]},
+  {name:"Firbolg",desc:"+1 STR, -1 DEX, +1 WIS.",bonuses:{STR:1,DEX:-1,WIS:1},abilities:[
+    {name:"Detect Magic 1/day",detail:"Cast Detect Magic once per day from 1st level."},
+    {name:"Disguise Self 1/day",detail:"Cast Disguise Self once per day from 1st level."},
+    {name:"Powerful Build",detail:"Counts as one size larger for carrying, pushing, dragging."}]},
+  {name:"Gnome (Rock)",desc:"+1 DEX, +1 INT, -1 WIS.",bonuses:{DEX:1,INT:1,WIS:-1},abilities:[
+    {name:"Darkvision 60ft",detail:"Can see in darkness up to 60 feet."},
+    {name:"+2 saves vs illusion spells",detail:"Add +2 to saves against illusion magic."},
+    {name:"+2 saves vs Magic Items",detail:"Add +2 to saving throws against magic items."},
+    {name:"+2 Blast saves vs traps",detail:"Add +2 to Blast/Barrage saves from mechanical traps."}]},
+  {name:"Gnome (Forest)",desc:"-1 STR, +1 DEX, -1 INT, +1 WIS.",bonuses:{STR:-1,DEX:1,INT:-1,WIS:1},abilities:[
+    {name:"Darkvision 60ft",detail:"Can see in darkness up to 60 feet."},
+    {name:"+2 saves vs illusion spells",detail:"Add +2 to saves against illusion magic."},
+    {name:"Speak with small animals",detail:"Can communicate with small animals."}]},
+  {name:"Gnome (Deep)",desc:"+1 DEX, -1 INT, +1 WIS, -2 CHA.",bonuses:{DEX:1,INT:-1,WIS:1,CHA:-2},abilities:[
+    {name:"Darkvision 120ft",detail:"Can see in darkness up to 120 feet."},
+    {name:"+2 saves vs illusion spells",detail:"Add +2 to saves against illusion magic."},
+    {name:"Non-Detection",detail:"Always active — cannot be located by divination magic."}]},
+  {name:"Goliath",desc:"+2 STR, -1 DEX, +1 CON, -1 CHA.",bonuses:{STR:2,DEX:-1,CON:1,CHA:-1},abilities:[
+    {name:"Powerful Build",detail:"Counts as one size larger for carrying, pushing, dragging."},
+    {name:"Mountain Born: +2 vs Cold",detail:"Add +2 to saves against cold effects."},
+    {name:"Bonus Exp: Mountain Survival",detail:"Bonus XP for surviving mountainous terrain."}]},
+  {name:"Half-Elf",desc:"Choose any 2 stats to receive +1 each.",bonuses:{},humanChoice:true,abilities:[
+    {name:"+2 saves vs sleep/charm",detail:"Add +2 to saves against sleep and charm."},
+    {name:"Two Bonus Experiences",detail:"Gain two Bonus Experiences of your choice."}]},
+  {name:"Halfling (Lightfoot)",desc:"-1 STR, +1 DEX, +1 CHA.",bonuses:{STR:-1,DEX:1,CHA:1},abilities:[
+    {name:"+2 saves vs poison/fear",detail:"Add +2 to saves against poison and fear."},
+    {name:"+2 saves vs Magic Items",detail:"Add +2 to saving throws against magic items."},
+    {name:"Lucky",detail:"Reroll natural 1 on attacks/saves. Reroll natural 20 on ability checks."}]},
+  {name:"Halfling (Stout)",desc:"-1 STR, +1 DEX, +1 CON.",bonuses:{STR:-1,DEX:1,CON:1},abilities:[
+    {name:"+2 saves vs poison/fear",detail:"Add +2 to saves against poison and fear."},
+    {name:"+2 saves vs Magic Items",detail:"Add +2 to saving throws against magic items."},
+    {name:"Poison Resistance",detail:"Halves poison damage even on a failed save."}]},
+  {name:"Human",desc:"Choose any 2 stats to receive +1 each.",bonuses:{},humanChoice:true,abilities:[
+    {name:"Bonus Experience",detail:"Gain one Bonus Experience of your choice."},
+    {name:"+20% experience points",detail:"Gain 20% bonus XP from all sources."}]},
+  {name:"Tiefling",desc:"+1 INT, +1 CHA, -1 WIS.",bonuses:{INT:1,CHA:1,WIS:-1},abilities:[
+    {name:"Darkvision 60ft",detail:"Can see in darkness up to 60 feet."},
+    {name:"+2 saves vs fire",detail:"Add +2 to saving throws against fire."}]}
+];
+
+var WARRIOR_CLASSES=["Fighter","Barbarian","Paladin","Ranger"];
+
+var WEAPONS={
+  Longsword:{name:"Longsword",die:"1d8",twoHanded:false,ranged:false},
+  Shortsword:{name:"Shortsword",die:"1d6",twoHanded:false,ranged:false},
+  Handaxe:{name:"Handaxe",die:"1d6",twoHanded:false,ranged:false},
+  Greataxe:{name:"Greataxe",die:"1d12",twoHanded:true,ranged:false},
+  Greatsword:{name:"Greatsword",die:"2d6",twoHanded:true,ranged:false},
+  Battleaxe:{name:"Battleaxe",die:"1d8",twoHanded:false,ranged:false},
+  Warhammer:{name:"Warhammer",die:"1d8",twoHanded:false,ranged:false},
+  Mace:{name:"Mace",die:"1d6",twoHanded:false,ranged:false},
+  Quarterstaff:{name:"Quarterstaff",die:"1d6",twoHanded:true,ranged:false},
+  Dagger:{name:"Dagger",die:"1d4",twoHanded:false,ranged:false},
+  Rapier:{name:"Rapier",die:"1d8",twoHanded:false,ranged:false},
+  Scimitar:{name:"Scimitar",die:"1d6",twoHanded:false,ranged:false},
+  Longbow:{name:"Longbow",die:"1d8",twoHanded:true,ranged:true},
+  Shortbow:{name:"Shortbow",die:"1d6",twoHanded:true,ranged:true}
+};
+
+var ARMORS={
+  None:{name:"No Armour",baseAC:10,maxDex:null},
+  Leather:{name:"Leather",baseAC:11,maxDex:null},
+  StuddedLeather:{name:"Studded Leather",baseAC:12,maxDex:null},
+  HideArmor:{name:"Hide Armour",baseAC:12,maxDex:2},
+  Ringmail:{name:"Ringmail",baseAC:14,maxDex:null},
+  Chainmail:{name:"Chainmail",baseAC:14,maxDex:0},
+  ScaleMail:{name:"Scale Mail",baseAC:14,maxDex:2},
+  Plate:{name:"Plate",baseAC:18,maxDex:0}
+};
+
+var CLASS_EQUIPMENT={
+  Fighter:[
+    {label:"Plate, shield, longsword",armor:"Plate",shield:true,weapon:"Longsword",extras:["5 javelins"]},
+    {label:"Chainmail, greatsword",armor:"Chainmail",shield:false,weapon:"Greatsword",extras:["5 javelins"]},
+    {label:"Scale mail, shield, battleaxe",armor:"ScaleMail",shield:true,weapon:"Battleaxe",extras:["4 handaxes"]}],
+  Barbarian:[
+    {label:"No armour, greataxe",armor:"None",shield:false,weapon:"Greataxe",extras:["2 handaxes","Explorer's pack"]},
+    {label:"No armour, longsword",armor:"None",shield:false,weapon:"Longsword",extras:["2 handaxes","Explorer's pack"]}],
+  Paladin:[
+    {label:"Plate, shield, longsword",armor:"Plate",shield:true,weapon:"Longsword",extras:["5 javelins","Holy symbol"]},
+    {label:"Chainmail, greatsword",armor:"Chainmail",shield:false,weapon:"Greatsword",extras:["5 javelins","Holy symbol"]}],
+  Ranger:[
+    {label:"Scale mail, shortsword, longbow",armor:"ScaleMail",shield:false,weapon:"Shortsword",extras:["Longbow","20 arrows","Dungeoneer's pack"]},
+    {label:"Leather, longsword, shortbow",armor:"Leather",shield:false,weapon:"Longsword",extras:["Shortbow","20 arrows","Dungeoneer's pack"]}],
+  Cleric:[
+    {label:"Chainmail, shield, mace",armor:"Chainmail",shield:true,weapon:"Mace",extras:["Holy symbol","Priest's pack"]},
+    {label:"Ringmail, shield, warhammer",armor:"Ringmail",shield:true,weapon:"Warhammer",extras:["Holy symbol","Priest's pack"]}],
+  Druid:[
+    {label:"Hide armour, shield, scimitar",armor:"HideArmor",shield:true,weapon:"Scimitar",extras:["Druidic focus","Explorer's pack"]},
+    {label:"Leather, quarterstaff",armor:"Leather",shield:false,weapon:"Quarterstaff",extras:["Druidic focus","Explorer's pack"]}],
+  Bard:[
+    {label:"Leather, rapier",armor:"Leather",shield:false,weapon:"Rapier",extras:["Lute","Diplomat's pack"]},
+    {label:"Leather, longsword",armor:"Leather",shield:false,weapon:"Longsword",extras:["Lute","Entertainer's pack"]}],
+  Thief:[
+    {label:"Leather, two shortswords",armor:"Leather",shield:false,weapon:"Shortsword",extras:["Second shortsword","Burglar's pack","Thieves' tools"]},
+    {label:"Leather, rapier",armor:"Leather",shield:false,weapon:"Rapier",extras:["Dagger","Dungeoneer's pack","Thieves' tools"]}],
+  Wizard:[
+    {label:"Dagger, spellbook",armor:"None",shield:false,weapon:"Dagger",extras:["Spellbook","Component pouch","Scholar's pack"]},
+    {label:"Quarterstaff, spellbook",armor:"None",shield:false,weapon:"Quarterstaff",extras:["Spellbook","Arcane focus","Explorer's pack"]}]
+};
+
+var CLASSES={
+  Fighter:{hitDie:10,armor:"Any armour, Shields",weapons:"Any weapons",expCount:4,expFixed:[],
+    l1:[{name:"Weapon Specialization",desc:"+2 damage to melee or ranged attacks (choose one)."},
+        {name:"Cleave",desc:"Kill an enemy with 1 HD or less: make one additional attack immediately."}],
+    atk:[1,1,2,2,3,3,4,5,5,6,6,7,7,8,9,9,10,10,11,12]},
+  Barbarian:{hitDie:12,armor:"No armour, Shield",weapons:"All weapons",expCount:5,expFixed:["Athletics","Survival"],
+    l1:[{name:"Double CON bonus to HP",desc:"Apply double CON bonus to HP at every level."},
+        {name:"Double DEX bonus to AC",desc:"Apply double DEX AC bonus."},
+        {name:"Reckless Attack",desc:"Attack with advantage; enemies also get advantage to attack you."}],
+    atk:[1,1,2,2,3,3,4,5,5,6,6,7,7,8,9,9,10,10,11,12]},
+  Paladin:{hitDie:10,armor:"All armour, Shields",weapons:"All weapons",expCount:null,expFixed:[],spellcaster:true,
+    l1:[{name:"Divine Sense",desc:"Detect evil, celestials, fiends, undead within 60ft."},
+        {name:"Lay on Hands",desc:"Healing pool of 5x level. Spend 5 to cure disease/poison."},
+        {name:"Divine Health",desc:"Immunity to disease."}],
+    atk:[1,1,2,2,3,3,4,5,5,6,6,7,7,8,9,9,10,10,11,12]},
+  Ranger:{hitDie:10,armor:"Light and Medium Armour, Shields",weapons:"All weapons",expCount:5,expFixed:["Nature","Survival"],spellcaster:true,
+    l1:[{name:"Two-Handed Fighting",desc:"No size restriction on off-hand. STR damage bonus applies to off-hand."},
+        {name:"Favoured Enemy",desc:"+4 to attack and damage vs a chosen enemy type."},
+        {name:"Natural Explorer",desc:"Pick a terrain. +4 to navigating, tracking, stealth, foraging in that terrain."}],
+    atk:[1,1,2,2,3,3,4,5,5,6,6,7,7,8,9,9,10,10,11,12]},
+  Cleric:{hitDie:8,armor:"All armour, Shields",weapons:"All weapons",expCount:4,expFixed:["Religion"],spellcaster:true,
+    l1:[{name:"Turn Undead",desc:"Present holy symbol to repel or destroy undead (2e rules)."}],
+    atk:[0,1,1,2,2,2,3,3,3,4,4,5,5,5,6,6,6,7,7,8]},
+  Druid:{hitDie:8,armor:"Any non-metal armour, Shield",weapons:"Clubs, daggers, darts, javelins, maces, quarterstaffs, scimitars, sickles, slings, spears",expCount:4,expFixed:["Nature"],spellcaster:true,
+    l1:[{name:"Wild Shape",desc:"Transform into a beast of CR 1/4 or lower."}],
+    atk:[0,1,1,2,2,2,3,3,3,4,4,5,5,5,6,6,6,7,7,8]},
+  Bard:{hitDie:8,armor:"Light/Medium armour, Ringmail, Chainmail",weapons:"All weapons",expCount:6,expFixed:["Pickpocket","Arcana"],spellcaster:true,
+    l1:[{name:"Bardic Inspiration",desc:"Grant ally a bonus die for attacks, checks, or saves."},
+        {name:"Jack of All Trades",desc:"+1 to any ability check when not applying an Experience."}],
+    atk:[0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,5]},
+  Thief:{hitDie:8,armor:"Light Armour",weapons:"Simple weapons, hand crossbows, longswords, rapiers, shortswords",expCount:9,expFixed:["Stealth","Open Locks","Find/Remove Traps","Climb","Pick Pockets"],
+    l1:[{name:"Backstab",desc:"x2 dmg on unaware targets. x3 (5th), x4 (9th), x5 (13th)."},
+        {name:"Expertise",desc:"Pick two Experiences: double the +2 bonus for those."},
+        {name:"Thieves Cant",desc:"Secret language of the criminal underworld."}],
+    atk:[0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,5]},
+  Wizard:{hitDie:6,armor:"No armour",weapons:"Simple weapons",expCount:null,expFixed:[],spellcaster:true,wizardAtk:true,
+    l1:[{name:"Spellcasting",desc:"Cast arcane spells from spellbook. INT governs spell attack and potency."}],
+    atk:[0,0,0,0,0,1,1,1,1,1,2,2,2,2,2,3,3,3,3,4],
+    spellAtk:[0,1,1,1,1,2,2,2,2,3,3,3,4,4,4,4,5,5,5,6]}
+};
+
+var SAVES_L1={
+  Fighter:{Death:15,Magic:17,Petrify:16,Blast:14,Spell:18},
+  Barbarian:{Death:13,Magic:18,Petrify:15,Blast:13,Spell:19},
+  Paladin:{Death:13,Magic:15,Petrify:14,Blast:14,Spell:16},
+  Ranger:{Death:14,Magic:16,Petrify:15,Blast:13,Spell:17},
+  Cleric:{Death:13,Magic:15,Petrify:14,Blast:16,Spell:15},
+  Druid:{Death:13,Magic:15,Petrify:14,Blast:16,Spell:15},
+  Bard:{Death:14,Magic:15,Petrify:15,Blast:16,Spell:16},
+  Thief:{Death:15,Magic:16,Petrify:16,Blast:15,Spell:17},
+  Wizard:{Death:16,Magic:18,Petrify:16,Blast:16,Spell:17}
+};
+
+var STR_HIT={3:-3,4:-2,5:-2,6:-1,7:-1,8:0,9:0,10:0,11:0,12:0,13:0,14:0,15:1,16:1,17:2,18:2,19:3,20:3,21:4,22:4,23:5,24:6};
+var STR_DMG={3:-1,4:-1,5:-1,6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0,15:1,16:2,17:3,18:5,19:7,20:8,21:9,22:10,23:11,24:12};
+var DEX_HIT={3:-3,4:-2,5:-1,6:0,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0,15:1,16:1,17:2,18:2,19:3,20:3,21:4,22:4,23:5,24:6};
+var DEX_AC= {3:-4,4:-3,5:-2,6:-1,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:1,15:1,16:2,17:3,18:4,19:4,20:4,21:5,22:5,23:5,24:6};
+var CON_HP_STD={3:-2,4:-1,5:-1,6:-1,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0,15:1,16:2,17:2,18:2,19:2,20:2,21:2,22:2,23:2,24:2};
+var CON_HP_WAR={3:-2,4:-1,5:-1,6:-1,7:0,8:0,9:0,10:0,11:0,12:0,13:0,14:0,15:1,16:2,17:3,18:4,19:5,20:5,21:6,22:6,23:6,24:7};
+var INT_LANG={3:1,4:1,5:1,6:1,7:1,8:1,9:2,10:2,11:2,12:3,13:3,14:4,15:4,16:5,17:6,18:7,19:8,20:9,21:10,22:11,23:12,24:15};
+var INT_SPATK={3:-3,4:-2,5:-2,6:-1,7:-1,8:0,9:0,10:0,11:0,12:0,13:0,14:0,15:1,16:1,17:2,18:2,19:3,20:3,21:4,22:4,23:5,24:6};
+var WIS_SAVE={3:-3,4:-2,5:-1,6:-1,7:-1,8:0,9:0,10:0,11:0,12:0,13:0,14:0,15:1,16:2,17:3,18:4,19:4,20:4,21:4,22:4,23:4,24:4};
+var WIS_DIV= {3:3,4:2,5:2,6:1,7:1,8:0,9:0,10:0,11:0,12:0,13:0,14:0,15:-1,16:-1,17:-2,18:-2,19:-3,20:-3,21:-4,22:-4,23:-5,24:-6};
+
+var EXPERIENCES_LIST=[
+  "Acrobatics","Animal Handling","Arcana","Athletics","Deception","History",
+  "Insight","Intimidation","Investigation","Medicine","Nature","Perception",
+  "Performance","Persuasion","Religion","Sleight of Hand","Stealth","Survival",
+  "Blacksmith","Sailor","Streetwise","Alchemist","Farmer","Soldier",
+  "Gambler","Forger","Hunter's Guide","Court Etiquette"
+];
+
+var state={step:1,charName:"",race:null,humanBonusChosen:[],assignedStats:{},rollOrder:0,pendingStat:null,isTouchDevice:false,lastRoll:null,cls:null,experiences:[],equipment:null};
+
+function clamp(v){return Math.max(STAT_MIN,Math.min(STAT_MAX,v));}
+function sc(s){return Math.max(3,Math.min(24,s));}
+function signV(v){return v===0?"+0":v>0?"+"+v:""+v;}
+function rand6(){return Math.floor(Math.random()*6)+1;}
+
+function getRaceBonuses(){
+  if(!state.race) return {};
+  if(state.race.humanChoice){var b={};state.humanBonusChosen.forEach(function(s){b[s]=1;});return b;}
+  return state.race.bonuses;
+}
+function getFinalStats(){
+  var stats={};
+  STAT_ORDER.forEach(function(s){stats[s]=state.assignedStats[s]?state.assignedStats[s].total:10;});
+  return stats;
+}
+function raceModSummary(r){
+  if(r.humanChoice) return "+1 to any 2";
+  var e=Object.entries(r.bonuses);
+  if(!e.length) return "no mods";
+  return e.map(function(kv){return (kv[1]>0?"+":"")+kv[1]+" "+kv[0];}).join(", ");
+}
+
+function mkCard(title){
+  var card=document.createElement("div"); card.className="card";
+  if(title){var t=document.createElement("div");t.className="card-title";t.textContent=title;card.appendChild(t);}
+  return card;
+}
+function mkBackBtn(){
+  var btn=document.createElement("button"); btn.className="reset-btn";
+  btn.style.cssText="width:100%;margin-top:0.5rem;"; btn.textContent="Back";
+  btn.onclick=function(){state.step--;render();}; return btn;
+}
+function addTooltipTouch(tag){
+  var t=null;
+  tag.addEventListener("touchstart",function(){t=setTimeout(function(){tag.classList.add("tooltip-open");},400);},{passive:true});
+  tag.addEventListener("touchend",function(){clearTimeout(t);setTimeout(function(){tag.classList.remove("tooltip-open");},1200);});
+  tag.addEventListener("touchmove",function(){clearTimeout(t);});
+}
+function renderAbilityTags(abilities){
+  if(!abilities||!abilities.length) return "";
+  return '<div class="abilities-label">Special Abilities</div><div class="race-abilities">'+
+    abilities.map(function(a){return '<span class="ability-tag">'+a.name+'<span class="ability-tooltip">'+a.detail+'</span></span>';}).join("")+
+    '</div>';
+}
+
+function render(){
+  var names=["","Name & Race","Roll Stats","Choose Class","Experiences","Equipment","Character Sheet"];
+  document.getElementById("page-subtitle").textContent="Step "+state.step+" of 6 — "+names[state.step];
+  var app=document.getElementById("app");
+  app.innerHTML="";
+
+  var dots=document.createElement("div"); dots.className="step-indicator";
+  for(var i=1;i<=6;i++){var d=document.createElement("div");d.className="step-dot"+(i<state.step?" done":i===state.step?" active":"");dots.appendChild(d);}
+  app.appendChild(dots);
+
+  if(state.step>1){renderSummary(app,1,"Name & Race",state.charName+" — "+(state.race?state.race.name:""));}
+  if(state.step>2){
+    var st=getFinalStats();
+    renderSummary(app,2,"Stats",STAT_ORDER.map(function(s){return s+" "+st[s];}).join("  "));
+  }
+  if(state.step>3){renderSummary(app,3,"Class",state.cls||"");}
+  if(state.step>4){
+    var cl2=CLASSES[state.cls]; var fx=cl2?cl2.expFixed||[]:[];
+    var all=[].concat(fx,state.experiences.filter(function(e){return fx.indexOf(e)<0;}));
+    renderSummary(app,4,"Experiences",all.join(", ")||"None");
+  }
+  if(state.step>5&&state.equipment!==null){
+    var eq2=CLASS_EQUIPMENT[state.cls]&&CLASS_EQUIPMENT[state.cls][state.equipment];
+    renderSummary(app,5,"Equipment",eq2?eq2.label:"");
+  }
+
+  if(state.step===1) renderStep1(app);
+  else if(state.step===2) renderStep2(app);
+  else if(state.step===3) renderStep3(app);
+  else if(state.step===4) renderStep4(app);
+  else if(state.step===5) renderStep5(app);
+  else if(state.step===6) renderStep6(app);
+}
+
+function renderSummary(app,targetStep,label,value){
+  var card=document.createElement("div"); card.className="summary-card";
+  card.onclick=function(){state.step=targetStep;render();};
+  var left=document.createElement("div"); left.className="summary-left";
+  left.innerHTML='<div class="summary-label">'+label+'</div><div class="summary-value">'+value+'</div>';
+  var edit=document.createElement("div"); edit.className="summary-edit"; edit.textContent="edit";
+  card.appendChild(left); card.appendChild(edit); app.appendChild(card);
+}
+
+function renderStep1(app){
+  var nameCard=mkCard("Character Name");
+  var inp=document.createElement("input"); inp.type="text"; inp.placeholder="Enter a name…"; inp.value=state.charName;
+  inp.oninput=function(e){state.charName=e.target.value;};
+  nameCard.appendChild(inp); app.appendChild(nameCard);
+
+  var raceCard=mkCard("Race");
+  var sel=document.createElement("select");
+  sel.innerHTML='<option value="">— Choose your race —</option>';
+  RACES.forEach(function(r){
+    var o=document.createElement("option"); o.value=r.name;
+    o.textContent=r.name+" — "+raceModSummary(r);
+    if(state.race&&state.race.name===r.name) o.selected=true;
+    sel.appendChild(o);
+  });
+  sel.onchange=function(){
+    state.race=RACES.find(function(r){return r.name===sel.value;})||null;
+    state.humanBonusChosen=[]; render();
+  };
+  raceCard.appendChild(sel);
+
+  if(state.race){
+    var descEl=document.createElement("div"); descEl.className="race-desc";
+    descEl.innerHTML="<div>"+state.race.desc+"</div>"+renderAbilityTags(state.race.abilities);
+    descEl.querySelectorAll(".ability-tag").forEach(addTooltipTouch);
+    raceCard.appendChild(descEl);
+  }
+  app.appendChild(raceCard);
+
+  if(state.race&&state.race.humanChoice){
+    var bonusCard=mkCard("Racial Bonus");
+    var rem=2-state.humanBonusChosen.length;
+    var hint=document.createElement("div"); hint.className="step-hint";
+    hint.textContent=rem>0?"Choose "+rem+" more stat"+(rem>1?"s":"")+" for +1:":"+1 to "+state.humanBonusChosen.join(" and ");
+    bonusCard.appendChild(hint);
+    var row=document.createElement("div"); row.className="btn-row";
+    STAT_ORDER.forEach(function(s){
+      var btn=document.createElement("button");
+      btn.className="stat-btn"+(state.humanBonusChosen.indexOf(s)>=0?" bonus-selected":"");
+      btn.textContent=s;
+      btn.onclick=function(){
+        var idx=state.humanBonusChosen.indexOf(s);
+        if(idx>=0) state.humanBonusChosen.splice(idx,1);
+        else if(state.humanBonusChosen.length<2) state.humanBonusChosen.push(s);
+        render();
+      };
+      row.appendChild(btn);
+    });
+    bonusCard.appendChild(row); app.appendChild(bonusCard);
+  }
+
+  var ok=state.race&&(!state.race.humanChoice||state.humanBonusChosen.length===2);
+  var btn=document.createElement("button"); btn.className="next-btn"; btn.textContent="Roll Stats →"; btn.disabled=!ok;
+  btn.onclick=function(){state.step=2;render();}; app.appendChild(btn);
+}
+
+var capProbCache={};
+function probAtOrAbove(n,threshold){
+  var key=n+"_"+threshold;
+  if(capProbCache[key]!==undefined) return capProbCache[key];
+  var trials=20000,hits=0;
+  for(var i=0;i<trials;i++){
+    var rolls=[]; for(var d=0;d<n;d++) rolls.push(rand6());
+    rolls.sort(function(a,b){return b-a;});
+    if(rolls[0]+rolls[1]+rolls[2]>=threshold) hits++;
+  }
+  return capProbCache[key]=hits/trials;
+}
+
+function renderStep2(app){
+  var card=mkCard("");
+  var hdr=document.createElement("div"); hdr.className="roll-header";
+  var t=document.createElement("div"); t.className="card-title"; t.style.margin="0"; t.textContent="Roll Stats";
+  var allDone=state.rollOrder>=6;
+  var badge=document.createElement("span"); badge.className="badge "+(allDone?"badge-done":"badge-active");
+  badge.textContent=allDone?"All done!":"Pick "+(state.rollOrder+1)+" of 6";
+  var resetBtn=document.createElement("button"); resetBtn.className="reset-btn"; resetBtn.textContent="↺ Reroll all";
+  resetBtn.onclick=function(){state.assignedStats={};state.rollOrder=0;state.pendingStat=null;state.lastRoll=null;render();};
+  var badges=document.createElement("div"); badges.style.cssText="display:flex;gap:6px;align-items:center;";
+  badges.appendChild(badge); badges.appendChild(resetBtn);
+  hdr.appendChild(t); hdr.appendChild(badges); card.appendChild(hdr);
+
+  if(!allDone){
+    var hint=document.createElement("div"); hint.className="step-hint";
+    hint.textContent=state.isTouchDevice?"Tap to preview, tap again to confirm:":"Hover to preview, click to assign:";
+    card.appendChild(hint);
+    var preview=document.createElement("div"); preview.className="stat-preview"; preview.id="stat-preview";
+    preview.innerHTML='<span class="preview-main"></span>'; card.appendChild(preview);
+    var row=document.createElement("div"); row.className="btn-row";
+    STAT_ORDER.forEach(function(s){
+      var btn=document.createElement("button");
+      btn.className="stat-btn"+(s===state.pendingStat?" pending":"");
+      btn.textContent=s; btn.disabled=s in state.assignedStats;
+      (function(stat,b){
+        b.addEventListener("touchstart",function(e){
+          state.isTouchDevice=true;
+          if(stat in state.assignedStats) return;
+          if(state.pendingStat===stat) return;
+          e.preventDefault();
+          state.pendingStat=stat; showStatPreview(stat);
+          row.querySelectorAll(".stat-btn").forEach(function(x){
+            if(!x.disabled) x.className="stat-btn"+(x.textContent===stat?" pending":"");
+          });
+        },{passive:false});
+        b.addEventListener("mouseenter",function(){if(!state.isTouchDevice) showStatPreview(stat);});
+        b.addEventListener("mouseleave",function(){if(!state.isTouchDevice){var p=document.getElementById("stat-preview");if(p)p.innerHTML='<span class="preview-main"></span>';}});
+        b.addEventListener("click",function(){if(stat in state.assignedStats) return; pickStat(stat);});
+      })(s,btn);
+      row.appendChild(btn);
+    });
+    card.appendChild(row);
+  }
+
+  if(state.lastRoll){var rr=document.createElement("div");rr.className="roll-result";rr.innerHTML=buildRollHTML(state.lastRoll);card.appendChild(rr);}
+  app.appendChild(card);
+
+  var assigned=Object.keys(state.assignedStats);
+  if(assigned.length>0){
+    var grid=document.createElement("div"); grid.className="stat-mini-grid";
+    assigned.forEach(function(s){
+      var d=state.assignedStats[s];
+      var bt=d.bonus===0?"":(d.bonus>0?"+"+d.bonus:""+d.bonus);
+      var cls2=d.bonus>0?"pos":d.bonus<0?"neg":"";
+      var c=document.createElement("div"); c.className="stat-mini";
+      c.innerHTML='<div class="label">'+s+'</div><div class="value">'+d.total+'</div>'+(bt?'<div class="bonus '+cls2+'">'+bt+' racial</div>':"");
+      grid.appendChild(c);
+    });
+    app.appendChild(grid);
+  }
+
+  if(allDone){
+    var nb=document.createElement("button"); nb.className="next-btn"; nb.textContent="Choose Class →";
+    nb.onclick=function(){state.step=3;render();}; app.appendChild(nb);
+  }
+  app.appendChild(mkBackBtn());
+}
+
+function showStatPreview(stat){
+  var el=document.getElementById("stat-preview"); if(!el) return;
+  var numDice=DICE_COUNTS[state.rollOrder];
+  var bonus=(getRaceBonuses()[stat]||0);
+  var expectedTotal=Math.min(STAT_MAX,Math.max(STAT_MIN,(EXPECTED[numDice]||10)+bonus));
+  var bonusStr=bonus>0?" + "+bonus+" racial":bonus<0?" "+bonus+" racial":"";
+  var mechLabel=numDice==="2x2"?"2d6 twice, keep highest":numDice+"d6 keep 3";
+  var html='<span class="preview-main">'+STAT_NAMES[stat]+": rolling "+mechLabel+bonusStr+" — expected "+expectedTotal.toFixed(1)+'</span>';
+  if(bonus>0&&numDice!=="2x2"){
+    var p=probAtOrAbove(numDice,STAT_MAX-bonus+1);
+    if(p>0.04) html+='<div class="preview-warn">+'+bonus+' racial may be partly wasted — ~'+Math.round(p*100)+'% of rolls hit the 18 cap.</div>';
+  }
+  el.innerHTML=html;
+}
+
+function pickStat(stat){
+  var numDice=DICE_COUNTS[state.rollOrder];
+  var bonus=getRaceBonuses()[stat]||0;
+  var rolls,top3,base,rollData;
+  if(numDice==="2x2"){
+    var a=[rand6(),rand6()],b=[rand6(),rand6()];
+    rollData={attemptA:a,attemptB:b,sumA:a[0]+a[1],sumB:b[0]+b[1]};
+    rollData.base=Math.max(rollData.sumA,rollData.sumB); base=rollData.base; rolls=null; top3=null;
+  } else {
+    rolls=[]; for(var i=0;i<numDice;i++) rolls.push(rand6());
+    var sorted=rolls.slice().sort(function(a,b){return b-a;}); top3=sorted.slice(0,3);
+    base=top3[0]+top3[1]+top3[2]; rollData=null;
+  }
+  var rawTotal=base+bonus, total=clamp(rawTotal);
+  state.assignedStats[stat]={rolls:rolls,top3:top3,base:base,bonus:bonus,rawTotal:rawTotal,total:total,numDice:numDice,wasCapped:rawTotal!==total,rollData:rollData};
+  state.pendingStat=null;
+  state.lastRoll={stat:stat,rolls:rolls,top3:top3,base:base,bonus:bonus,rawTotal:rawTotal,total:total,numDice:numDice,wasCapped:rawTotal!==total,rollData:rollData};
+  state.rollOrder++;
+  render();
+}
+
+function buildRollHTML(r){
+  var html='<div class="roll-desc">Rolled '+(r.numDice==="2x2"?"2d6 twice":r.numDice+"d6")+" for "+STAT_NAMES[r.stat]+(r.numDice==="2x2"?" — keeping highest":" — keeping top 3")+':</div><div class="dice-row">';
+  if(r.numDice==="2x2"&&r.rollData){
+    var rd=r.rollData;
+    html+='<div style="width:100%;text-align:center;font-size:11px;color:var(--text3);margin-bottom:4px;">Roll 1: '+rd.sumA+(rd.sumA>=rd.sumB?" ✓":"")+"</div>";
+    rd.attemptA.forEach(function(v){html+='<span class="die'+(rd.sumA>=rd.sumB?" kept":"")+'">'+v+"</span>";});
+    html+='<div style="width:100%;margin:4px 0;"></div>';
+    html+='<div style="width:100%;text-align:center;font-size:11px;color:var(--text3);margin-bottom:4px;">Roll 2: '+rd.sumB+(rd.sumB>rd.sumA?" ✓":"")+"</div>";
+    rd.attemptB.forEach(function(v){html+='<span class="die'+(rd.sumB>rd.sumA?" kept":"")+'">'+v+"</span>";});
+  } else if(r.rolls){
+    var topIdxs=r.rolls.map(function(v,i){return {v:v,i:i};}).sort(function(a,b){return b.v-a.v;}).slice(0,3).map(function(x){return x.i;});
+    r.rolls.forEach(function(v,i){html+='<span class="die'+(topIdxs.indexOf(i)>=0?" kept":"")+'">'+v+"</span>";});
+  }
+  html+="</div>";
+  var bonusStr=r.bonus>0?" + "+r.bonus+" racial":r.bonus<0?" - "+Math.abs(r.bonus)+" racial":"";
+  var baseDesc=r.numDice==="2x2"?""+r.base:r.top3?r.top3.join(" + ")+" = "+r.base:""+r.base;
+  html+='<div class="roll-summary">'+baseDesc+bonusStr+" = "+r.rawTotal+(r.wasCapped?" (capped at "+r.total+")":"")+"</div>";
+  if(r.wasCapped&&r.rawTotal>STAT_MAX) html+='<div class="capped-note">Capped at 18.</div>';
+  if(r.wasCapped&&r.rawTotal<STAT_MIN) html+='<div class="capped-note">Raised to 6.</div>';
+  return html;
+}
+
+function renderStep3(app){
+  var card=mkCard("Choose Class");
+  var grid=document.createElement("div"); grid.className="class-grid";
+  Object.keys(CLASSES).forEach(function(cname){
+    var btn=document.createElement("button");
+    btn.className="class-btn"+(state.cls===cname?" selected":"");
+    btn.textContent=cname;
+    btn.onclick=function(){state.cls=cname;state.experiences=[];state.equipment=null;render();};
+    grid.appendChild(btn);
+  });
+  card.appendChild(grid);
+  if(state.cls){
+    var cl=CLASSES[state.cls];
+    var det=document.createElement("div"); det.className="class-detail";
+    det.innerHTML='<div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--gold);margin-bottom:6px;">'+state.cls+'</div>'+
+      '<div style="margin-bottom:4px;"><strong style="color:var(--text);font-size:12px;">Armour:</strong> '+cl.armor+'</div>'+
+      '<div style="margin-bottom:4px;"><strong style="color:var(--text);font-size:12px;">Weapons:</strong> '+cl.weapons+'</div>'+
+      '<div style="margin-bottom:8px;"><strong style="color:var(--text);font-size:12px;">Hit Die:</strong> d'+cl.hitDie+'</div>'+
+      '<strong style="color:var(--text);font-size:12px;">Level 1 Abilities:</strong>'+
+      '<ul style="list-style:none;margin-top:4px;display:flex;flex-direction:column;gap:4px;">'+
+      cl.l1.map(function(a){return '<li style="font-size:12px;color:var(--text2);"><strong style="color:var(--text);">'+a.name+':</strong> '+a.desc+'</li>';}).join("")+
+      '</ul>';
+    card.appendChild(det);
+  }
+  app.appendChild(card);
+  var btn=document.createElement("button"); btn.className="next-btn"; btn.textContent="Choose Experiences →"; btn.disabled=!state.cls;
+  btn.onclick=function(){state.step=4;render();}; app.appendChild(btn);
+  app.appendChild(mkBackBtn());
+}
+
+function renderStep4(app){
+  var cl=CLASSES[state.cls];
+  var fixed=cl.expFixed||[];
+  var totalCount=cl.expCount;
+  var freeSlots=totalCount?totalCount-fixed.length:null;
+  var selected=state.experiences.filter(function(e){return fixed.indexOf(e)<0;});
+
+  var card=mkCard("Choose Experiences");
+  var countEl=document.createElement("div"); countEl.className="exp-count";
+  countEl.textContent=totalCount?selected.length+" of "+freeSlots+" free slot"+(freeSlots!==1?"s":"")+" chosen"+(fixed.length?" ("+fixed.join(", ")+" fixed)":""):"No fixed count — choose freely.";
+  card.appendChild(countEl);
+
+  if(fixed.length){
+    var fl=document.createElement("div"); fl.style.cssText="margin-top:0.5rem;margin-bottom:0.5rem;";
+    fl.innerHTML='<div class="abilities-label">Fixed</div><div class="exp-grid">'+fixed.map(function(e){return '<span class="exp-tag selected">'+e+'</span>';}).join("")+'</div>';
+    card.appendChild(fl);
+  }
+  var fl2=document.createElement("div"); fl2.className="abilities-label"; fl2.style.marginTop="0.5rem"; fl2.textContent="Choose from list";
+  card.appendChild(fl2);
+  var expGrid=document.createElement("div"); expGrid.className="exp-grid";
+  EXPERIENCES_LIST.filter(function(e){return fixed.indexOf(e)<0;}).forEach(function(e){
+    var tag=document.createElement("span"); tag.className="exp-tag"+(selected.indexOf(e)>=0?" selected":""); tag.textContent=e;
+    tag.onclick=function(){
+      var idx=selected.indexOf(e);
+      if(idx>=0) state.experiences=state.experiences.filter(function(x){return x!==e;});
+      else if(freeSlots===null||selected.length<freeSlots) state.experiences.push(e);
+      render();
+    };
+    expGrid.appendChild(tag);
+  });
+  card.appendChild(expGrid);
+
+  var customRow=document.createElement("div"); customRow.className="exp-custom";
+  var customInput=document.createElement("input"); customInput.type="text"; customInput.placeholder="Write your own…";
+  var addBtn=document.createElement("button"); addBtn.textContent="Add";
+  addBtn.onclick=function(){
+    var val=customInput.value.trim(); if(!val) return;
+    if(freeSlots!==null&&selected.length>=freeSlots) return;
+    if(state.experiences.indexOf(val)<0) state.experiences.push(val);
+    customInput.value=""; render();
+  };
+  customRow.appendChild(customInput); customRow.appendChild(addBtn); card.appendChild(customRow);
+
+  var customAdded=state.experiences.filter(function(e){return fixed.indexOf(e)<0&&EXPERIENCES_LIST.indexOf(e)<0;});
+  if(customAdded.length){
+    var cl2=document.createElement("div"); cl2.className="abilities-label"; cl2.style.marginTop="0.5rem"; cl2.textContent="Custom";
+    card.appendChild(cl2);
+    var cg=document.createElement("div"); cg.className="exp-grid";
+    customAdded.forEach(function(e){
+      var tag=document.createElement("span"); tag.className="exp-tag selected"; tag.textContent=e+" ✕";
+      tag.onclick=function(){state.experiences=state.experiences.filter(function(x){return x!==e;});render();};
+      cg.appendChild(tag);
+    });
+    card.appendChild(cg);
+  }
+  app.appendChild(card);
+
+  var canProceed=freeSlots===null||selected.length===freeSlots;
+  var btn=document.createElement("button"); btn.className="next-btn"; btn.textContent="Choose Equipment →"; btn.disabled=!canProceed;
+  btn.onclick=function(){state.step=5;render();}; app.appendChild(btn);
+  app.appendChild(mkBackBtn());
+}
+
+function calcAC(opt,dexACVal,barDouble){
+  var armor=ARMORS[opt.armor]||ARMORS.None;
+  var ac=armor.baseAC;
+  if(barDouble) ac+=dexACVal*2;
+  else if(armor.maxDex===null) ac+=dexACVal;
+  else if(armor.maxDex>0) ac+=Math.min(dexACVal,armor.maxDex);
+  if(opt.shield) ac+=2;
+  return ac;
+}
+
+function renderStep5(app){
+  var stats=getFinalStats();
+  var strHitV=STR_HIT[sc(stats.STR)]||0;
+  var strDmgV=STR_DMG[sc(stats.STR)]||0;
+  var dexHitV=DEX_HIT[sc(stats.DEX)]||0;
+  var dexACV=DEX_AC[sc(stats.DEX)]||0;
+  var cl=CLASSES[state.cls];
+  var atkBonus=cl.atk[0];
+  var barDouble=state.cls==="Barbarian";
+  var options=CLASS_EQUIPMENT[state.cls]||[];
+
+  var card=mkCard("Starting Equipment");
+  var hint=document.createElement("div"); hint.className="step-hint"; hint.textContent="Choose your starting loadout:"; card.appendChild(hint);
+
+  options.forEach(function(opt,i){
+    var div=document.createElement("div"); div.className="equip-option"+(state.equipment===i?" selected":"");
+    div.onclick=function(){state.equipment=i;render();};
+    var armor=ARMORS[opt.armor]||ARMORS.None;
+    var weapon=WEAPONS[opt.weapon]||WEAPONS.Dagger;
+    var ac=calcAC(opt,dexACV,barDouble);
+    var isRanged=weapon.ranged;
+    var hitBonus=atkBonus+(isRanged?dexHitV:strHitV);
+    var dmgBonus=isRanged?0:strDmgV;
+    var dmgStr=dmgBonus===0?weapon.die:weapon.die+" "+signV(dmgBonus);
+    var extraStr=opt.extras&&opt.extras.length?opt.extras.join(", "):"";
+    div.innerHTML='<div class="eq-name">'+opt.label+'</div><div class="eq-detail">AC <strong style="color:var(--text)">'+ac+'</strong> ('+armor.name+(opt.shield?", Shield":"")+')'+" &bull; "+weapon.name+': <strong style="color:var(--text)">'+signV(hitBonus)+'</strong> to hit, <strong style="color:var(--text)">'+dmgStr+'</strong> dmg'+(extraStr?"<br>Also: "+extraStr:"")+"</div>";
+    card.appendChild(div);
+  });
+  app.appendChild(card);
+
+  var btn=document.createElement("button"); btn.className="next-btn"; btn.textContent="View Character Sheet →"; btn.disabled=state.equipment===null;
+  btn.onclick=function(){state.step=6;render();}; app.appendChild(btn);
+  app.appendChild(mkBackBtn());
+}
+
+function renderStep6(app){
+  var stats=getFinalStats();
+  var cl=CLASSES[state.cls];
+  var isWarrior=WARRIOR_CLASSES.indexOf(state.cls)>=0;
+  var barDouble=state.cls==="Barbarian";
+  var conBonus=isWarrior?(CON_HP_WAR[sc(stats.CON)]||0):(CON_HP_STD[sc(stats.CON)]||0);
+  var hp=cl.hitDie+(barDouble?conBonus*2:conBonus);
+  var saves=SAVES_L1[state.cls];
+  var wisBonus=WIS_SAVE[sc(stats.WIS)]||0;
+  var dexACV=DEX_AC[sc(stats.DEX)]||0;
+  var strHitV=STR_HIT[sc(stats.STR)]||0;
+  var strDmgV=STR_DMG[sc(stats.STR)]||0;
+  var dexHitV=DEX_HIT[sc(stats.DEX)]||0;
+  var atkBonus=cl.atk[0];
+  var eq=CLASS_EQUIPMENT[state.cls]&&CLASS_EQUIPMENT[state.cls][state.equipment];
+  var armor=ARMORS[eq?eq.armor:"None"]||ARMORS.None;
+  var weapon=WEAPONS[eq?eq.weapon:"Dagger"]||WEAPONS.Dagger;
+  var ac=eq?calcAC(eq,dexACV,barDouble):10+dexACV;
+  var isRanged=weapon.ranged;
+  var hitBonus=atkBonus+(isRanged?dexHitV:strHitV);
+  var dmgBonus=isRanged?0:strDmgV;
+
+  var card=mkCard("");
+  var hdr=document.createElement("div"); hdr.className="sheet-header";
+  hdr.innerHTML='<div class="sheet-name">'+(state.charName||"Unnamed Hero")+'</div><div class="sheet-sub">'+(state.race?state.race.name:"")+" "+state.cls+' &bull; Level 1</div>';
+  card.appendChild(hdr);
+
+  function sec(title){var s=document.createElement("div");s.className="sheet-section";var t=document.createElement("div");t.className="sheet-section-title";t.textContent=title;s.appendChild(t);return s;}
+
+  var ss=sec("Ability Scores");
+  var bonuses=getRaceBonuses();
+  var parts=Object.keys(bonuses).map(function(s){return s+" "+(bonuses[s]>0?"+":"")+bonuses[s];});
+  var raEl=document.createElement("div"); raEl.className="race-applied";
+  var abHtml=state.race&&state.race.abilities&&state.race.abilities.length?renderAbilityTags(state.race.abilities):"";
+  raEl.innerHTML="<div>"+(parts.length?(state.race?state.race.name:"")+" "+parts.join(", "):(state.race?state.race.name:""))+"</div>"+abHtml;
+  raEl.querySelectorAll(".ability-tag").forEach(addTooltipTouch);
+  ss.appendChild(raEl);
+  var sgrid=document.createElement("div"); sgrid.className="stat-sheet-grid";
+  STAT_ORDER.forEach(function(s){
+    var d=state.assignedStats[s];
+    var bt=!d||d.bonus===0?"":(d.bonus>0?"+"+d.bonus:""+d.bonus);
+    var cls2=d&&d.bonus>0?"pos":d&&d.bonus<0?"neg":"";
+    var rollDetail=d?(d.top3?d.top3.join("+")+"﻿="+d.base:d.numDice==="2x2"?"2d6x2="+d.base:""):"";
+    var c=document.createElement("div"); c.className="stat-sheet-card";
+    c.innerHTML='<div class="sname">'+STAT_NAMES[s]+'</div><div class="sval">'+stats[s]+'</div>'+(bt?'<div class="sracial '+cls2+'">'+bt+' racial</div>':'')+'<div class="sbonus">'+rollDetail+"</div>";
+    sgrid.appendChild(c);
+  });
+  ss.appendChild(sgrid); card.appendChild(ss);
+
+  var hpSec=sec("Hit Points");
+  var hpBox=document.createElement("div"); hpBox.className="hp-big";
+  var conNote=barDouble?"Double CON bonus ("+signV(conBonus)+" x2 = "+signV(conBonus*2)+")":"CON bonus: "+signV(conBonus);
+  hpBox.innerHTML='<div class="hp-num">'+hp+'</div><div class="hp-label">Max HP at Level 1</div><div class="hp-detail">d'+cl.hitDie+' max, '+conNote+'</div>';
+  hpSec.appendChild(hpBox); card.appendChild(hpSec);
+
+  var eqSec=sec("Equipment & Armour Class");
+  var acBox=document.createElement("div"); acBox.className="ac-display";
+  acBox.innerHTML='<div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:2px;">Armour Class</div><div class="ac-num">'+ac+'</div></div>'+
+    '<div class="ac-detail">'+armor.name+(eq&&eq.shield?"<br>+ Shield":"")+"<br>DEX bonus: "+signV(dexACV)+(barDouble?" (x2)":"")+"</div>";
+  eqSec.appendChild(acBox);
+  var wCard=document.createElement("div"); wCard.className="weapon-card";
+  var dmgStr=dmgBonus===0?weapon.die:weapon.die+" "+signV(dmgBonus);
+  wCard.innerHTML='<div class="weapon-name">'+weapon.name+(weapon.twoHanded?" (two-handed)":"")+"</div>"+
+    '<div class="weapon-stats">'+
+    '<div class="weapon-stat"><div class="wlabel">To Hit</div><div class="wval">'+signV(hitBonus)+"</div></div>"+
+    '<div class="weapon-stat"><div class="wlabel">Damage</div><div class="wval">'+dmgStr+"</div></div>"+
+    '<div class="weapon-stat"><div class="wlabel">Atk (class)</div><div class="wval">'+signV(atkBonus)+"</div></div>"+
+    '<div class="weapon-stat"><div class="wlabel">'+(isRanged?"DEX Hit":"STR Hit")+'</div><div class="wval">'+signV(isRanged?dexHitV:strHitV)+"</div></div>"+
+    (!isRanged?'<div class="weapon-stat"><div class="wlabel">STR Dmg</div><div class="wval">'+signV(strDmgV)+"</div></div>":"")+
+    "</div>";
+  eqSec.appendChild(wCard);
+  if(eq&&eq.extras&&eq.extras.length){
+    var extra=document.createElement("div"); extra.style.cssText="font-size:12px;color:var(--text2);margin-top:8px;";
+    extra.textContent="Also: "+eq.extras.join(", "); eqSec.appendChild(extra);
+  }
+  card.appendChild(eqSec);
+
+  var derSec=sec("Combat Bonuses");
+  var dgrid=document.createElement("div"); dgrid.className="derived-grid";
+  function dItem(label,val){
+    var item=document.createElement("div"); item.className="derived-item";
+    var cls2=val>0?"pos":val<0?"neg":"";
+    item.innerHTML='<span class="dlabel">'+label+'</span><span class="dval '+cls2+'">'+signV(val)+"</span>";
+    dgrid.appendChild(item);
+  }
+  dItem("Melee Hit (STR)",strHitV); dItem("Melee Dmg (STR)",strDmgV);
+  dItem("Ranged Hit (DEX)",dexHitV); dItem("AC Bonus (DEX)",dexACV);
+  if(cl.wizardAtk){
+    var spAtk=cl.spellAtk?cl.spellAtk[0]:0;
+    var intAtk=INT_SPATK[sc(stats.INT)]||0;
+    dItem("Spell Atk (class)",spAtk); dItem("Spell Atk Bonus (INT)",intAtk); dItem("Spell Potency (INT)",-intAtk);
+  } else if(cl.spellcaster){
+    var wisDiv=WIS_DIV[sc(stats.WIS)]||0;
+    dItem("Divine Potency (WIS)",wisDiv); dItem("Spell Save Bonus (WIS)",wisBonus);
+  }
+  dItem("Languages (INT)",INT_LANG[sc(stats.INT)]||1);
+  derSec.appendChild(dgrid); card.appendChild(derSec);
+
+  var savSec=sec("Saving Throws — roll 1d20 ≥ target");
+  var note=document.createElement("div"); note.style.cssText="font-size:11px;color:var(--text3);margin-bottom:6px;";
+  note.textContent="Lower target = easier save. DEX bonus adds to your Blast roll. WIS bonus adds to your Spell roll.";
+  savSec.appendChild(note);
+  var savGrid=document.createElement("div"); savGrid.className="saves-grid";
+  var saveLabels={Death:"Death / Paralyze",Magic:"Magic Item",Petrify:"Petrify / Polymorph",Blast:"Blast / Barrage",Spell:"Spell"};
+  Object.keys(saves).forEach(function(k){
+    var v=saves[k];
+    var row=document.createElement("div"); row.className="save-row";
+    var modText="";
+    if(k==="Blast"&&dexACV!==0) modText='<span class="smod">roll '+signV(dexACV)+' DEX</span>';
+    if(k==="Spell"&&wisBonus!==0) modText='<span class="smod">roll '+signV(wisBonus)+' WIS</span>';
+    row.innerHTML='<span class="slabel">'+saveLabels[k]+'</span><div class="sright"><span class="snum">'+v+"</span>"+modText+"</div>";
+    savGrid.appendChild(row);
+  });
+  savSec.appendChild(savGrid); card.appendChild(savSec);
+
+  var abSec=sec(state.cls+" — Level 1 Abilities");
+  var abList=document.createElement("ul"); abList.className="class-ability-list";
+  cl.l1.forEach(function(a){var li=document.createElement("li");li.innerHTML="<strong>"+a.name+"</strong>"+a.desc;abList.appendChild(li);});
+  abSec.appendChild(abList); card.appendChild(abSec);
+
+  var expSec=sec("Experiences");
+  var fixed2=cl.expFixed||[];
+  var allExp=fixed2.concat(state.experiences.filter(function(e){return fixed2.indexOf(e)<0;}));
+  var expList=document.createElement("div"); expList.className="exp-list";
+  allExp.forEach(function(e){var tag=document.createElement("span");tag.className="exp-tag selected";tag.style.cursor="default";tag.textContent=e;expList.appendChild(tag);});
+  expSec.appendChild(expList); card.appendChild(expSec);
+
+  app.appendChild(card);
+
+  var newBtn=document.createElement("button"); newBtn.className="new-char-btn"; newBtn.textContent="↺ Create New Character";
+  newBtn.onclick=function(){state={step:1,charName:"",race:null,humanBonusChosen:[],assignedStats:{},rollOrder:0,pendingStat:null,isTouchDevice:false,lastRoll:null,cls:null,experiences:[],equipment:null};render();};
+  app.appendChild(newBtn);
+}
+
+render();
+</script>
+</body>
+</html>
