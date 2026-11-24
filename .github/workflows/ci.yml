@@ -17,6 +17,10 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run check
+      - name: Rules data and report are up to date
+        run: |
+          npm run rules
+          git diff --exit-code -- src/rules/data docs/rules-report.md
 
   desktop:
     name: Desktop app (${{ matrix.name }})

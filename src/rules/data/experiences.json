@@ -1,0 +1,11 @@
+{
+  "source": "Experiences (18hBsCFV3PQC8Mjufchcp0iFHwNlqpXYsuq8FNg1uI_M)",
+  "note": "An Experience gives +2 to the ability score for one roll-under check when the DM accepts it. Players may also write their own. playerWrittenExamples are illustrative, not official.",
+  "startingList": [
+    "Acrobatics", "Animal Handling", "Arcana", "Athletics", "Deception", "History", "Insight", "Intimidation", "Investigation",
+    "Medicine", "Nature", "Perception", "Performance", "Persuasion", "Religion", "Sleight of Hand", "Stealth", "Survival"
+  ],
+  "playerWrittenExamples": [
+    "Blacksmith", "Sailor", "Streetwise", "Alchemist", "Farmer", "Soldier", "Gambler", "Forger", "Hunter's Guide", "Court Etiquette"
+  ]
+}

@@ -1,0 +1,99 @@
+{
+  "source": "Weapons and Armour (12wbQbJ4gk696MVNLaP_taK80j9Xb374qkDi8E90CU_E)",
+  "note": "Copied from the sheet. null means the cell is empty in the sheet. Damage with a slash is one-handed/two-handed for Versatile weapons. AC is written as in the sheet; the app reads 'Dex. Mod.' as the DEX AC Bonus from Ability Score Tables v4.",
+  "weapons": [
+    { "name": "Club", "category": "Simple", "cost": 3, "type": "B", "damage": null, "range": null, "traits": [] },
+    { "name": "Dagger", "category": "Simple", "cost": 2, "type": "P/S", "damage": "1d4", "range": "20/60", "traits": ["Light", "Thrown"] },
+    { "name": "Mace", "category": "Simple", "cost": 8, "type": "B", "damage": "1d6", "range": null, "traits": [] },
+    { "name": "Hand Axe", "category": "Simple", "cost": 1, "type": "S", "damage": "1d6", "range": "20/60", "traits": ["Light", "Thrown"] },
+    { "name": "Quarterstaff", "category": "Simple", "cost": 4, "type": "B", "damage": "1d8", "range": null, "traits": ["Two-Handed"] },
+    { "name": "Spear", "category": "Simple", "cost": 1, "type": "P", "damage": "1d6/1d8", "range": "20/60", "traits": ["Versatile", "Thrown"] },
+    { "name": "Great Club", "category": "Simple", "cost": 6, "type": "B", "damage": "2d4", "range": null, "traits": ["Heavy", "Two-Handed"] },
+    { "name": "Light Hammer", "category": "Simple", "cost": 8, "type": "B", "damage": "1d4", "range": "20/60", "traits": ["Light", "Thrown"] },
+    { "name": "Sickle", "category": "Simple", "cost": 0.2, "type": "S", "damage": "1d6", "range": null, "traits": ["Light"] },
+    { "name": "Short Bow", "category": "Simple", "cost": 30, "type": "P", "damage": "1d6", "range": "80/320", "traits": ["Two-Handed"] },
+    { "name": "Light Crossbow", "category": "Simple", "cost": 35, "type": "P", "damage": "1d8", "range": "80/320", "traits": ["Two-Handed", "Loading"] },
+    { "name": "Javelin", "category": "Simple", "cost": 0.5, "type": "P", "damage": "1d6", "range": "30/120", "traits": ["Thrown"] },
+    { "name": "Sling", "category": "Simple", "cost": 0.1, "type": "B", "damage": "1d4", "range": "30/120", "traits": [] },
+    { "name": "Dart", "category": "Simple", "cost": 0.05, "type": null, "damage": "1d4", "range": "20/60", "traits": ["Thrown"] },
+    { "name": "Battle Axe", "category": "Martial", "cost": 5, "type": "S", "damage": "1d8/1d10", "range": null, "traits": ["Versatile"] },
+    { "name": "Lance", "category": "Martial", "cost": 15, "type": "P", "damage": "1d12", "range": null, "traits": [] },
+    { "name": "Morning Star", "category": "Martial", "cost": 10, "type": "B", "damage": "1d8", "range": null, "traits": [] },
+    { "name": "Bastard Sword", "category": "Martial", "cost": 25, "type": "S", "damage": "1d6/1d12", "range": null, "traits": ["Heavy", "Versatile"] },
+    { "name": "Broad Sword", "category": "Martial", "cost": 10, "type": "S", "damage": "2d4", "range": null, "traits": [] },
+    { "name": "Long Sword", "category": "Martial", "cost": 15, "type": "S", "damage": "1d8/1d10", "range": null, "traits": ["Versatile"] },
+    { "name": "Two-handed Sword", "category": "Martial", "cost": 50, "type": "S", "damage": "2d6", "range": null, "traits": ["Heavy", "Two-Handed"] },
+    { "name": "Warhammer", "category": "Martial", "cost": 2, "type": "B", "damage": "1d8/1d10", "range": null, "traits": ["Versatile"] },
+    { "name": "Flail", "category": "Martial", "cost": 15, "type": "B", "damage": "2d4", "range": null, "traits": [] },
+    { "name": "Maul", "category": "Martial", "cost": 15, "type": "B", "damage": "2d6", "range": null, "traits": ["Heavy", "Two-Handed"] },
+    { "name": "Rapier", "category": "Martial", "cost": 25, "type": "P", "damage": "1d8", "range": null, "traits": [] },
+    { "name": "Short Sword", "category": "Martial", "cost": 10, "type": "P", "damage": "1d6", "range": null, "traits": ["Light"] },
+    { "name": "Scimitar", "category": "Martial", "cost": 25, "type": "S", "damage": "1d6", "range": null, "traits": ["Light"] },
+    { "name": "Trident", "category": "Martial", "cost": 5, "type": "P", "damage": "1d8/2d4", "range": "20/60", "traits": ["Versatile", "Thrown"] },
+    { "name": "War Pick", "category": "Martial", "cost": 5, "type": "P", "damage": "1d8", "range": null, "traits": [] },
+    { "name": "Great Axe", "category": "Martial", "cost": null, "type": "S", "damage": "1d12", "range": null, "traits": ["Heavy", "Two-Handed"] },
+    { "name": "Halberd", "category": "Martial", "cost": 15, "type": "P/S", "damage": "1d10", "range": null, "traits": ["Heavy", "Two-Handed", "Reach"] },
+    { "name": "Glaive", "category": "Martial", "cost": 8, "type": "S", "damage": "1d10", "range": null, "traits": ["Heavy", "Two-Handed", "Reach"] },
+    { "name": "Ranseur/Pike", "category": "Martial", "cost": 7, "type": "P", "damage": "1d10", "range": null, "traits": ["Heavy", "Two-Handed", "Reach"] },
+    { "name": "Bec de Corbin", "category": "Martial", "cost": 10, "type": "P/B", "damage": "1d10", "range": null, "traits": ["Heavy", "Two-Handed", "Reach"] },
+    { "name": "Long Bow", "category": "Martial", "cost": 75, "type": "P", "damage": "1d8", "range": "150/600", "traits": ["Two-Handed"] },
+    { "name": "Hand Crossbow", "category": "Martial", "cost": 300, "type": "P", "damage": "1d6", "range": "30/120", "traits": ["Light", "Loading"] },
+    { "name": "Heavy Crossbow", "category": "Martial", "cost": 50, "type": "P", "damage": "1d10", "range": "100/400", "traits": ["Heavy", "Two-Handed", "Loading"] }
+  ],
+  "armour": [
+    { "name": "Shield", "group": "Shield", "cost": 10, "acText": "+2", "baseAC": null, "acBonus": 2, "dexCap": null, "strReq": null, "notes": null },
+    { "name": "Padded", "group": "Light", "cost": 5, "acText": "11 +Dex. Mod.", "baseAC": 11, "acBonus": null, "dexCap": null, "strReq": null, "notes": "Disadvantage on Stealth" },
+    { "name": "Leather", "group": "Light", "cost": 10, "acText": "11 +Dex. Mod.", "baseAC": 11, "acBonus": null, "dexCap": null, "strReq": null, "notes": null },
+    { "name": "Studded Leather", "group": "Light", "cost": 45, "acText": "12 +Dex. Mod.", "baseAC": 12, "acBonus": null, "dexCap": null, "strReq": null, "notes": null },
+    { "name": "Hide", "group": "Medium", "cost": 10, "acText": "12 + Dex. Mod. (max +2)", "baseAC": 12, "acBonus": null, "dexCap": 2, "strReq": null, "notes": null },
+    { "name": "Chain Shirt", "group": "Medium", "cost": 50, "acText": "13 + Dex. Mod. (max +2)", "baseAC": 13, "acBonus": null, "dexCap": 2, "strReq": null, "notes": null },
+    { "name": "Scale Mail / Brigandine", "group": "Medium", "cost": 50, "acText": "14 + Dex. Mod. (max +2)", "baseAC": 14, "acBonus": null, "dexCap": 2, "strReq": null, "notes": "Disadvantage on Stealth" },
+    { "name": "Breastplate", "group": "Medium", "cost": 400, "acText": "14 + Dex. Mod. (max +2)", "baseAC": 14, "acBonus": null, "dexCap": 2, "strReq": null, "notes": null },
+    { "name": "Halfplate", "group": "Medium", "cost": 750, "acText": "15 + Dex. Mod. (max +2)", "baseAC": 15, "acBonus": null, "dexCap": 2, "strReq": null, "notes": "Disadvantage on Stealth" },
+    { "name": "Ring Mail", "group": "Heavy", "cost": 30, "acText": "14", "baseAC": 14, "acBonus": null, "dexCap": 0, "strReq": null, "notes": "Disadvantage on Stealth" },
+    { "name": "Chain / Banded Mail", "group": "Heavy", "cost": 75, "acText": "16", "baseAC": 16, "acBonus": null, "dexCap": 0, "strReq": 13, "notes": "Disadvantage on Stealth" },
+    { "name": "Splint", "group": "Heavy", "cost": 200, "acText": "17", "baseAC": 17, "acBonus": null, "dexCap": 0, "strReq": 15, "notes": "Disadvantage on Stealth" },
+    { "name": "Plate", "group": "Heavy", "cost": 1500, "acText": "18", "baseAC": 18, "acBonus": null, "dexCap": 0, "strReq": 15, "notes": "Disadvantage on Stealth" }
+  ],
+  "startingOptions": {
+    "note": "Text exactly as in the 'Starting Equipment options' sheet. The player picks one Choice One option and one Choice Two option.",
+    "classes": {
+      "Fighter": {
+        "choiceOne": ["Two-Handed Martial Melee", "One-Handed Martial Melee and Light Crossbow", "Two One-Handed Martial Melee and one thrown weapon"],
+        "choiceTwo": ["Chain Mail", "Chain Shirt and Shield", "Leather and Long Bow"]
+      },
+      "Ranger": {
+        "choiceOne": ["Scale Mail / Brigandine / Chain Shirt and One-Handed Martial", "Learther Armour and Long Bow"],
+        "choiceTwo": ["One Handed Martial Melee and Shield", "Shortbow and Dagger", "One Handed Martial Melee and Short Sword"]
+      },
+      "Barbarian": {
+        "choiceOne": ["Two-Handed Martial Melee", "Two One-Handed Martial Melee and one thrown weapon"],
+        "choiceTwo": ["Shield", "Any light or thrown weapon"]
+      },
+      "Paladin": {
+        "choiceOne": ["Two-Handed Martial Melee", "One-Handed Martial Melee and Light Crossbow", "Two One-Handed Martial Melee and one thrown weapon"],
+        "choiceTwo": ["Chain Mail", "Chain Shirt and Shield"]
+      },
+      "Cleric": {
+        "choiceOne": ["One-Handed Martial Melee and Light Crossbow", "Two One-Handed Martial Melee and one thrown weapon"],
+        "choiceTwo": ["Chain Mail", "Scale Mail and Shield"]
+      },
+      "Druid": {
+        "choiceOne": ["Leather Armour and any Druid weapon", "Hide Armour and any Druid weapon"],
+        "choiceTwo": ["Shield", "Any Druid Weapon"]
+      },
+      "Thief": {
+        "choiceOne": ["Studded Leather", "Leather Armour and Rapier"],
+        "choiceTwo": ["Light Cross and 2 Dagger", "Longsword and Shortsword"]
+      },
+      "Bard": {
+        "choiceOne": ["Chain Mail", "Chain Shirt and One Handed Martial Melee"],
+        "choiceTwo": ["Heavy Crossbow and Dagger", "Any two Martial Melee weapons"]
+      },
+      "Wizard": {
+        "choiceOne": ["Any two Wizard Weapons"],
+        "choiceTwo": []
+      }
+    }
+  }
+}

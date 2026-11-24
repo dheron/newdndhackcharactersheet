@@ -53,6 +53,8 @@ Plan: [`docs/development-plan.md`](docs/development-plan.md).
 - `npm run dev`: front end in a browser at http://localhost:1420.
 - `npx tauri dev`: the desktop app with live reload.
 - `npm run check`: typecheck, tests and front end build. Run before every commit.
+- Rules data: `src/rules/data/*.json`, one file per source doc, each naming its source. `src/rules/index.ts` is the only way the app reads it. Spell lists are generated from `sources/spell-lists.txt`.
+- `npm run rules`: regenerates `spells.json` and `docs/rules-report.md` (every value next to its source, plus gaps and interpretations). Run after any data change; CI fails if they are stale.
 - `npx tauri build`: installers for the current OS. CI (`.github/workflows/ci.yml`) builds the macOS (universal) and Windows installers and attaches them to each run.
 - App icon: `app-icon.png` is a placeholder; regenerate sizes with `npx tauri icon app-icon.png`.
 
@@ -61,6 +63,6 @@ Plan: [`docs/development-plan.md`](docs/development-plan.md).
 1. Print page 1: approved (first draft).
 2. Print page 2 for spellcasters: approved for Wizard and Cleric; Druid, Bard, Paladin, Ranger drafted.
 3. iPad and phone versions: in progress.
-4. App build: phase 0 (app skeleton and CI) done. Next: phase 1, rules data for character creation.
+4. App build: phase 0 (app skeleton and CI) done. Phase 1 (rules data and report) done, awaiting David's check of `docs/rules-report.md`. Next: phase 2, character creation.
 
 Open questions are listed at the end of the spec.

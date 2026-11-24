@@ -1,0 +1,169 @@
+{
+  "source": "Classes v4 (1UDB0LV9BfAtNSdZ3lAkDJWmv1Wi6RIQGlaXwbqs3rpg)",
+  "note": "Per-level arrays: index 0 is level 1. hp is the doc's HP column. spellSlots lists slots per spell level, 1st first. abilities and cantrips are keyed by class level. Text is copied from the doc; where the doc ran two entries together they are split into separate strings.",
+  "classes": {
+    "Fighter": {
+      "armour": "Any armour, Shields",
+      "weapons": "Any Weapons",
+      "experiences": { "docText": "Pick 4", "fixed": [], "total": 4 },
+      "xp": [0, 300, 700, 1300, 2500, 4450, 7300, 11200, 16300, 22750, 30700, 44200, 67400, 95150, 140800, 223650, 325900, 467600, 609300, 751000],
+      "attackBonus": [1, 1, 2, 2, 3, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 9, 10, 10, 11, 12],
+      "hp": ["1d10", "2d10", "3d10", "4d10", "5d10", "6d10", "7d10", "8d10", "9d10", "10d10", "10d10+3", "10d10+6", "10d10+9", "10d10+12", "10d10+15", "10d10+18", "10d10+21", "10d10+24", "10d10+27", "10d10+30"],
+      "abilities": {
+        "1": ["Weapon Specialization: +2 damage to either melee or ranged attack (pick one)."],
+        "3": ["Cleave: If you kill an enemy with DL1 or less you can make another attack"],
+        "5": ["Extra Attack"],
+        "9": ["Cleave: DL2 or less"],
+        "12": ["Extra Attack"],
+        "16": ["Cleave: DL4 or less"]
+      }
+    },
+    "Barbarian": {
+      "armour": "No armour. Shield.",
+      "weapons": "All weapons.",
+      "experiences": { "docText": "Athletics, Survival, 3 more", "fixed": ["Athletics", "Survival"], "total": 5 },
+      "xp": [0, 2000, 4000, 8000, 16000, 32000, 64000, 125000, 250000, 500000, 750000, 1000000, 1250000, 1500000, 1750000, 2000000, 2250000, 2500000, 2750000, 3000000],
+      "attackBonus": [1, 1, 2, 2, 3, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 9, 10, 10, 11, 12],
+      "hp": ["1d12", "2d12", "3d12", "4d12", "5d12", "6d12", "7d12", "8d12", "9d12", "10d12", "10d12+3", "10d12+6", "10d12+9", "10d12+12", "10d12+15", "10d12+18", "10d12+21", "10d12+24", "10d12+27", "10d12+30"],
+      "abilities": {
+        "1": ["Double Con bonus to HP. Double Dex bonus to AC", "Reckless Attack: Can attack with advantage, enemies get advantage to attack PC"],
+        "3": ["Danger Sense: Double Dex bonus to save vs Blast/Barrage. Dex bonus to an save vs traps"],
+        "5": ["Extra Attack"],
+        "9": ["Brutal Critical: 1 Extra Damage dice on Crit (note: maybe this should be exploding damage and avoid crit trigger)"],
+        "12": ["Extra Attack"],
+        "13": ["Brutal Critical: 2 Extra Damage dice on Crit"],
+        "17": ["Brutal Critical: 3 Extra Damage dice on Crit"]
+      }
+    },
+    "Paladin": {
+      "armour": null,
+      "weapons": null,
+      "experiences": { "docText": null, "fixed": [], "total": null },
+      "xp": [0, 350, 800, 1480, 2940, 5280, 8600, 13000, 20420, 30910, 44540, 64300, 72530, 95730, 140970, 239440, 411720, 617360, 823000, 1028640],
+      "attackBonus": [1, 1, 2, 2, 3, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 9, 10, 10, 11, 12],
+      "hp": ["1d10", "2d10", "3d10", "4d10", "5d10", "6d10", "7d10", "8d10", "9d10", "10d10", "10d10+3", "10d10+6", "10d10+9", "10d10+12", "10d10+15", "10d10+18", "10d10+21", "10d10+24", "10d10+27", "10d10+30"],
+      "spellSlots": [[], [2], [3], [3], [4, 2], [4, 2], [4, 3], [4, 3], [4, 3, 2], [4, 3, 2], [4, 3, 3], [4, 3, 3], [4, 3, 3, 1], [4, 3, 3, 1], [4, 3, 3, 2], [4, 3, 3, 2], [4, 3, 3, 3, 1], [4, 3, 3, 3, 1], [4, 3, 3, 3, 2], [4, 3, 3, 3, 2]],
+      "abilities": {
+        "1": [
+          "Divine Sense- detect the presence of evil, celestial, fiend, or undead up to 60 feet away.",
+          "Lay on Hands - A pool of healing equal to 5×paladin level, refills after a long rest. Touch a creature and spend points from the pool to restore that many hit points. Spend 5 points to cure one disease or neutralize one poison.",
+          "Divine Health - You are immunity to disease"
+        ],
+        "3": ["Turn Undead - as per 2e add"],
+        "5": ["Extra Attack"],
+        "6": ["Aura of Protection - 10ft radius. All summoned and evil creatures suffer a -1 penalty to their attack rolls."],
+        "10": ["Aura of Protection - All good creatures get +1 to saves"],
+        "12": ["Extra Attack"]
+      }
+    },
+    "Ranger": {
+      "armour": "Light and Medium Armour, Shields",
+      "weapons": "All weapons",
+      "experiences": { "docText": "Nature, Survival. Three others", "fixed": ["Nature", "Survival"], "total": 5 },
+      "xp": [0, 350, 800, 1480, 2940, 5280, 8600, 13000, 20420, 30910, 44540, 64300, 72530, 95730, 140970, 239440, 411720, 617360, 823000, 1028640],
+      "attackBonus": [1, 1, 2, 2, 3, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 9, 10, 10, 11, 12],
+      "hp": ["1d10", "2d10", "3d10", "4d10", "5d10", "6d10", "7d10", "8d10", "9d10", "10d10", "10d10+3", "10d10+6", "10d10+9", "10d10+12", "10d10+15", "10d10+18", "10d10+21", "10d10+24", "10d10+27", "10d10+30"],
+      "spellSlots": [[], [2], [3], [3], [4, 2], [4, 2], [4, 3], [4, 3], [4, 3, 2], [4, 3, 2], [4, 3, 3], [4, 3, 3], [4, 3, 3, 1], [4, 3, 3, 1], [4, 3, 3, 2], [4, 3, 3, 2], [4, 3, 3, 3, 1], [4, 3, 3, 3, 1], [4, 3, 3, 3, 2], [4, 3, 3, 3, 2]],
+      "abilities": {
+        "1": [
+          "Two-Handed Fighting - No size restriction on off hand weapons. Str bonus to damage applied to off-hand.",
+          "Favoured Enemy - +4 attack and damage",
+          "Natural Explorer - Pick terrain. +4 when trying to navigate, track, move unseen, forage etc"
+        ],
+        "5": ["Extra Attack"],
+        "12": ["Extra Attack"]
+      }
+    },
+    "Cleric": {
+      "armour": "All armour, Shields",
+      "weapons": "All weapons",
+      "experiences": { "docText": "Religion, 3 others", "fixed": ["Religion"], "total": 4 },
+      "xp": [0, 300, 700, 1300, 2450, 4230, 6720, 10000, 15070, 21950, 30650, 41180, 63090, 87010, 122480, 181470, 262810, 364890, 491310, 617730],
+      "attackBonus": [0, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 8],
+      "hp": ["1d8", "2d8", "3d8", "4d8", "5d8", "6d8", "7d8", "8d8", "9d8", "10d8", "10d8+2", "10d8+4", "10d8+6", "10d8+8", "10d8+10", "10d8+12", "10d8+14", "10d8+16", "10d8+18", "10d8+20"],
+      "spellSlots": [[2], [3], [3, 1], [3, 2], [3, 3, 1], [3, 3, 2], [3, 3, 2, 1], [3, 3, 3, 2], [4, 4, 3, 2, 1], [4, 4, 3, 3, 2], [5, 4, 4, 3, 2, 1], [6, 5, 5, 3, 2, 2], [6, 6, 6, 4, 2, 2], [6, 6, 6, 5, 3, 2, 1], [6, 6, 6, 6, 4, 2, 1], [7, 7, 7, 6, 4, 3, 1], [7, 7, 7, 7, 5, 3, 2], [8, 8, 8, 8, 6, 4, 2], [9, 9, 8, 8, 6, 4, 2], [9, 9, 9, 8, 7, 5, 2]],
+      "cantrips": { "1": 2, "5": 3, "13": 4 },
+      "abilities": {
+        "1": ["Turn Undead as per 2e add", "2 Cantrips"],
+        "5": ["Third Cantrip"],
+        "10": ["Divine Intervention"],
+        "13": ["4th Cantrip"]
+      }
+    },
+    "Druid": {
+      "armour": "Any non metal armour, Shield",
+      "weapons": "clubs, daggers, darts, javelins, maces, quarterstaffs, scimitars, sickles, slings, spears",
+      "experiences": { "docText": "Nature, 3 others", "fixed": ["Nature"], "total": 4 },
+      "xp": [0, 300, 700, 1300, 2450, 4230, 6720, 10000, 15070, 21950, 30650, 41180, 63090, 87010, 122480, 181470, 262810, 364890, 491310, 617730],
+      "attackBonus": [0, 1, 1, 2, 2, 2, 3, 3, 3, 4, 4, 5, 5, 5, 6, 6, 6, 7, 7, 8],
+      "hp": ["1d8", "2d8", "3d8", "4d8", "5d8", "6d8", "7d8", "8d8", "9d8", "10d8", "10d8+2", "10d8+4", "10d8+6", "10d8+8", "10d8+10", "10d8+12", "10d8+14", "10d8+16", "10d8+18", "10d8+20"],
+      "spellSlots": [[2], [3], [3, 1], [3, 2], [3, 3, 1], [3, 3, 2], [3, 3, 2, 1], [3, 3, 3, 2], [4, 4, 3, 2, 1], [4, 4, 3, 3, 2], [5, 4, 4, 3, 2, 1], [6, 5, 5, 3, 2, 2], [6, 6, 6, 4, 2, 2], [6, 6, 6, 5, 3, 2, 1], [6, 6, 6, 6, 4, 2, 1], [7, 7, 7, 6, 4, 3, 1], [7, 7, 7, 7, 5, 3, 2], [8, 8, 8, 8, 6, 4, 2], [9, 9, 8, 8, 6, 4, 2], [9, 9, 9, 8, 7, 5, 2]],
+      "cantrips": { "1": 2, "5": 3, "13": 4 },
+      "abilities": {
+        "1": ["Wild Shape - CR ¼", "2 Cantrips"],
+        "3": ["Wild Shape - CR Druid Level / 3 round down"],
+        "4": ["Wild Shape - Swim"],
+        "5": ["3rd Cantrip"],
+        "8": ["Wild Shape- Fly"],
+        "10": ["Elemental Wild Shape"],
+        "13": ["4th Cantrip"],
+        "18": ["Timeless Body"]
+      }
+    },
+    "Bard": {
+      "armour": "Light/Medium armour, Ringmail, Chainmail",
+      "weapons": "All weapons",
+      "experiences": { "docText": "pickpocket, arcana, 4 others", "fixed": ["pickpocket", "arcana"], "total": 6 },
+      "xp": [0, 300, 1000, 2460, 4730, 7850, 11850, 18070, 26530, 37270, 50310, 67390, 71340, 89410, 120380, 224760, 392350, 598980, 805600, 1012220],
+      "attackBonus": [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5],
+      "hp": ["1d6", "2d6", "3d6", "4d6", "5d6", "6d6", "7d6", "8d6", "9d6", "10d6", "10d6+2", "10d6+4", "10d6+6", "10d6+8", "10d6+10", "10d6+12", "10d6+14", "10d6+16", "10d6+18", "10d6+20"],
+      "spellSlots": [[2], [3], [4], [4, 1], [4, 2], [4, 3], [4, 4], [4, 4, 1], [4, 4, 2], [4, 4, 3], [4, 4, 4], [4, 4, 4, 1], [4, 4, 4, 2], [4, 4, 4, 3], [4, 4, 4, 4], [4, 4, 4, 4, 1], [4, 4, 4, 4, 2], [4, 4, 4, 4, 3], [4, 4, 4, 4, 4, 1], [4, 4, 4, 4, 4, 2]],
+      "cantrips": { "1": 2, "5": 3, "13": 4 },
+      "abilities": {
+        "1": ["Bardic Inspiration", "Jack of All Trade - +1 ability when not using experience", "2 Cantrips"],
+        "4": ["Magical Secrets - pick spell from any list"],
+        "5": ["3rd Cantrip"],
+        "8": ["Magical Secrets"],
+        "10": ["Extra Attack"],
+        "12": ["Magical Secrets"],
+        "13": ["4th Cantrip"],
+        "16": ["Magical Secrets"],
+        "19": ["Magical Secrets"]
+      }
+    },
+    "Thief": {
+      "armour": "Light Armour",
+      "weapons": "simple weapons, hand crossbows, longswords, rapiers, shortswords",
+      "experiences": { "docText": "Stealth, Open Locks, Find/Remove Traps, Climb, Pick Pockets, 4 others.", "fixed": ["Stealth", "Open Locks", "Find/Remove Traps", "Climb", "Pick Pockets"], "total": 9 },
+      "xp": [0, 170, 440, 850, 1440, 2250, 3790, 5630, 7810, 12530, 20990, 34390, 50010, 66060, 85000, 110040, 142290, 199620, 264730, 339180],
+      "attackBonus": [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 5],
+      "hp": ["1d6", "2d6", "3d6", "4d6", "5d6", "6d6", "7d6", "8d6", "9d6", "10d6", "10d6+2", "10d6+4", "10d6+6", "10d6+8", "10d6+10", "10d6+12", "10d6+14", "10d6+16", "10d6+18", "10d6+20"],
+      "abilities": {
+        "1": ["Backstab (x2 damage)", "Expertise (Pick two experiences, you may double the bonus)", "Thieves Cant’"],
+        "5": ["Backstab (x3 damage)"],
+        "6": ["Expertise (Pick two more)"],
+        "7": ["Evasion - If successful save vs Blast/Barrage they take no damage when they normal would take half."],
+        "9": ["Backstab (x4 damage)"],
+        "10": ["Use Magic Device"],
+        "13": ["Backstab (x5 damage)"],
+        "16": ["Expertise (Pick 2 more)"]
+      }
+    },
+    "Wizard": {
+      "armour": "No armour",
+      "weapons": "Daggers, darts, slings, quarterstaffs, Sickle, light crossbow",
+      "experiences": { "docText": null, "fixed": [], "total": null },
+      "xp": [0, 350, 850, 1600, 3250, 5950, 9850, 15100, 25080, 39890, 59630, 84400, 106690, 179800, 294080, 454400, 626990, 799580, 972180, 1144770],
+      "attackBonus": [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3, 3, 3, 4],
+      "spellAttack": [0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 6],
+      "hp": ["1d4", "2d4", "3d4", "4d4", "5d4", "6d4", "7d4", "8d4", "9d4", "10d4", "10d4+1", "10d4+2", "10d4+3", "10d4+4", "10d4+5", "10d4+6", "10d4+7", "10d4+8", "10d4+9", "10d4+10"],
+      "spellSlots": [[2], [3], [4, 2], [4, 3], [4, 3, 2], [4, 3, 3], [4, 3, 3, 1], [4, 3, 3, 2], [4, 3, 3, 3, 1], [4, 4, 3, 3, 2], [4, 4, 4, 3, 2, 1], [4, 4, 4, 4, 3, 2], [5, 5, 5, 4, 4, 2, 1], [5, 5, 5, 5, 4, 3, 1], [5, 5, 5, 5, 5, 3, 2, 1], [5, 5, 5, 5, 5, 3, 2, 1], [5, 5, 5, 5, 5, 3, 3, 2, 1], [5, 5, 5, 5, 5, 3, 3, 2, 1], [5, 5, 5, 5, 5, 3, 3, 3, 1], [5, 5, 5, 5, 5, 4, 3, 3, 2]],
+      "cantrips": { "1": 3, "5": 4, "13": 5 },
+      "abilities": {
+        "1": ["3 Cantrips"],
+        "5": ["4th Cantrip"],
+        "13": ["5th Cantrips"]
+      }
+    }
+  }
+}

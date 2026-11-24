@@ -1,0 +1,39 @@
+{
+  "source": "Classes v4, Multiclassing (1UDB0LV9BfAtNSdZ3lAkDJWmv1Wi6RIQGlaXwbqs3rpg)",
+  "note": "Combinations text copied from the doc. In the doc, * means the Fighter (or other marked class) can be swapped for Ranger, ** for Bard or Druid as noted per race. Each class in a multiclass character gets its own sheet (David's decision).",
+  "rules": [
+    "A multi-class character improves in two or more classes simultaneously. His experience is divided equally between each class. The available class combinations vary according to race. The character can use the abilities of both classes at any time, with only a few restrictions.",
+    "A multi-class character always uses the most favorable attack bonus and saving throw from his different classes.",
+    "The character's hit points are the average of all his Hit Dice rolls. When the character is first created, the player rolls hit points for each class separately, totals them up, then divides by the number of dice rolled (round fractions down). Any Constitution bonus is then added to the character's hit points.",
+    "Later the character is likely to gain levels in different classes at different times. When this happens, roll the appropriate Hit Die and divide the result by the number of classes the character has (round fractions down, but a Hit Die never yields less than 1 hit point). The character's Constitution bonus is split between his classes."
+  ],
+  "combinations": {
+    "Dwarf (Duergar)": { "options": "Fighter*/Thief, Fighter/Cleric, Cleric/Thief", "key": "*or Ranger" },
+    "Dwarf (Hill)": { "options": "Fighter*/Thief, Fighter/Cleric.", "key": "*or Ranger" },
+    "Dwarf (Mountain)": { "options": "Fighter*/Thief, Fighter/Cleric.", "key": "*or Ranger" },
+    "Dragonborn": { "options": "Fighter/Thief, Fighter/Cleric, Fighter/Wizard", "key": "" },
+    "Elf (Drow)": { "options": "Fighter*/Thief, Fighter*/Cleric, Cleric/Thief, Fighter*/Wizard, Fighter*/Wizard/Thief.", "key": "*or Ranger" },
+    "Elf (High)": { "options": "Fighter*/Thief**, Fighter*/Wizard, Fighter/Wizard/Thief.", "key": "*or Ranger **or Bard" },
+    "Elf (Wood)": { "options": "Fighter*/Thief, Fighter*/Wizard, Fighter/Wizard/Thief, Fighter/Druid.", "key": "*or Ranger" },
+    "Firbolg": { "options": "Fighter*/Cleric, Fighter*/Wizard, Druid/Wizard.", "key": "*or Ranger" },
+    "Gnome (Deep)": { "options": "Fighter/Thief, Fighter/Mage, Mage/Thief", "key": "" },
+    "Gnome (Forest)": { "options": "Fighter*/Thief, Fighter*/Mage, Mage*/Thief, Fighter*/Cleric**", "key": "*or Ranger **or Druid" },
+    "Gnome (Rock)": { "options": "Fighter/Thief, Fighter/Mage, Mage/Thief", "key": "" },
+    "Goliath": { "options": "Fighter*/Wizard, Fighter*/Cleric**, Barbarian/Cleric**.", "key": "*or Ranger **or Druid" },
+    "Half-Elf": { "options": "Fighter*/Thief**, Fighter*/Cleric***, Fighter*/Wizard, Cleric/Thief**, Cleric***/Wizard, Cleric***/Wizard, Fighter/Wizard/Thief.", "key": "*or Ranger **or Bard. ***or Druid" },
+    "Halfling (Lightfoot)": { "options": "Fighter*/Thief**", "key": "*or Ranger **or Bard" },
+    "Halfling (Stout)": { "options": "Fighter/Thief, Fighter/Cleric", "key": "" },
+    "Human": { "options": "Fighter*/Thief**, Fighter*/Cleric***, Fighter*/Wizard, Cleric/Thief**, Cleric***/Wizard, Cleric***/Wizard, Barbarian/Thief, Barbarian/Cleric***.", "key": "*or Ranger **or Bard. ***or Druid" },
+    "Tiefling": { "options": "Fighter/Thief, Fighter/Mage, Mage/Thief", "key": "" }
+  },
+  "restrictions": {
+    "Fighter": "A multi-classed fighter can use all of his abilities without restriction.",
+    "Ranger": "A multi-classed Ranger may only benefit from Two-Handed Fighting, Natural Explorer, and Spellcasting if they are not wearing Heavy Armour.",
+    "Barbarian": "A multi-classed Barbarian may only benefit from class abilities if they are unarmoured.",
+    "Thief": "A multi-classed Thief may only benefit from Backstab or Evasion if they are not wearing Medium or Heavy Armour",
+    "Bard": "A multi-classed Bard may only cast spells if they are not wearing Heavy Armour",
+    "Cleric": "A multi-classed Cleric can use all of his abilities without restriction.",
+    "Druid": "A multi-classed may only wear non metal amour",
+    "Wizard": "A multi-classed Wizard may only cast spells if they are unarmoured."
+  }
+}
