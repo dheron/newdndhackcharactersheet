@@ -289,11 +289,21 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
           </ul>
           <div class="l left">Languages ({view.bonuses.languages})</div>
           {view.languages.length > 0 && <div class="known-langs">{view.languages.join(", ")}</div>}
-          <textarea class="in area small" aria-label="Languages" value={c.play.languages} onInput={(e) => play({ languages: (e.target as HTMLTextAreaElement).value })} />
+          <LinedText small label="Languages" value={c.play.languages} onChange={(v) => play({ languages: v })} />
         </div>
-        <textarea class="in area" aria-label="Inventory" value={c.play.inventory} onInput={(e) => play({ inventory: (e.target as HTMLTextAreaElement).value })} />
-        <textarea class="in area" aria-label="Notes" value={c.play.notes} onInput={(e) => play({ notes: (e.target as HTMLTextAreaElement).value })} />
+        <LinedText label="Inventory" value={c.play.inventory} onChange={(v) => play({ inventory: v })} />
+        <LinedText label="Notes" value={c.play.notes} onChange={(v) => play({ notes: v })} />
       </div>
+    </div>
+  );
+}
+
+/** A ruled text area. Printing shows the text on ruled lines instead of the text box, which prints unreliably. */
+function LinedText({ label, value, onChange, small }: { label: string; value: string; onChange: (v: string) => void; small?: boolean }) {
+  return (
+    <div class={small ? "lined small" : "lined"}>
+      <textarea class="in area no-print" aria-label={label} value={value} onInput={(e) => onChange((e.target as HTMLTextAreaElement).value)} />
+      <div class="print-only lines-text">{value}</div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import type { Character } from "../model/character";
 import { saveCharacterFileAs, writeCharacterFile, type FilePath } from "../storage";
+import { printSheet } from "../print";
 import { sheetFor } from "./derived";
 import { Page1 } from "./Page1";
 import { Page2 } from "./Page2";
@@ -71,6 +72,9 @@ export function Sheet({ initial, path: initialPath, onClose }: { initial: Charac
         </span>
         <button type="button" class={!path && dirty ? "primary" : ""} onClick={saveAs}>
           {path ? "Save as" : "Save"}
+        </button>
+        <button type="button" onClick={() => printSheet().catch((e) => setStatus(`Could not print: ${e instanceof Error ? e.message : String(e)}`))}>
+          Print
         </button>
       </div>
       <div class="pages">

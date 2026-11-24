@@ -68,6 +68,10 @@ One page per casting class. Same structure for all:
 - Concentration is not a rule in this system.
 - Alignment is the basic 5e list (David).
 
+## Printing (phase 4)
+
+The Print button prints the same pages: page 1, then a page 2 for each casting class, one US Letter page each with the sheet's own 40px margin (printer margins off). The print dialog also saves a PDF. Page 2 follows each class's approved wireframe (columns, row heights, slot boxes, Turn Undead); `src/sheet/page2Layout.ts` holds those layouts. On paper, the Slots boxes the character has now are filled; spent slots and prepared spells print as currently ticked. Text the player typed prints on ruled lines.
+
 ## On screen (phase 3)
 
 The app shows the same pages as the print layout, with worked-out values filled in and inputs for what changes in play: XP, current and temp HP, hit dice lines 2 and 3, extra Experiences, save notes, armour, shield, AC misc and note, weapons with Mag and Note, languages, inventory and notes. Page 2 shows the slots the character has now (filled), Spent tick boxes for those, and a Prepared tick beside each spell; Wizards add spells to their spellbook from the list. In the desktop app every change is saved back to the character's file.

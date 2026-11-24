@@ -5,6 +5,7 @@ import { spells, turnUndead } from "../rules";
 import { emptyCasting, type Character } from "../model/character";
 import type { Caster } from "../engine/derive";
 import { slotTable, turnUndeadColumn } from "./derived";
+import { PAGE2_LAYOUT, type BoxId } from "./page2Layout";
 import type { Update } from "./Page1";
 
 const sign = (n: number) => (n > 0 ? `+${n}` : `${n}`);
@@ -13,7 +14,9 @@ const ordinal = (n: number) => `${n}${n === 1 ? "st" : n === 2 ? "nd" : n === 3 
 export function Page2({ c, caster, update }: { c: Character; caster: Caster; update: Update }) {
   const cls = caster.cls;
   const list = spells[cls]?.levels ?? {};
-  const slots = slotTable(cls, caster.level).filter((s) => s.max > 0 && (list[String(s.spellLevel)]?.length ?? 0) > 0);
+  const layout = PAGE2_LAYOUT[cls];
+  if (!layout) return null;
+  const slots = slotTable(cls, caster.level);
   const isWizard = cls === "Wizard";
   const mine = c.play.casting[cls] ?? emptyCasting();
   const setCasting = (patch: Partial<typeof mine>) =>
@@ -27,16 +30,111 @@ export function Page2({ c, caster, update }: { c: Character; caster: Caster; upd
   const attackTotal = caster.spellAttack + mine.spellAttackMisc;
   const statPart = caster.spellAttackStat;
   const tu = turnUndeadColumn(cls, caster.level);
-  const showTurnUndead = cls === "Cleric" || cls === "Paladin";
+  const showTurnUndead = layout.turnUndead;
+  const rowStyle = `height:${layout.rowHeight}px`;
+  const cantrips = c.cantrips[cls] ?? [];
+
+  const square = (key: number, filled: boolean) => <span key={key} class={filled ? "sq have" : "sq"} />;
+  const slotBand = (i: number) => {
+    const { max, now } = slots[i] ?? { max: 0, now: 0 };
+    const spent = Math.min(mine.slotsSpent[i] ?? 0, now);
+    const have = Array.from({ length: max }, (_, k) => square(k, k < now));
+    const spentBoxes = Array.from({ length: max }, (_, k) =>
+      k < now ? (
+        <input key={k} type="checkbox" class="sq-check" aria-label={`${ordinal(i + 1)} level slot ${k + 1} spent`} checked={k < spent} onChange={() => setSpent(i, k < spent ? k : k + 1)} />
+      ) : (
+        square(k, false)
+      ),
+    );
+    if (max === 0) return null;
+    return layout.twoLineSlots ? (
+      <div class="sb2">
+        <div class="sbr">
+          <span class="t">Slots</span>
+          {have}
+        </div>
+        <div class="sbr">
+          <span class="t">Spent</span>
+          {spentBoxes}
+        </div>
+      </div>
+    ) : (
+      <div class="sb1">
+        <span>Slots</span>
+        {have}
+        <span class="gap">Spent</span>
+        {spentBoxes}
+      </div>
+    );
+  };
+  const spellRow = (s: string) => (
+    <label key={s} class="rw" style={rowStyle}>
+      <input type="checkbox" class="ck" aria-label={`${s} prepared`} checked={mine.prepared.includes(s)} onChange={() => togglePrepared(s)} />
+      <span>{s}</span>
+    </label>
+  );
+  const box = (id: BoxId) => {
+    if (id === "cantrips") {
+      const lines = Math.max(layout.cantripLines, cantrips.length);
+      return (
+        <div key="c" class="bx">
+          <div class="bh">Cantrips</div>
+          <div class="pad">
+            {Array.from({ length: lines }, (_, k) => (
+              <div key={k} class="wl">
+                <div class="nm">{cantrips[k] ?? ""}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+    const level = id;
+    const all = list[String(level)] ?? [];
+    const locked = (slots[level - 1]?.now ?? 0) === 0;
+    if (isWizard) {
+      const known = c.knownSpells.filter((s) => all.includes(s));
+      const lines = Math.max(layout.spellbookLines?.[level - 1] ?? 0, known.length);
+      return (
+        <div key={level} class={locked ? "bx locked" : "bx"}>
+          <div class="bh">{ordinal(level)} level</div>
+          {slotBand(level - 1)}
+          {Array.from({ length: lines }, (_, k) => {
+            const s = known[k];
+            return s ? (
+              <label key={k} class="rw book" style={rowStyle}>
+                <input type="checkbox" class="ck" aria-label={`${s} prepared`} checked={mine.prepared.includes(s)} onChange={() => togglePrepared(s)} />
+                <span class="nm">{s}</span>
+              </label>
+            ) : (
+              <div key={k} class="rw book" style={rowStyle}>
+                <span class="ck" />
+                <span class="nm" />
+              </div>
+            );
+          })}
+          <AddSpell options={all.filter((s) => !c.knownSpells.includes(s))} onAdd={(s) => update((ch) => ({ ...ch, knownSpells: [...ch.knownSpells, s] }))} />
+          <div style="height:4px" />
+        </div>
+      );
+    }
+    return (
+      <div key={level} class={locked ? "bx locked" : "bx"}>
+        <div class="bh">{ordinal(level)} level</div>
+        {slotBand(level - 1)}
+        <div class="pad">{all.map(spellRow)}</div>
+      </div>
+    );
+  };
 
   return (
-    <div class="pg page2">
+    <div class={`pg page2 page2-${cls.toLowerCase()}`}>
       <div class="hdr2">
-        <div>
+        <div class="name">
           <div class="l">Name</div>
           <div class="b val">{c.name}</div>
         </div>
-        <div>
+        <div class="cls">
           <div class="l">Class and level</div>
           <div class="b val">{`${cls} ${caster.level}`}</div>
         </div>
@@ -72,59 +170,24 @@ export function Page2({ c, caster, update }: { c: Character; caster: Caster; upd
             />
           </div>
         </div>
-        <div>
+        <div class="pot">
           <div class="l">{caster.potencyKind === "arcane" ? "Arcane potency" : "Divine potency"}</div>
-          <div class="b val">{sign(caster.potency)}</div>
+          <div class="b val thick">{sign(caster.potency)}</div>
         </div>
       </div>
 
-      <div class="levels">
-        {caster.cantrips > 0 && (
-          <section class="lvl">
-            <div class="sh">Cantrips ({caster.cantrips})</div>
-            <ul class="spells">
-              {(c.cantrips[cls] ?? []).map((s) => (
-                <li key={s}>{s}</li>
-              ))}
-            </ul>
-          </section>
-        )}
-        {slots.map(({ spellLevel, max, now }, i) => {
-          const spent = Math.min(mine.slotsSpent[i] ?? 0, now);
-          const names = isWizard ? c.knownSpells.filter((s) => list[String(spellLevel)]?.includes(s)) : (list[String(spellLevel)] ?? []);
-          return (
-            <section key={spellLevel} class={now === 0 ? "lvl locked" : "lvl"}>
-              <div class="sh">{ordinal(spellLevel)} level</div>
-              <div class="slots">
-                <span class="l left">Slots</span>
-                {Array.from({ length: max }, (_, k) => (
-                  <span key={k} class={k < now ? "tick have" : "tick"} title={k < now ? "Slot you have" : "Slot at a higher level"} />
-                ))}
-                <span class="l left gap">Spent</span>
-                {Array.from({ length: now }, (_, k) => (
-                  <input key={k} type="checkbox" aria-label={`${ordinal(spellLevel)} level slot ${k + 1} spent`} checked={k < spent} onChange={() => setSpent(i, k < spent ? k : k + 1)} />
-                ))}
-              </div>
-              <ul class="spells">
-                {names.map((s) => (
-                  <li key={s}>
-                    <label>
-                      <input type="checkbox" aria-label={`${s} prepared`} checked={mine.prepared.includes(s)} onChange={() => togglePrepared(s)} />
-                      {s}
-                    </label>
-                  </li>
-                ))}
-              </ul>
-              {isWizard && <AddSpell options={(list[String(spellLevel)] ?? []).filter((s) => !c.knownSpells.includes(s))} onAdd={(s) => update((ch) => ({ ...ch, knownSpells: [...ch.knownSpells, s] }))} />}
-            </section>
-          );
-        })}
+      <div class={showTurnUndead ? "levels with-tu" : "levels"} style={`grid-template-columns:repeat(${layout.columns.length},minmax(0,1fr))`}>
+        {layout.columns.map((col, k) => (
+          <div key={k} class={isWizard ? "lcol wide" : "lcol"}>
+            {col.map(box)}
+          </div>
+        ))}
       </div>
 
       {showTurnUndead && (
         <div class="turn">
-          <div class="sh left">Turn Undead{cls === "Paladin" ? " (two levels lower)" : ""}</div>
-          <table>
+          <div class="sh">Turn undead{cls === "Paladin" ? " (two levels lower)" : ""}</div>
+          <table class="tu">
             <thead>
               <tr>
                 <th>DL</th>
@@ -158,7 +221,7 @@ export function Page2({ c, caster, update }: { c: Character; caster: Caster; upd
 function AddSpell({ options, onAdd }: { options: string[]; onAdd: (s: string) => void }) {
   if (options.length === 0) return null;
   return (
-    <select class="add" aria-label="Add a spell to the spellbook" value="" onChange={(e) => onAdd((e.target as HTMLSelectElement).value)}>
+    <select class="add no-print" aria-label="Add a spell to the spellbook" value="" onChange={(e) => onAdd((e.target as HTMLSelectElement).value)}>
       <option value="">Add to spellbook...</option>
       {options.map((o) => (
         <option key={o} value={o}>
