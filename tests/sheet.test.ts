@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { STATS } from "../src/rules";
+import report from "../docs/rules-report.md?raw";
+import { STATS, races } from "../src/rules";
+import { multiclassOptions } from "../src/engine/multiclass";
 import type { StatRoll } from "../src/engine/abilities";
 import { emptyDraft, toCharacter, withClass, experienceSlots, type Draft } from "../src/creation/draft";
 import { fromFileText, toFileText, MELEE_ROWS, RANGED_ROWS } from "../src/model/character";
-import { alignmentShort, sheetFor, slotTable, turnUndeadColumn } from "../src/sheet/derived";
+import { alignmentShort, classAndLevel, sheetFor, slotTable, turnUndeadColumn } from "../src/sheet/derived";
 
 const rolls = (values: number[]): StatRoll[] =>
   STATS.map((stat, pick) => ({ stat, pick, method: "test", dice: [values[pick]!], kept: [values[pick]!], total: values[pick]! }) as StatRoll);
@@ -45,10 +47,16 @@ describe("the sheet from a saved character", () => {
     expect(sheetFor(c).experiences).toContain("Exp 0");
   });
 
-  it("opens a file saved before Alignment and play tracking existed", () => {
+  it("opens a file saved before Alignment, play tracking and multiclassing existed", () => {
     const c = toCharacter(fighter());
-    const { play: _play, alignment: _alignment, ...old } = c;
+    const { play: _play, alignment: _alignment, classes: _classes, levels: _levels, equipmentClass: _ec, cantrips: _cantrips, ...rest } = c;
+    const old = { ...rest, cls: "Fighter", level: 1, cantrips: [], play: { prepared: ["Bless"], slotsSpent: [1], spellAttackMisc: 0 } };
     const opened = fromFileText(JSON.stringify(old));
+    expect(opened.classes).toEqual(["Fighter"]);
+    expect(opened.levels).toEqual([1]);
+    expect(opened.equipmentClass).toBe("Fighter");
+    expect(opened.play.casting.Fighter).toEqual({ prepared: ["Bless"], slotsSpent: [1], spellAttackMisc: 0 });
+    expect("cls" in opened).toBe(false);
     expect(opened.alignment).toBe("");
     expect(opened.play.melee).toHaveLength(MELEE_ROWS);
     expect(opened.play.ranged).toHaveLength(RANGED_ROWS);
@@ -57,8 +65,19 @@ describe("the sheet from a saved character", () => {
 
   it("keeps play changes through a save", () => {
     const c = toCharacter(fighter());
-    const played = { ...c, xp: 120, play: { ...c.play, hpCurrent: 4, prepared: ["Bless"], slotsSpent: [1] } };
+    const played = { ...c, xp: 120, play: { ...c.play, hpCurrent: 4, casting: { Cleric: { prepared: ["Bless"], slotsSpent: [1], spellAttackMisc: 0 } } } };
     expect(fromFileText(toFileText(played))).toEqual(played);
+  });
+});
+
+describe("a multiclass sheet", () => {
+  it("shows every class, its hit dice and a page 2 for each caster", () => {
+    const c = { ...toCharacter(fighter()), classes: ["Cleric", "Wizard"] as const, levels: [1, 1] };
+    const v = sheetFor({ ...c, classes: [...c.classes] });
+    expect(classAndLevel({ ...c, classes: [...c.classes] })).toBe("Cleric 1 / Wizard 1");
+    expect(v.hitDice.map((h) => h.cls)).toEqual(["Cleric", "Wizard"]);
+    expect(v.casters.map((x) => x.cls)).toEqual(["Cleric", "Wizard"]);
+    expect(v.abilities.some((a) => a.startsWith("Wizard: "))).toBe(true);
   });
 });
 
@@ -86,3 +105,13 @@ describe("page 2 helpers", () => {
   });
 });
 
+
+describe("rules report", () => {
+  it("lists the same multiclass combinations the app offers", () => {
+    for (const r of races) {
+      const row = [...report.split("\n")].reverse().find((l: string) => l.startsWith(`| ${r.name} |`) && l.split("|").length > 5);
+      expect(row, r.name).toBeDefined();
+      expect(row!.split("|").at(-2)!.trim(), r.name).toBe(multiclassOptions(r.name).map((c) => c.join("/")).join(", "));
+    }
+  });
+});

@@ -75,7 +75,9 @@ export function Sheet({ initial, path: initialPath, onClose }: { initial: Charac
       </div>
       <div class="pages">
         <Page1 c={c} view={view} update={update} />
-        {view.spellcasting && <Page2 c={c} view={view} update={update} />}
+        {view.casters.map((caster) => (
+          <Page2 key={caster.cls} c={c} caster={caster} update={update} />
+        ))}
       </div>
     </div>
   );

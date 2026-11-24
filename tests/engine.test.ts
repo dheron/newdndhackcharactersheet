@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { CLASS_NAMES, STATS, raceByName, type Stat } from "../src/rules";
+import { CLASS_NAMES, STATS, raceByName, races, type Stat } from "../src/rules";
+import { multiclassOptions } from "../src/engine/multiclass";
 import { EXPECTED_ROLL, ROLL_METHODS, capWasteChance, clampScore, finalScores, racialModifiers, rollForPick } from "../src/engine/abilities";
 import { fixedRng, seededRng } from "../src/engine/dice";
 import { OPTION_SLOTS, meetsStrength, optionAvailable, optionsFor, slotsFor, weaponByName, weaponsFor, WEAPON_FILTERS, type WeaponFilter } from "../src/engine/equipment";
@@ -113,23 +114,32 @@ describe("starting equipment", () => {
 
 describe("derived sheet values", () => {
   it("works out level 1 HP from the hit die and CON", () => {
-    expect(level1Hp("Fighter", statBonuses(scores([10, 10, 18, 10, 10, 10]), "Fighter"))).toBe(14);
-    expect(level1Hp("Wizard", statBonuses(scores([10, 10, 18, 10, 10, 10]), "Wizard"))).toBe(6);
-    expect(level1Hp("Barbarian", statBonuses(scores([10, 10, 16, 10, 10, 10]), "Barbarian"))).toBe(16);
+    expect(level1Hp(["Fighter"], statBonuses(scores([10, 10, 18, 10, 10, 10])))).toBe(14);
+    expect(level1Hp(["Wizard"], statBonuses(scores([10, 10, 18, 10, 10, 10])))).toBe(6);
+    expect(level1Hp(["Barbarian"], statBonuses(scores([10, 10, 16, 10, 10, 10])))).toBe(16);
+  });
+
+  it("averages maximum hit dice and each class's CON bonus for a multiclass character", () => {
+    const b = statBonuses(scores([10, 10, 18, 10, 10, 10]));
+    // Fighter d10 and Thief d6: (10 + 6) / 2 = 8; CON warrior share + normal share, halved, rounded down.
+    expect(level1Hp(["Fighter", "Thief"], b)).toBe(8 + Math.floor((b.hpPerHitDieWarrior + b.hpPerHitDie) / 2));
+    // Barbarian doubles only its own share.
+    expect(level1Hp(["Barbarian", "Cleric"], b)).toBe(Math.floor((12 + 8) / 2) + Math.floor((b.hpPerHitDieWarrior * 2 + b.hpPerHitDie) / 2));
+    // Fighter / Wizard / Thief: (10 + 4 + 6) / 3 = 6.67, rounded down to 6.
+    expect(level1Hp(["Fighter", "Wizard", "Thief"], b)).toBe(6 + Math.floor((b.hpPerHitDieWarrior + 2 * b.hpPerHitDie) / 3));
   });
 
   it("works out AC from armour, DEX and shield", () => {
-    expect(armourClass("Fighter", "Leather", false, 3).total).toBe(14);
-    expect(armourClass("Fighter", "Hide", true, 3).total).toBe(16);
-    expect(armourClass("Fighter", "Plate", false, 3).total).toBe(18);
-    expect(armourClass("Barbarian", null, true, 2).total).toBe(16);
+    expect(armourClass(["Fighter"], "Leather", false, 3).total).toBe(14);
+    expect(armourClass(["Fighter"], "Hide", true, 3).total).toBe(16);
+    expect(armourClass(["Fighter"], "Plate", false, 3).total).toBe(18);
+    expect(armourClass(["Barbarian"], null, true, 2).total).toBe(16);
   });
 
   it("builds a full level 1 Fighter", () => {
     const sheet = deriveSheet({
       race: "Dwarf (Hill)",
-      cls: "Fighter",
-      level: 1,
+      classes: [{ cls: "Fighter", level: 1 }],
       scores: scores([16, 13, 16, 10, 13, 8]),
       armour: "Chain Shirt",
       shield: true,
@@ -145,11 +155,48 @@ describe("derived sheet values", () => {
     expect(sheet.saves.blastBarrage.bonus).toBe(sheet.bonuses.blastSave);
     expect(sheet.saves.blastBarrage.total).toBe(sheet.saves.blastBarrage.base - sheet.bonuses.blastSave);
     expect(sheet.generalSaveNotes).toEqual(["+2 vs poison"]);
-    expect(sheet.spellcasting).toBeNull();
+    expect(sheet.casters).toEqual([]);
+  });
+
+  it("uses the best attack bonus and saves of a multiclass character's classes", () => {
+    const sheet = deriveSheet({ race: "Human", classes: [{ cls: "Fighter", level: 1 }, { cls: "Thief", level: 1 }], scores: scores([10, 10, 10, 10, 10, 10]), armour: null, shield: false, weapons: [] });
+    expect(sheet.attackBonus).toBe(1);
+    // Fighter 1: 15 17 16 14 18. Thief 1: 16 14 15 11 16 (Saving Throws doc).
+    expect(Object.fromEntries(Object.entries(sheet.saves).map(([k, v]) => [k, v.base]))).toEqual({ deathParalyze: 15, magicItem: 14, petrificationPolymorph: 15, blastBarrage: 11, spell: 16 });
+    expect(sheet.hitDice.map((h) => h.dice)).toEqual(["1d10", "1d6"]);
+  });
+
+  it("gives each casting class of a multiclass character its own spellcasting", () => {
+    const sheet = deriveSheet({ race: "Human", classes: [{ cls: "Cleric", level: 1 }, { cls: "Wizard", level: 1 }], scores: scores([10, 10, 10, 16, 14, 10]), armour: null, shield: false, weapons: [] });
+    expect(sheet.casters.map((c) => [c.cls, c.potencyKind])).toEqual([["Cleric", "divine"], ["Wizard", "arcane"]]);
   });
 
   it("works out Wizard spellcasting", () => {
-    const sheet = deriveSheet({ race: "Elf (High)", cls: "Wizard", level: 1, scores: scores([8, 14, 12, 17, 10, 10]), armour: null, shield: false, weapons: ["Dagger"] });
-    expect(sheet.spellcasting).toMatchObject({ spellAttack: 2, potency: -2, potencyKind: "arcane", slots: [2], cantrips: 3, wizardKnown: 6 });
+    const sheet = deriveSheet({ race: "Elf (High)", classes: [{ cls: "Wizard", level: 1 }], scores: scores([8, 14, 12, 17, 10, 10]), armour: null, shield: false, weapons: ["Dagger"] });
+    expect(sheet.casters[0]).toMatchObject({ spellAttack: 2, potency: -2, potencyKind: "arcane", slots: [2], cantrips: 3, wizardKnown: 6 });
+  });
+});
+
+describe("multiclass combinations (Classes v4)", () => {
+  it("expands the starred swaps", () => {
+    expect(multiclassOptions("Elf (High)").map((c) => c.join("/"))).toEqual([
+      "Fighter/Thief",
+      "Fighter/Bard",
+      "Ranger/Thief",
+      "Ranger/Bard",
+      "Fighter/Wizard",
+      "Ranger/Wizard",
+      "Fighter/Wizard/Thief",
+    ]);
+  });
+
+  it("reads Mage as Wizard and drops repeated combinations", () => {
+    expect(multiclassOptions("Gnome (Rock)").map((c) => c.join("/"))).toEqual(["Fighter/Thief", "Fighter/Wizard", "Wizard/Thief"]);
+    const human = multiclassOptions("Human").map((c) => c.join("/"));
+    expect(new Set(human).size).toBe(human.length);
+  });
+
+  it("has combinations for every race", () => {
+    for (const r of races) expect(multiclassOptions(r.name).length, r.name).toBeGreaterThan(0);
   });
 });

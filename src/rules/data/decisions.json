@@ -13,7 +13,13 @@
     "Paladin": { "spellAttackBase": "class Attack Bonus", "spellAttackStat": null, "potency": "divine" },
     "Ranger": { "spellAttackBase": "class Attack Bonus", "spellAttackStat": null, "potency": "divine" }
   },
-  "multiclass": "Each class of a multiclass character uses its own sheet.",
+  "multiclass": "Each casting class of a multiclass character has its own page 2. Page 1 shows all classes (Class and level, best Atk Bns, best saves).",
+  "multiclassCreation": {
+    "experiences": "Every fixed Experience from each class (and the race), plus free picks equal to the highest free count among the classes.",
+    "equipment": "The player picks one of their classes and uses that class's starting equipment options.",
+    "level1Hp": "The maximum of each class's hit die, averaged (rounded down), plus the CON bonus.",
+    "conBonus": "Each class uses its own CON column (warrior column for warriors, doubled for Barbarian) and the bonus is split equally between the classes, rounded down, as Classes v4 describes for levelling. David's answer was cut off; confirm."
+  },
   "preparing": "Spells are prepared like 5e: mark spells prepared, spend slots separately.",
   "cantripClasses": ["Wizard", "Cleric", "Druid", "Bard"],
   "alignments": {

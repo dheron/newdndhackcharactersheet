@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { STATS, classes, experiences, raceByName, type Stat } from "../src/rules";
+import { STATS, classes, experiences, raceByName, type ClassName, type Stat } from "../src/rules";
 import type { StatRoll } from "../src/engine/abilities";
 import { deriveSheet } from "../src/engine/derive";
 import {
@@ -14,7 +14,10 @@ import {
   stepsFor,
   toCharacter,
   withClass,
+  withClasses,
+  withEquipmentClass,
   withRace,
+  creationCasters,
   type Draft,
 } from "../src/creation/draft";
 import { fromFileText, toFileText } from "../src/model/character";
@@ -137,10 +140,62 @@ describe("finished character", () => {
     const c = toCharacter(d);
     expect(fromFileText(toFileText(c))).toEqual(c);
     const s = scores(d)!;
-    const plain = deriveSheet({ race: c.race, cls: c.cls, level: 1, scores: s, armour: c.equipment.armour, shield: false, weapons: c.equipment.weapons });
-    const spec = deriveSheet({ race: c.race, cls: c.cls, level: 1, scores: s, armour: c.equipment.armour, shield: false, weapons: c.equipment.weapons, specialization: "melee" });
+    const cl = [{ cls: c.classes[0]!, level: 1 }];
+    const plain = deriveSheet({ race: c.race, classes: cl, scores: s, armour: c.equipment.armour, shield: false, weapons: c.equipment.weapons });
+    const spec = deriveSheet({ race: c.race, classes: cl, scores: s, armour: c.equipment.armour, shield: false, weapons: c.equipment.weapons, specialization: "melee" });
     expect(plain.weapons[0]!.damage).not.toBe(spec.weapons[0]!.damage);
-    const ranged = deriveSheet({ race: c.race, cls: c.cls, level: 1, scores: s, armour: null, shield: false, weapons: ["Long Bow"], specialization: "melee" });
-    expect(ranged.weapons[0]!.damage).toBe(deriveSheet({ race: c.race, cls: c.cls, level: 1, scores: s, armour: null, shield: false, weapons: ["Long Bow"] }).weapons[0]!.damage);
+    const ranged = deriveSheet({ race: c.race, classes: cl, scores: s, armour: null, shield: false, weapons: ["Long Bow"], specialization: "melee" });
+    expect(ranged.weapons[0]!.damage).toBe(deriveSheet({ race: c.race, classes: cl, scores: s, armour: null, shield: false, weapons: ["Long Bow"] }).weapons[0]!.damage);
+  });
+});
+
+describe("multiclass creation", () => {
+  const mc = (classes: ClassName[], race = "Human"): Draft => withClasses({ ...base({ race, raceChoices: ["STR", "INT"] as Stat[] }), multiclass: true }, classes);
+
+  it("merges fixed Experiences and uses the highest free count", () => {
+    const d = mc(["Fighter", "Thief"]);
+    const { fixed, free } = experienceSlots(d);
+    for (const e of classes.Thief.experiences.fixed) expect(fixed).toContain(e);
+    const thiefFree = (classes.Thief.experiences.total ?? 0) - classes.Thief.experiences.fixed.length;
+    const fighterFree = (classes.Fighter.experiences.total ?? 0) - classes.Fighter.experiences.fixed.length;
+    expect(free).toBe(Math.max(thiefFree, fighterFree) + (raceByName("Human").bonusExperienceChoices ?? 0));
+  });
+
+  it("needs a class to take starting equipment from", () => {
+    const d: Draft = { ...mc(["Fighter", "Thief"]), choiceOne: "Two-Handed Martial Melee", choiceTwo: "Chain Mail", slotPicks: { "one:0": ["Great Axe"] }, gold: { rolls: [1, 1], total: 2 } };
+    expect(d.equipmentClass).toBeNull();
+    expect(stepComplete(d, "equipment")).toBe(false);
+    expect(stepComplete({ ...d, equipmentClass: "Fighter" }, "equipment")).toBe(true);
+    expect(withEquipmentClass({ ...d, equipmentClass: "Fighter" }, "Thief").choiceOne).toBeNull();
+  });
+
+  it("asks for spells for each casting class", () => {
+    const d = mc(["Cleric", "Wizard"]);
+    expect(stepsFor(d)).toContain("spells");
+    expect(creationCasters(d)).toEqual(["Cleric", "Wizard"]);
+    expect(stepsFor(mc(["Fighter", "Thief"]))).not.toContain("spells");
+  });
+
+  it("clears a combination the new race cannot take", () => {
+    const d = mc(["Barbarian", "Thief"]);
+    expect(withRace(d, "Human").classes).toEqual(["Barbarian", "Thief"]);
+    expect(withRace(d, "Dwarf (Hill)").classes).toEqual([]);
+  });
+
+  it("saves every class at level 1", () => {
+    const d: Draft = {
+      ...mc(["Fighter", "Thief"]),
+      specialization: "melee",
+      experiences: Array.from({ length: experienceSlots(mc(["Fighter", "Thief"])).free }, (_, i) => `Exp ${i}`),
+      equipmentClass: "Thief",
+      choiceOne: "Studded Leather",
+      choiceTwo: "Longsword and Shortsword",
+      gold: { rolls: [1, 2], total: 3 },
+    };
+    expect(currentStep(d)).toBe("done");
+    const c = toCharacter(d);
+    expect(c.classes).toEqual(["Fighter", "Thief"]);
+    expect(c.levels).toEqual([1, 1]);
+    expect(c.equipmentClass).toBe("Thief");
   });
 });

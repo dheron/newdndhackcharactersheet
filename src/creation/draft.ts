@@ -3,7 +3,7 @@
 import {
   STATS,
   cantripsKnown,
-  classes,
+  classes as classRules,
   experiences as experienceData,
   raceByName,
   spells,
@@ -14,6 +14,7 @@ import {
 } from "../rules";
 import { finalScores, racialModifiers, type StatRoll } from "../engine/abilities";
 import { optionsFor, slotsFor, weaponsFor, type Slot } from "../engine/equipment";
+import { multiclassOptions } from "../engine/multiclass";
 import { initialPlay, newId, rolledScores, CHARACTER_FORMAT, type Character, type CharacterEquipment } from "../model/character";
 
 export type StepId = "race" | "stats" | "class" | "experiences" | "equipment" | "spells" | "done";
@@ -26,15 +27,21 @@ export interface Draft {
   /** Set when the player presses Next on the race step, so they can read the race details first. */
   raceConfirmed: boolean;
   rolls: StatRoll[];
-  cls: ClassName | null;
+  /** Whether the player is choosing a multiclass combination. */
+  multiclass: boolean;
+  /** The chosen class, or the classes of the chosen multiclass combination. Empty until chosen. */
+  classes: ClassName[];
   specialization: "melee" | "ranged" | null;
   experiences: string[];
+  /** Which class's starting equipment options are used (multiclass characters pick one). */
+  equipmentClass: ClassName | null;
   choiceOne: string | null;
   choiceTwo: string | null;
   /** Picks for each slot of the chosen options, keyed "one:0", "two:1" and so on. */
   slotPicks: Record<string, string[]>;
   gold: { rolls: number[]; total: number } | null;
-  cantrips: string[];
+  /** Cantrips for each casting class. */
+  cantrips: Partial<Record<ClassName, string[]>>;
   knownSpells: string[];
 }
 
@@ -45,14 +52,16 @@ export const emptyDraft = (): Draft => ({
   alignment: "",
   raceConfirmed: false,
   rolls: [],
-  cls: null,
+  multiclass: false,
+  classes: [],
   specialization: null,
   experiences: [],
+  equipmentClass: null,
   choiceOne: null,
   choiceTwo: null,
   slotPicks: {},
   gold: null,
-  cantrips: [],
+  cantrips: {},
   knownSpells: [],
 });
 
@@ -77,16 +86,22 @@ const norm = (s: string) => s.trim().toLowerCase();
 
 /** Experiences the character gets automatically, and how many more the player picks. */
 export function experienceSlots(d: Draft): { fixed: string[]; free: number } {
-  if (!d.cls || !d.race) return { fixed: [], free: 0 };
-  return experienceSlotsFor(d.cls, d.race);
+  if (d.classes.length === 0 || !d.race) return { fixed: [], free: 0 };
+  return experienceSlotsFor(d.classes, d.race);
 }
 
-export function experienceSlotsFor(clsName: ClassName, raceName: string): { fixed: string[]; free: number } {
-  const cls = classes[clsName].experiences;
+/**
+ * Fixed Experiences from every class and the race, plus free picks. A multiclass character
+ * gets the highest free count among their classes (David).
+ */
+export function experienceSlotsFor(classNames: ClassName[], raceName: string): { fixed: string[]; free: number } {
   const race = raceByName(raceName);
-  const fixed = [...cls.fixed, ...race.bonusExperiences];
-  const free = (cls.total ?? 0) - cls.fixed.length + (race.bonusExperienceChoices ?? 0);
-  return { fixed, free: Math.max(0, free) };
+  const fixed: string[] = [];
+  for (const e of [...classNames.flatMap((c) => classRules[c].experiences.fixed), ...race.bonusExperiences]) {
+    if (!fixed.some((f) => norm(f) === norm(e))) fixed.push(e);
+  }
+  const classFree = Math.max(...classNames.map((c) => (classRules[c].experiences.total ?? 0) - classRules[c].experiences.fixed.length));
+  return { fixed, free: Math.max(0, classFree + (race.bonusExperienceChoices ?? 0)) };
 }
 
 /** The starting list, minus anything the character already has. */
@@ -95,18 +110,22 @@ export function experienceChoices(d: Draft): string[] {
   return experienceData.startingList.filter((e) => !fixed.has(norm(e)));
 }
 
-export function isCaster(cls: ClassName | null): boolean {
-  if (!cls) return false;
+export function isCasterClass(cls: ClassName): boolean {
   return cantripsKnown(cls, 1) > 0 || cls === "Wizard";
 }
 
-export function cantripCount(d: Draft): number {
-  return d.cls ? cantripsKnown(d.cls, 1) : 0;
+/** Classes that choose spells during creation: those with cantrips, and Wizards. */
+export function creationCasters(d: Draft): ClassName[] {
+  return d.classes.filter(isCasterClass);
+}
+
+export function cantripCount(cls: ClassName): number {
+  return cantripsKnown(cls, 1);
 }
 
 export function knownSpellCount(d: Draft): number {
   const s = scores(d);
-  return d.cls === "Wizard" && s ? wizardSpellsKnown(1, s.INT) : 0;
+  return d.classes.includes("Wizard") && s ? wizardSpellsKnown(1, s.INT) : 0;
 }
 
 /** Spell levels a Wizard can know: any level they have slots for (David). */
@@ -147,7 +166,7 @@ export function equipmentFor(d: Draft): CharacterEquipment {
 }
 
 export function stepsFor(d: Draft): StepId[] {
-  return ["race", "stats", "class", "experiences", "equipment", ...(isCaster(d.cls) ? (["spells"] as StepId[]) : []), "done"];
+  return ["race", "stats", "class", "experiences", "equipment", ...(creationCasters(d).length > 0 ? (["spells"] as StepId[]) : []), "done"];
 }
 
 /** Name and race filled in; the Next button is enabled. */
@@ -162,17 +181,17 @@ export function stepComplete(d: Draft, step: StepId): boolean {
     case "stats":
       return d.rolls.length === STATS.length;
     case "class":
-      return d.cls !== null && (d.cls !== "Fighter" || d.specialization !== null);
+      return d.classes.length > 0 && (!d.classes.includes("Fighter") || d.specialization !== null);
     case "experiences":
-      return d.cls !== null && d.experiences.length === experienceSlots(d).free;
+      return d.classes.length > 0 && d.experiences.length === experienceSlots(d).free;
     case "equipment": {
-      if (!d.cls) return false;
-      const needsTwo = optionsFor(d.cls).choiceTwo.length > 0;
+      if (!d.equipmentClass) return false;
+      const needsTwo = optionsFor(d.equipmentClass).choiceTwo.length > 0;
       if (!d.choiceOne || (needsTwo && !d.choiceTwo) || !d.gold) return false;
       return [...slotsWithKeys("one", d.choiceOne), ...slotsWithKeys("two", d.choiceTwo)].every(({ key, slot }) => slotComplete(slot, d.slotPicks[key]));
     }
     case "spells":
-      return d.cantrips.length === cantripCount(d) && d.knownSpells.length === knownSpellCount(d);
+      return creationCasters(d).every((c) => (d.cantrips[c]?.length ?? 0) === cantripCount(c)) && d.knownSpells.length === knownSpellCount(d);
     case "done":
       return false;
   }
@@ -184,7 +203,7 @@ export function currentStep(d: Draft): StepId {
 }
 
 export function toCharacter(d: Draft): Character {
-  if (!d.race || !d.cls || !d.gold) throw new Error("The character is not finished.");
+  if (!d.race || d.classes.length === 0 || !d.gold || !d.equipmentClass) throw new Error("The character is not finished.");
   const equipment = equipmentFor(d);
   const gold = d.gold.total;
   return {
@@ -196,29 +215,59 @@ export function toCharacter(d: Draft): Character {
     raceChoices: d.raceChoices,
     alignment: d.alignment,
     rolls: d.rolls,
-    cls: d.cls,
-    level: 1,
+    classes: d.classes,
+    levels: d.classes.map(() => 1),
+    equipmentClass: d.equipmentClass,
     xp: 0,
-    specialization: d.specialization,
+    specialization: d.classes.includes("Fighter") ? d.specialization : null,
     experiences: d.experiences,
     equipmentChoices: { choiceOne: d.choiceOne, choiceTwo: d.choiceTwo },
     equipment,
     gold,
-    cantrips: d.cantrips,
-    knownSpells: d.knownSpells,
+    cantrips: Object.fromEntries(creationCasters(d).map((c) => [c, d.cantrips[c] ?? []])),
+    knownSpells: d.classes.includes("Wizard") ? d.knownSpells : [],
     play: initialPlay({ equipment, gold }),
   };
 }
 
-/** Changing class clears everything that depends on it. */
-export function withClass(d: Draft, cls: ClassName): Draft {
-  if (d.cls === cls) return d;
-  return { ...d, cls, specialization: null, experiences: [], choiceOne: null, choiceTwo: null, slotPicks: {}, cantrips: [], knownSpells: [] };
+/** Changing class clears everything that depends on it. A single class also sets the equipment class. */
+export function withClasses(d: Draft, classes: ClassName[]): Draft {
+  if (d.classes.join("/") === classes.join("/")) return d;
+  return {
+    ...d,
+    classes,
+    specialization: null,
+    experiences: [],
+    equipmentClass: classes.length === 1 ? classes[0]! : null,
+    choiceOne: null,
+    choiceTwo: null,
+    slotPicks: {},
+    cantrips: {},
+    knownSpells: [],
+  };
 }
 
-/** Changing race clears its stat picks and any Experiences that no longer fit the count. */
+export const withClass = (d: Draft, cls: ClassName): Draft => withClasses({ ...d, multiclass: false }, [cls]);
+
+/** Switching between single class and multiclass clears the class choice. */
+export function withMulticlass(d: Draft, multiclass: boolean): Draft {
+  if (d.multiclass === multiclass) return d;
+  return { ...withClasses(d, []), multiclass };
+}
+
+/** Picking which class's starting equipment to use clears the equipment choices. */
+export function withEquipmentClass(d: Draft, cls: ClassName): Draft {
+  if (d.equipmentClass === cls) return d;
+  return { ...d, equipmentClass: cls, choiceOne: null, choiceTwo: null, slotPicks: {} };
+}
+
+/**
+ * Changing race clears its stat picks and any Experiences that no longer fit the count.
+ * A multiclass combination the new race cannot take is cleared too.
+ */
 export function withRace(d: Draft, race: string): Draft {
   if (d.race === race) return d;
-  const next = { ...d, race, raceChoices: [] as Stat[] };
+  let next: Draft = { ...d, race, raceChoices: [] };
+  if (next.multiclass && !multiclassOptions(race).some((o) => o.join("/") === next.classes.join("/"))) next = withClasses(next, []);
   return { ...next, experiences: next.experiences.slice(0, experienceSlots(next).free) };
 }

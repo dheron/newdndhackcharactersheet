@@ -5,7 +5,7 @@ import type { JSX } from "preact";
 import { armour as armourList, weapons as weaponList, type SaveKey } from "../rules";
 import { isRangedWeapon } from "../engine/equipment";
 import { EXPERIENCE_LINES, type Character, type PlayState, type WeaponRow } from "../model/character";
-import { alignmentShort, type SheetView, type WeaponRowView } from "./derived";
+import { alignmentShort, classAndLevel, type SheetView, type WeaponRowView } from "./derived";
 
 export type Update = (fn: (c: Character) => Character) => void;
 
@@ -69,7 +69,7 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
         </div>
         <div>
           <div class="l">Class and level</div>
-          <Box>{`${c.cls} ${c.level}`}</Box>
+          <Box>{classAndLevel(c)}</Box>
         </div>
         <div>
           <div class="l">XP</div>
@@ -104,7 +104,7 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
           <div class="sh">Stat bonuses</div>
           <BonusRow items={[["Melee hit", sign(b.meleeHit)], ["Damage", sign(b.damage)], null]} />
           <BonusRow items={[["Ranged hit", sign(b.rangedHit)], ["AC", sign(b.ac)], ["Blast save", sign(b.blastSave)]]} />
-          <BonusRow items={[["HP per hit die", sign(b.hpPerHitDie)]]} />
+          <BonusRow items={[["HP per hit die", view.conColumns.map(sign).join(" / ")]]} />
           <BonusRow items={[["Languages", String(b.languages)], ["Spell attack", sign(b.spellAttack)], ["Arcane potency", sign(b.arcanePotency)]]} />
           <BonusRow items={[["Divine potency", sign(b.divinePotency)], ["Mind spell save", sign(b.mindSpellSave)], null]} />
           <div class="br" />
@@ -126,12 +126,16 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
           </div>
           <div>
             <div class="l">Hit dice</div>
-            <Box class="hd">{view.hitDice}</Box>
-            {c.play.hitDiceLines.map((line, i) => (
+            {view.hitDice.map((h) => (
+              <Box key={h.cls} class="hd">
+                {view.hitDice.length > 1 ? `${h.dice} ${h.cls}` : h.dice}
+              </Box>
+            ))}
+            {c.play.hitDiceLines.slice(0, Math.max(0, 3 - view.hitDice.length)).map((line, i) => (
               <TextInput
                 key={i}
                 class="b hd"
-                label={`Hit dice line ${i + 2}`}
+                label={`Hit dice line ${view.hitDice.length + i + 1}`}
                 value={line}
                 onChange={(v) => play({ hitDiceLines: (i === 0 ? [v, c.play.hitDiceLines[1]] : [c.play.hitDiceLines[0], v]) as [string, string] })}
               />
@@ -279,7 +283,7 @@ export function Page1({ c, view, update }: { c: Character; view: SheetView; upda
         <div class="sh span2">Inventory / Notes</div>
         <div class="abilities">
           <ul>
-            {view.classAbilities.map((a) => (
+            {view.abilities.map((a) => (
               <li key={a}>{a}</li>
             ))}
             {view.raceTraits.map((t) => (

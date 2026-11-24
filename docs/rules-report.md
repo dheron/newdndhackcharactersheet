@@ -28,7 +28,11 @@ Source: David, in chat (not yet in the Drive docs). Kept in `src/rules/data/deci
 - Armour Strength requirement: Enforced during character creation: armour with a Str Req above the character's STR cannot be chosen.
 - Wizard known spells: A Wizard's known spells can be of any spell level they can cast (any level they have slots for).
 - Spell attack and potency: Wizard Wizard Spell Atk column + INT, arcane potency; Cleric class Attack Bonus, divine potency; Druid class Attack Bonus, divine potency; Bard class Attack Bonus, arcane potency; Paladin class Attack Bonus, divine potency; Ranger class Attack Bonus, divine potency.
-- Multiclass: Each class of a multiclass character uses its own sheet.
+- Multiclass: Each casting class of a multiclass character has its own page 2. Page 1 shows all classes (Class and level, best Atk Bns, best saves).
+- Multiclass Experiences: Every fixed Experience from each class (and the race), plus free picks equal to the highest free count among the classes.
+- Multiclass starting equipment: The player picks one of their classes and uses that class's starting equipment options.
+- Multiclass level 1 HP: The maximum of each class's hit die, averaged (rounded down), plus the CON bonus.
+- Multiclass CON bonus: Each class uses its own CON column (warrior column for warriors, doubled for Barbarian) and the bonus is split equally between the classes, rounded down, as Classes v4 describes for levelling. David's answer was cut off; confirm.
 - Preparing: Spells are prepared like 5e: mark spells prepared, spend slots separately.
 - Cantrips: Wizard, Cleric, Druid, Bard only.
 - Alignment: The basic 5e alignments. Lawful Good (LG), Neutral Good (NG), Chaotic Good (CG), Lawful Neutral (LN), Neutral (N), Chaotic Neutral (CN), Lawful Evil (LE), Neutral Evil (NE), Chaotic Evil (CE). The list is the standard 5e one, written from memory.
@@ -770,25 +774,27 @@ Roll 1d20, equal or greater succeeds. T: turned automatically. D: destroyed. -: 
 
 Source: Classes v4, Multiclassing (1UDB0LV9BfAtNSdZ3lAkDJWmv1Wi6RIQGlaXwbqs3rpg)
 
-| Race | Combinations | Key |
-|---|---|---|
-| Dwarf (Duergar) | Fighter*/Thief, Fighter/Cleric, Cleric/Thief | *or Ranger |
-| Dwarf (Hill) | Fighter*/Thief, Fighter/Cleric. | *or Ranger |
-| Dwarf (Mountain) | Fighter*/Thief, Fighter/Cleric. | *or Ranger |
-| Dragonborn | Fighter/Thief, Fighter/Cleric, Fighter/Wizard |   |
-| Elf (Drow) | Fighter*/Thief, Fighter*/Cleric, Cleric/Thief, Fighter*/Wizard, Fighter*/Wizard/Thief. | *or Ranger |
-| Elf (High) | Fighter*/Thief**, Fighter*/Wizard, Fighter/Wizard/Thief. | *or Ranger **or Bard |
-| Elf (Wood) | Fighter*/Thief, Fighter*/Wizard, Fighter/Wizard/Thief, Fighter/Druid. | *or Ranger |
-| Firbolg | Fighter*/Cleric, Fighter*/Wizard, Druid/Wizard. | *or Ranger |
-| Gnome (Deep) | Fighter/Thief, Fighter/Mage, Mage/Thief |   |
-| Gnome (Forest) | Fighter*/Thief, Fighter*/Mage, Mage*/Thief, Fighter*/Cleric** | *or Ranger **or Druid |
-| Gnome (Rock) | Fighter/Thief, Fighter/Mage, Mage/Thief |   |
-| Goliath | Fighter*/Wizard, Fighter*/Cleric**, Barbarian/Cleric**. | *or Ranger **or Druid |
-| Half-Elf | Fighter*/Thief**, Fighter*/Cleric***, Fighter*/Wizard, Cleric/Thief**, Cleric***/Wizard, Cleric***/Wizard, Fighter/Wizard/Thief. | *or Ranger **or Bard. ***or Druid |
-| Halfling (Lightfoot) | Fighter*/Thief** | *or Ranger **or Bard |
-| Halfling (Stout) | Fighter/Thief, Fighter/Cleric |   |
-| Human | Fighter*/Thief**, Fighter*/Cleric***, Fighter*/Wizard, Cleric/Thief**, Cleric***/Wizard, Cleric***/Wizard, Barbarian/Thief, Barbarian/Cleric***. | *or Ranger **or Bard. ***or Druid |
-| Tiefling | Fighter/Thief, Fighter/Mage, Mage/Thief |   |
+| Race | Combinations (doc text) | Key | Combinations offered in the app |
+|---|---|---|---|
+| Dwarf (Duergar) | Fighter*/Thief, Fighter/Cleric, Cleric/Thief | *or Ranger | Fighter/Thief, Ranger/Thief, Fighter/Cleric, Cleric/Thief |
+| Dwarf (Hill) | Fighter*/Thief, Fighter/Cleric. | *or Ranger | Fighter/Thief, Ranger/Thief, Fighter/Cleric |
+| Dwarf (Mountain) | Fighter*/Thief, Fighter/Cleric. | *or Ranger | Fighter/Thief, Ranger/Thief, Fighter/Cleric |
+| Dragonborn | Fighter/Thief, Fighter/Cleric, Fighter/Wizard |   | Fighter/Thief, Fighter/Cleric, Fighter/Wizard |
+| Elf (Drow) | Fighter*/Thief, Fighter*/Cleric, Cleric/Thief, Fighter*/Wizard, Fighter*/Wizard/Thief. | *or Ranger | Fighter/Thief, Ranger/Thief, Fighter/Cleric, Ranger/Cleric, Cleric/Thief, Fighter/Wizard, Ranger/Wizard, Fighter/Wizard/Thief, Ranger/Wizard/Thief |
+| Elf (High) | Fighter*/Thief**, Fighter*/Wizard, Fighter/Wizard/Thief. | *or Ranger **or Bard | Fighter/Thief, Fighter/Bard, Ranger/Thief, Ranger/Bard, Fighter/Wizard, Ranger/Wizard, Fighter/Wizard/Thief |
+| Elf (Wood) | Fighter*/Thief, Fighter*/Wizard, Fighter/Wizard/Thief, Fighter/Druid. | *or Ranger | Fighter/Thief, Ranger/Thief, Fighter/Wizard, Ranger/Wizard, Fighter/Wizard/Thief, Fighter/Druid |
+| Firbolg | Fighter*/Cleric, Fighter*/Wizard, Druid/Wizard. | *or Ranger | Fighter/Cleric, Ranger/Cleric, Fighter/Wizard, Ranger/Wizard, Druid/Wizard |
+| Gnome (Deep) | Fighter/Thief, Fighter/Mage, Mage/Thief |   | Fighter/Thief, Fighter/Wizard, Wizard/Thief |
+| Gnome (Forest) | Fighter*/Thief, Fighter*/Mage, Mage*/Thief, Fighter*/Cleric** | *or Ranger **or Druid | Fighter/Thief, Ranger/Thief, Fighter/Wizard, Ranger/Wizard, Wizard/Thief, Fighter/Cleric, Fighter/Druid, Ranger/Cleric, Ranger/Druid |
+| Gnome (Rock) | Fighter/Thief, Fighter/Mage, Mage/Thief |   | Fighter/Thief, Fighter/Wizard, Wizard/Thief |
+| Goliath | Fighter*/Wizard, Fighter*/Cleric**, Barbarian/Cleric**. | *or Ranger **or Druid | Fighter/Wizard, Ranger/Wizard, Fighter/Cleric, Fighter/Druid, Ranger/Cleric, Ranger/Druid, Barbarian/Cleric, Barbarian/Druid |
+| Half-Elf | Fighter*/Thief**, Fighter*/Cleric***, Fighter*/Wizard, Cleric/Thief**, Cleric***/Wizard, Cleric***/Wizard, Fighter/Wizard/Thief. | *or Ranger **or Bard. ***or Druid | Fighter/Thief, Fighter/Bard, Ranger/Thief, Ranger/Bard, Fighter/Cleric, Fighter/Druid, Ranger/Cleric, Ranger/Druid, Fighter/Wizard, Ranger/Wizard, Cleric/Thief, Cleric/Bard, Cleric/Wizard, Druid/Wizard, Fighter/Wizard/Thief |
+| Halfling (Lightfoot) | Fighter*/Thief** | *or Ranger **or Bard | Fighter/Thief, Fighter/Bard, Ranger/Thief, Ranger/Bard |
+| Halfling (Stout) | Fighter/Thief, Fighter/Cleric |   | Fighter/Thief, Fighter/Cleric |
+| Human | Fighter*/Thief**, Fighter*/Cleric***, Fighter*/Wizard, Cleric/Thief**, Cleric***/Wizard, Cleric***/Wizard, Barbarian/Thief, Barbarian/Cleric***. | *or Ranger **or Bard. ***or Druid | Fighter/Thief, Fighter/Bard, Ranger/Thief, Ranger/Bard, Fighter/Cleric, Fighter/Druid, Ranger/Cleric, Ranger/Druid, Fighter/Wizard, Ranger/Wizard, Cleric/Thief, Cleric/Bard, Cleric/Wizard, Druid/Wizard, Barbarian/Thief, Barbarian/Cleric, Barbarian/Druid |
+| Tiefling | Fighter/Thief, Fighter/Mage, Mage/Thief |   | Fighter/Thief, Fighter/Wizard, Wizard/Thief |
+
+The app reads "Mage" as Wizard, offers each starred class or its swap, and drops repeated combinations.
 
 - **Fighter:** A multi-classed fighter can use all of his abilities without restriction.
 - **Ranger:** A multi-classed Ranger may only benefit from Two-Handed Fighting, Natural Explorer, and Spellcasting if they are not wearing Heavy Armour.

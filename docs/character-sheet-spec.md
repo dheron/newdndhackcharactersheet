@@ -53,7 +53,8 @@ One page per casting class. Same structure for all:
 
 ## Rules decisions (from David)
 
-- Multiclass characters use a separate sheet per class.
+- Multiclass characters: one page 1 showing all classes, and a page 2 for each casting class.
+- Multiclass creation (David): combinations by race from Classes v4 (starred classes can be swapped as the table's key says; "Mage" is Wizard). Experiences: every fixed one from each class plus the highest free count. Starting equipment: the player picks one class's options. Level 1 HP: the maximum of each hit die averaged, plus the CON bonus split between the classes (each class's own column). Hit dice lines show one class each.
 - Cantrips exist for Wizard, Cleric, Druid and Bard only (counts in the Classes doc).
 - Preparing spells works like 5e. Spellbook size is not capped.
 - Wizard spells known: INT Languages at 1st level, +1 spell on each level up (Classes v4).

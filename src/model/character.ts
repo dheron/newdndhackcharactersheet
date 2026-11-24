@@ -43,10 +43,18 @@ export interface PlayState {
   languages: string;
   inventory: string;
   /** Spell slots spent, per spell level (index 0 = 1st level). */
+  /** Spell tracking for each casting class. */
+  casting: Partial<Record<ClassName, CastingPlay>>;
+}
+
+export interface CastingPlay {
+  /** Spell slots spent, per spell level (index 0 = 1st level). */
   slotsSpent: number[];
   prepared: string[];
   spellAttackMisc: number;
 }
+
+export const emptyCasting = (): CastingPlay => ({ slotsSpent: [], prepared: [], spellAttackMisc: 0 });
 
 export interface Character {
   format: typeof CHARACTER_FORMAT;
@@ -60,8 +68,12 @@ export interface Character {
   rolls: StatRoll[];
   /** One of the basic 5e alignments (decisions.json). */
   alignment: string;
-  cls: ClassName;
-  level: number;
+  /** One class, or two or three for a multiclass character (Classes v4 combinations by race). */
+  classes: ClassName[];
+  /** Level in each class, in the same order. */
+  levels: number[];
+  /** The class whose starting equipment options were used. */
+  equipmentClass: ClassName;
   xp: number;
   /** Fighter Weapon Specialization: which attacks get +2 damage. */
   specialization: "melee" | "ranged" | null;
@@ -70,7 +82,8 @@ export interface Character {
   equipmentChoices: { choiceOne: string | null; choiceTwo: string | null };
   equipment: CharacterEquipment;
   gold: number;
-  cantrips: string[];
+  /** Cantrips chosen for each casting class. */
+  cantrips: Partial<Record<ClassName, string[]>>;
   /** Wizard spellbook. */
   knownSpells: string[];
   play: PlayState;
@@ -114,23 +127,39 @@ export function initialPlay(c: Pick<Character, "equipment" | "gold">): PlayState
     ranged: padRows(c.equipment.weapons.filter(isRanged).map(row), RANGED_ROWS),
     languages: "",
     inventory: `Gold: ${c.gold} gp`,
-    slotsSpent: [],
-    prepared: [],
-    spellAttackMisc: 0,
+    casting: {},
   };
 }
 
+type OldFields = { cls?: ClassName; level?: number; cantrips?: string[] | Partial<Record<ClassName, string[]>> };
+type OldPlay = { slotsSpent?: number[]; prepared?: string[]; spellAttackMisc?: number };
+
 export function fromFileText(text: string): Character {
-  const data = JSON.parse(text) as Partial<Character>;
+  const data = JSON.parse(text) as Partial<Character> & OldFields;
   if (data.format !== CHARACTER_FORMAT) throw new Error(`Unsupported character file format: ${String(data.format)}`);
-  if (!data.name || !data.race || !data.cls || !Array.isArray(data.rolls) || !data.equipment) throw new Error("This file is missing character details.");
-  // Files saved before Alignment and play tracking existed get the defaults.
-  const c = { alignment: "", cantrips: [], knownSpells: [], ...data } as Character;
+  const classes = data.classes ?? (data.cls ? [data.cls] : null);
+  if (!data.name || !data.race || !classes?.length || !Array.isArray(data.rolls) || !data.equipment) throw new Error("This file is missing character details.");
+  // Files saved before Alignment, play tracking and multiclassing get the defaults.
+  const cantrips = Array.isArray(data.cantrips) ? { [classes[0]!]: data.cantrips } : (data.cantrips ?? {});
+  const { cls: _cls, level: _level, ...rest } = data;
+  const c = {
+    alignment: "",
+    knownSpells: [],
+    ...rest,
+    classes,
+    levels: data.levels ?? classes.map(() => data.level ?? 1),
+    equipmentClass: data.equipmentClass ?? classes[0]!,
+    cantrips,
+  } as Character;
   const base = initialPlay(c);
-  const play = { ...base, ...(data.play ?? {}) } as PlayState;
-  play.saveNotes = { ...base.saveNotes, ...(data.play?.saveNotes ?? {}) };
+  const old = (data.play ?? {}) as Partial<PlayState> & OldPlay;
+  const { slotsSpent, prepared, spellAttackMisc, ...playRest } = old;
+  const play = { ...base, ...playRest } as PlayState;
+  play.saveNotes = { ...base.saveNotes, ...(old.saveNotes ?? {}) };
   play.melee = padRows(play.melee, MELEE_ROWS);
   play.ranged = padRows(play.ranged, RANGED_ROWS);
+  play.casting = { ...(old.casting ?? {}) };
+  if (slotsSpent || prepared || spellAttackMisc) play.casting[classes[0]!] = { slotsSpent: slotsSpent ?? [], prepared: prepared ?? [], spellAttackMisc: spellAttackMisc ?? 0 };
   return { ...c, play };
 }
 

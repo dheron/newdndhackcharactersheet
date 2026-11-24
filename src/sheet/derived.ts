@@ -1,7 +1,8 @@
 // Everything the sheet shows that is worked out from the saved character and the rules data.
-import { classes, decisions, raceByName, spellSlots, turnUndead, type ClassName, type Stat } from "../rules";
+import { classes, decisions, isWarrior, multiclass, raceByName, spellSlots, turnUndead, type ClassName, type Stat } from "../rules";
 import { finalScores, racialModifiers } from "../engine/abilities";
-import { armourClass, deriveSheet, weaponLine } from "../engine/derive";
+import { armourClass, deriveSheet, weaponLine, type ClassLevel } from "../engine/derive";
+import { classesLabel } from "../engine/multiclass";
 import { experienceSlotsFor } from "../creation/draft";
 import { rolledScores, type Character, type WeaponRow } from "../model/character";
 
@@ -19,24 +20,45 @@ export interface WeaponRowView {
   line: ReturnType<typeof weaponLine> | null;
 }
 
+export function classLevels(c: Character): ClassLevel[] {
+  return c.classes.map((cls, i) => ({ cls, level: c.levels[i] ?? 1 }));
+}
+
+/** "Fighter 1" or "Fighter 1 / Thief 1". */
+export function classAndLevel(c: Character): string {
+  return classLevels(c)
+    .map((x) => `${x.cls} ${x.level}`)
+    .join(" / ");
+}
+
 export function sheetFor(c: Character) {
   const scores = characterScores(c);
-  const sheet = deriveSheet({ race: c.race, cls: c.cls, level: c.level, scores, armour: c.play.armour, shield: c.play.shield, weapons: [], specialization: c.specialization });
-  const ac = armourClass(c.cls, c.play.armour, c.play.shield, sheet.bonuses.ac);
+  const fighter = c.classes.includes("Fighter");
+  const sheet = deriveSheet({ race: c.race, classes: classLevels(c), scores, armour: c.play.armour, shield: c.play.shield, weapons: [], specialization: c.specialization });
+  const ac = armourClass(c.classes, c.play.armour, c.play.shield, sheet.bonuses.ac);
   const rows = (list: WeaponRow[]): WeaponRowView[] =>
     list.map((row) => {
       if (!row.name) return { row, line: null };
-      const line = weaponLine(row.name, c.cls, c.level, sheet.bonuses, c.specialization);
+      const line = weaponLine(row.name, sheet.attackBonus, sheet.bonuses, fighter ? c.specialization : null);
       return { row, line: { ...line, magic: row.magic, hitBonus: line.hitBonus + row.magic } };
     });
-  const { fixed } = experienceSlotsFor(c.cls, c.race);
+  const { fixed } = experienceSlotsFor(c.classes, c.race);
+  // The CON column(s) the character's classes use, for the HP per hit die box.
+  const conColumns = [...new Set(c.classes.map((cls) => (isWarrior(cls) ? sheet.bonuses.hpPerHitDieWarrior : sheet.bonuses.hpPerHitDie)))];
+  const multi = c.classes.length > 1;
   return {
     scores,
     ...sheet,
+    classLabel: classesLabel(c.classes),
+    conColumns,
     ac: { ...ac, misc: c.play.acMisc, total: ac.total + c.play.acMisc },
     melee: rows(c.play.melee),
     ranged: rows(c.play.ranged),
     experiences: [...fixed, ...c.experiences],
+    abilities: [
+      ...sheet.classAbilities.map((a) => (multi ? `${a.cls}: ${a.text}` : a.text)),
+      ...(multi ? c.classes.map((cls) => (multiclass.restrictions as Record<string, string>)[cls]).filter((t): t is string => Boolean(t)) : []),
+    ],
   };
 }
 

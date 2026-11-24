@@ -61,6 +61,10 @@ out(`- Armour Strength requirement: ${decisions.armourStrengthRequirement}`);
 out(`- Wizard known spells: ${decisions.wizardKnownSpellLevels}`);
 out(`- Spell attack and potency: ${Object.entries(decisions.spellcasting).map(([cls, s]) => `${cls} ${s.spellAttackBase}${s.spellAttackStat ? ` + ${s.spellAttackStat}` : ""}, ${s.potency} potency`).join("; ")}.`);
 out(`- Multiclass: ${decisions.multiclass}`);
+out(`- Multiclass Experiences: ${decisions.multiclassCreation.experiences}`);
+out(`- Multiclass starting equipment: ${decisions.multiclassCreation.equipment}`);
+out(`- Multiclass level 1 HP: ${decisions.multiclassCreation.level1Hp}`);
+out(`- Multiclass CON bonus: ${decisions.multiclassCreation.conBonus}`);
 out(`- Preparing: ${decisions.preparing}`);
 out(`- Cantrips: ${decisions.cantripClasses.join(", ")} only.`);
 out(`- Alignment: ${decisions.alignments.rule} ${decisions.alignments.list.map((a) => `${a.name} (${a.short})`).join(", ")}. The list is the standard 5e one, written from memory.`);
@@ -200,7 +204,29 @@ out("## Multiclassing");
 out();
 out(`Source: ${multi.source}`);
 out();
-table(["Race", "Combinations", "Key"], Object.entries(multi.combinations).map(([race, c]) => [race, c.options, c.key || " "]));
+// Same reading as src/engine/multiclass.ts (tests/sheet.test.ts checks they agree).
+const expand = (entry) => {
+  const fix = (n) => (n === "Mage" ? "Wizard" : n);
+  const swaps = {};
+  for (const m of entry.key.matchAll(/(\*+)\s*or\s+([A-Za-z]+)/g)) swaps[m[1].length] = fix(m[2]);
+  const seen = [];
+  for (const option of entry.options.replace(/\.\s*$/, "").split(",")) {
+    let combos = [[]];
+    for (const p of option.trim().split("/")) {
+      const m = /^([A-Za-z]+)(\**)$/.exec(p.trim());
+      const choices = [fix(m[1]), ...(m[2] && swaps[m[2].length] ? [swaps[m[2].length]] : [])];
+      combos = combos.flatMap((c) => choices.map((x) => [...c, x]));
+    }
+    for (const c of combos) if (new Set(c).size === c.length && !seen.includes(c.join("/"))) seen.push(c.join("/"));
+  }
+  return seen;
+};
+table(
+  ["Race", "Combinations (doc text)", "Key", "Combinations offered in the app"],
+  Object.entries(multi.combinations).map(([race, c]) => [race, c.options, c.key || " ", expand(c).join(", ")]),
+);
+out("The app reads \"Mage\" as Wizard, offers each starred class or its swap, and drops repeated combinations.");
+out();
 for (const [cls, text] of Object.entries(multi.restrictions)) out(`- **${cls}:** ${text}`);
 out();
 

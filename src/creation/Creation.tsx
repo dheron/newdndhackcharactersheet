@@ -1,14 +1,16 @@
 import { useRef, useState } from "preact/hooks";
-import { CLASS_NAMES, STATS, abilitiesUpTo, classes, hitDie, raceByName, races, type Stat } from "../rules";
+import { CLASS_NAMES, STATS, abilitiesUpTo, classes, hitDie, multiclass as multiclassRules, raceByName, races, type ClassName, type Stat } from "../rules";
 import { EXPECTED_ROLL, ROLL_METHODS, capWasteChance, rollForPick } from "../engine/abilities";
 import { rollTotal } from "../engine/dice";
 import { WEAPON_FILTERS, armourByName, meetsStrength, optionAvailable, optionsFor, weaponsFor, type Slot } from "../engine/equipment";
 import { decisions } from "../rules";
+import { classesLabel, multiclassOptions } from "../engine/multiclass";
 import { saveCharacterFileAs, type FilePath } from "../storage";
 import type { Character } from "../model/character";
 import {
   cantripCount,
   cantripList,
+  creationCasters,
   currentStep,
   emptyDraft,
   equipmentFor,
@@ -26,6 +28,9 @@ import {
   stepsFor,
   toCharacter,
   withClass,
+  withClasses,
+  withEquipmentClass,
+  withMulticlass,
   withRace,
   type Draft,
   type StepId,
@@ -118,15 +123,16 @@ function summaryText(d: Draft, step: StepId): string {
       return s ? STATS.map((k) => `${k} ${s[k]}`).join("  ") : "";
     }
     case "class":
-      return `${d.cls}${d.specialization ? `, Weapon Specialization: ${d.specialization}` : ""}`;
+      return `${classesLabel(d.classes)}${d.specialization ? `, Weapon Specialization: ${d.specialization}` : ""}`;
     case "experiences":
       return [...experienceSlots(d).fixed, ...d.experiences].join(", ");
     case "equipment": {
       const e = equipmentFor(d);
-      return [e.armour, e.shield ? "Shield" : null, ...e.weapons, d.gold ? `${d.gold.total} gp` : null].filter(Boolean).join(", ");
+      const from = d.classes.length > 1 && d.equipmentClass ? `${d.equipmentClass} options: ` : "";
+      return from + [e.armour, e.shield ? "Shield" : null, ...e.weapons, d.gold ? `${d.gold.total} gp` : null].filter(Boolean).join(", ");
     }
     case "spells":
-      return [...d.cantrips, ...d.knownSpells].join(", ");
+      return [...Object.values(d.cantrips).flat(), ...d.knownSpells].join(", ");
     default:
       return "";
   }
@@ -333,37 +339,47 @@ function StatPreview({ stat, pick, mod }: { stat: Stat; pick: number; mod: numbe
 }
 
 function ClassStep({ draft, update }: StepProps) {
-  const cls = draft.cls ? classes[draft.cls] : null;
+  const combos = draft.race ? multiclassOptions(draft.race) : [];
+  const chosen = classesLabel(draft.classes);
   return (
     <>
-      <div class="chips">
-        {CLASS_NAMES.map((c) => (
-          <button key={c} type="button" class={draft.cls === c ? "chip on" : "chip"} aria-pressed={draft.cls === c} onClick={() => update((d) => withClass(d, c))}>
-            {c}
-          </button>
-        ))}
+      <div class="chips" role="group" aria-label="Single class or multiclass">
+        <button type="button" class={!draft.multiclass ? "chip on" : "chip"} aria-pressed={!draft.multiclass} onClick={() => update((d) => withMulticlass(d, false))}>
+          Single class
+        </button>
+        <button type="button" class={draft.multiclass ? "chip on" : "chip"} aria-pressed={draft.multiclass} disabled={combos.length === 0} onClick={() => update((d) => withMulticlass(d, true))}>
+          Multiclass
+        </button>
       </div>
-      {draft.cls && cls && (
-        <dl class="details">
-          <dt>Armour</dt>
-          <dd>{cls.armour}</dd>
-          <dt>Weapons</dt>
-          <dd>{cls.weapons}</dd>
-          <dt>Hit die</dt>
-          <dd>d{hitDie(draft.cls)}</dd>
-          <dt>Experiences</dt>
-          <dd>{cls.experiences.docText}</dd>
-          <dt>Level 1</dt>
-          <dd>
-            <ul>
-              {abilitiesUpTo(draft.cls, 1).map((a) => (
-                <li key={a.text}>{a.text}</li>
-              ))}
-            </ul>
-          </dd>
-        </dl>
+      {draft.multiclass ? (
+        <>
+          <p class="hint">
+            Combinations a {draft.race} can take (Classes v4). XP is split equally between the classes; the character uses the best attack bonus and saves of their classes.
+          </p>
+          <div class="chips">
+            {combos.map((combo) => {
+              const label = classesLabel(combo);
+              return (
+                <button key={label} type="button" class={chosen === label ? "chip on" : "chip"} aria-pressed={chosen === label} onClick={() => update((d) => withClasses(d, combo))}>
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      ) : (
+        <div class="chips">
+          {CLASS_NAMES.map((c) => (
+            <button key={c} type="button" class={chosen === c ? "chip on" : "chip"} aria-pressed={chosen === c} onClick={() => update((d) => withClass(d, c))}>
+              {c}
+            </button>
+          ))}
+        </div>
       )}
-      {draft.cls === "Fighter" && (
+      {draft.classes.map((c) => (
+        <ClassDetails key={c} cls={c} multiclass={draft.classes.length > 1} />
+      ))}
+      {draft.classes.includes("Fighter") && (
         <fieldset class="field">
           <legend>Weapon Specialization: +2 damage to</legend>
           <div class="chips">
@@ -375,6 +391,40 @@ function ClassStep({ draft, update }: StepProps) {
           </div>
         </fieldset>
       )}
+    </>
+  );
+}
+
+function ClassDetails({ cls, multiclass }: { cls: ClassName; multiclass: boolean }) {
+  const rules = classes[cls];
+  const restriction = (multiclassRules.restrictions as Record<string, string>)[cls];
+  return (
+    <>
+      {multiclass && <h3>{cls}</h3>}
+      <dl class="details">
+        <dt>Armour</dt>
+        <dd>{rules.armour}</dd>
+        <dt>Weapons</dt>
+        <dd>{rules.weapons}</dd>
+        <dt>Hit die</dt>
+        <dd>d{hitDie(cls)}</dd>
+        <dt>Experiences</dt>
+        <dd>{rules.experiences.docText}</dd>
+        <dt>Level 1</dt>
+        <dd>
+          <ul>
+            {abilitiesUpTo(cls, 1).map((a) => (
+              <li key={a.text}>{a.text}</li>
+            ))}
+          </ul>
+        </dd>
+        {multiclass && restriction && (
+          <>
+            <dt>Multiclassed</dt>
+            <dd>{restriction}</dd>
+          </>
+        )}
+      </dl>
     </>
   );
 }
@@ -442,7 +492,20 @@ function ExperiencesStep({ draft, update }: StepProps) {
 }
 
 function EquipmentStep({ draft, update }: StepProps) {
-  const cls = draft.cls!;
+  const cls = draft.equipmentClass;
+  const picker = draft.classes.length > 1 && (
+    <fieldset class="field">
+      <legend>Take starting equipment from</legend>
+      <div class="chips">
+        {draft.classes.map((c) => (
+          <button key={c} type="button" class={cls === c ? "chip on" : "chip"} aria-pressed={cls === c} onClick={() => update((d) => withEquipmentClass(d, c))}>
+            {c}
+          </button>
+        ))}
+      </div>
+    </fieldset>
+  );
+  if (!cls) return <>{picker}</>;
   const opts = optionsFor(cls);
   const str = scores(draft)?.STR ?? 0;
   const choose = (which: "one" | "two", option: string) =>
@@ -472,6 +535,7 @@ function EquipmentStep({ draft, update }: StepProps) {
 
   return (
     <>
+      {picker}
       {group("one", "Choice One", opts.choiceOne, draft.choiceOne)}
       {group("two", "Choice Two", opts.choiceTwo, draft.choiceTwo)}
       <fieldset class="field">
@@ -549,58 +613,70 @@ function SlotPicker({ slot, picks, str, onChange }: { slot: Slot; picks: string[
 }
 
 function SpellsStep({ draft, update }: StepProps) {
-  const cls = draft.cls!;
-  const nCantrips = cantripCount(draft);
   const nKnown = knownSpellCount(draft);
-  const toggle = (field: "cantrips" | "knownSpells", max: number, name: string) =>
+  const toggleCantrip = (cls: ClassName, max: number, name: string) =>
     update((d) => {
-      const list = d[field];
-      if (list.includes(name)) return { ...d, [field]: list.filter((x) => x !== name) };
-      return list.length < max ? { ...d, [field]: [...list, name] } : d;
+      const list = d.cantrips[cls] ?? [];
+      const next = list.includes(name) ? list.filter((x) => x !== name) : list.length < max ? [...list, name] : list;
+      return { ...d, cantrips: { ...d.cantrips, [cls]: next } };
     });
+  const toggleKnown = (name: string) =>
+    update((d) => ({
+      ...d,
+      knownSpells: d.knownSpells.includes(name) ? d.knownSpells.filter((x) => x !== name) : d.knownSpells.length < nKnown ? [...d.knownSpells, name] : d.knownSpells,
+    }));
   return (
     <>
-      {nCantrips > 0 && (
-        <>
-          <h3>
-            Cantrips: choose {nCantrips} ({nCantrips - draft.cantrips.length} left)
-          </h3>
-          <div class="chips">
-            {cantripList(cls).map((s) => {
-              const on = draft.cantrips.includes(s);
-              return (
-                <button key={s} type="button" class={on ? "chip on" : "chip"} aria-pressed={on} disabled={!on && draft.cantrips.length >= nCantrips} onClick={() => toggle("cantrips", nCantrips, s)}>
-                  {s}
-                </button>
-              );
-            })}
+      {creationCasters(draft).map((cls) => {
+        const nCantrips = cantripCount(cls);
+        const mine = draft.cantrips[cls] ?? [];
+        return (
+          <div key={cls}>
+            {nCantrips > 0 && (
+              <>
+                <h3>
+                  {cls} cantrips: choose {nCantrips} ({nCantrips - mine.length} left)
+                </h3>
+                <div class="chips">
+                  {cantripList(cls).map((s) => {
+                    const on = mine.includes(s);
+                    return (
+                      <button key={s} type="button" class={on ? "chip on" : "chip"} aria-pressed={on} disabled={!on && mine.length >= nCantrips} onClick={() => toggleCantrip(cls, nCantrips, s)}>
+                        {s}
+                      </button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+            {cls === "Wizard" ? (
+              <>
+                <h3>
+                  Spellbook: choose {nKnown} ({nKnown - draft.knownSpells.length} left)
+                </h3>
+                <p class="hint">A Wizard knows as many spells as their INT Languages at 1st level, of any level they can cast.</p>
+                {knowableSpellLevels(cls, 1).map((lvl) => (
+                  <div key={lvl}>
+                    <h4>Level {lvl}</h4>
+                    <div class="chips">
+                      {spellList(cls, lvl).map((s) => {
+                        const on = draft.knownSpells.includes(s);
+                        return (
+                          <button key={s} type="button" class={on ? "chip on" : "chip"} aria-pressed={on} disabled={!on && draft.knownSpells.length >= nKnown} onClick={() => toggleKnown(s)}>
+                            {s}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </>
+            ) : (
+              <p class="hint">{cls}s prepare spells from their full list during play.</p>
+            )}
           </div>
-        </>
-      )}
-      {cls === "Wizard" && (
-        <>
-          <h3>
-            Spellbook: choose {nKnown} ({nKnown - draft.knownSpells.length} left)
-          </h3>
-          <p class="hint">A Wizard knows as many spells as their INT Languages at 1st level, of any level they can cast.</p>
-          {knowableSpellLevels(cls, 1).map((lvl) => (
-            <div key={lvl}>
-              <h4>Level {lvl}</h4>
-              <div class="chips">
-                {spellList(cls, lvl).map((s) => {
-                  const on = draft.knownSpells.includes(s);
-                  return (
-                    <button key={s} type="button" class={on ? "chip on" : "chip"} aria-pressed={on} disabled={!on && draft.knownSpells.length >= nKnown} onClick={() => toggle("knownSpells", nKnown, s)}>
-                      {s}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </>
-      )}
-      {cls !== "Wizard" && <p class="hint">{cls === "Paladin" || cls === "Ranger" ? "" : `${cls}s prepare spells from their full list during play.`}</p>}
+        );
+      })}
     </>
   );
 }
@@ -620,7 +696,7 @@ function DoneStep({ draft, onNew, onFinish }: { draft: Draft; onNew: () => void;
   return (
     <>
       <p class="hint">
-        {draft.name} is ready: {draft.race} {draft.cls}, level 1. Save the character to a file, then play from the sheet.
+        {draft.name} is ready: {draft.race} {classesLabel(draft.classes)}, level 1. Save the character to a file, then play from the sheet.
       </p>
       <div class="actions">
         <button type="button" class="primary" onClick={finish}>

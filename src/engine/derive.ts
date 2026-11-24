@@ -20,10 +20,15 @@ import {
 } from "../rules";
 import { armourByName, isRangedWeapon, weaponByName } from "./equipment";
 
-export interface DeriveInput {
-  race: string;
+/** One of a character's classes and its level. A multiclass character has two or three. */
+export interface ClassLevel {
   cls: ClassName;
   level: number;
+}
+
+export interface DeriveInput {
+  race: string;
+  classes: ClassLevel[];
   scores: Record<Stat, number>;
   armour: string | null;
   shield: boolean;
@@ -38,7 +43,10 @@ export interface StatBonuses {
   rangedHit: number;
   ac: number;
   blastSave: number;
+  /** CON HP per hit die, normal column. */
   hpPerHitDie: number;
+  /** CON HP per hit die, warrior column (Fighter, Barbarian, Paladin, Ranger). */
+  hpPerHitDieWarrior: number;
   languages: number;
   spellAttack: number;
   arcanePotency: number;
@@ -68,14 +76,15 @@ export interface SaveLine {
   notes: string[];
 }
 
-export function statBonuses(scores: Record<Stat, number>, cls: ClassName): StatBonuses {
+export function statBonuses(scores: Record<Stat, number>): StatBonuses {
   return {
     meleeHit: abilityValue("STR", "meleeHit", scores.STR),
     damage: abilityValue("STR", "damage", scores.STR),
     rangedHit: abilityValue("DEX", "rangedHit", scores.DEX),
     ac: abilityValue("DEX", "ac", scores.DEX),
     blastSave: abilityValue("DEX", "blastSave", scores.DEX),
-    hpPerHitDie: abilityValue("CON", isWarrior(cls) ? "hpPerHitDieWarrior" : "hpPerHitDie", scores.CON),
+    hpPerHitDie: abilityValue("CON", "hpPerHitDie", scores.CON),
+    hpPerHitDieWarrior: abilityValue("CON", "hpPerHitDieWarrior", scores.CON),
     languages: abilityValue("INT", "languages", scores.INT),
     spellAttack: abilityValue("INT", "spellAttack", scores.INT),
     arcanePotency: abilityValue("INT", "arcanePotency", scores.INT),
@@ -84,10 +93,22 @@ export function statBonuses(scores: Record<Stat, number>, cls: ClassName): StatB
   };
 }
 
-/** Level 1 HP: maximum of the hit die plus the CON bonus; Barbarian doubles the CON bonus. */
-export function level1Hp(cls: ClassName, bonuses: StatBonuses): number {
-  const con = cls === "Barbarian" ? bonuses.hpPerHitDie * 2 : bonuses.hpPerHitDie;
-  return hitDie(cls) + con;
+/** A class's CON bonus per hit die: warrior column for warriors, doubled for Barbarian. */
+export function conHp(cls: ClassName, bonuses: StatBonuses): number {
+  const value = isWarrior(cls) ? bonuses.hpPerHitDieWarrior : bonuses.hpPerHitDie;
+  return cls === "Barbarian" ? value * 2 : value;
+}
+
+/**
+ * Level 1 HP: maximum of the hit die plus the class's CON bonus.
+ * Multiclass (David): the maximum of each class's hit die averaged, plus each class's CON bonus
+ * averaged, each rounded down (Classes v4 splits the CON bonus between the classes). Never below 1.
+ */
+export function level1Hp(classes: ClassName[], bonuses: StatBonuses): number {
+  const n = classes.length;
+  const dice = Math.floor(classes.reduce((t, c) => t + hitDie(c), 0) / n);
+  const con = Math.floor(classes.reduce((t, c) => t + conHp(c, bonuses), 0) / n);
+  return Math.max(1, dice + con);
 }
 
 /**
@@ -95,10 +116,10 @@ export function level1Hp(cls: ClassName, bonuses: StatBonuses): number {
  * Barbarian with no armour: 10 + double DEX AC bonus.
  * No armour for other classes: 10 + DEX AC bonus. (Not in the docs; the original app used 10.)
  */
-export function armourClass(cls: ClassName, armourName: string | null, shield: boolean, dexAc: number): { total: number; base: number; dex: number; shield: number } {
+export function armourClass(classes: ClassName[], armourName: string | null, shield: boolean, dexAc: number): { total: number; base: number; dex: number; shield: number } {
   const shieldBonus = shield ? (armourByName("Shield").acBonus ?? 0) : 0;
   if (!armourName) {
-    const dex = cls === "Barbarian" ? dexAc * 2 : dexAc;
+    const dex = classes.includes("Barbarian") ? dexAc * 2 : dexAc;
     return { total: 10 + dex + shieldBonus, base: 10, dex, shield: shieldBonus };
   }
   const a = armourByName(armourName);
@@ -109,10 +130,14 @@ export function armourClass(cls: ClassName, armourName: string | null, shield: b
 
 export const SPECIALIZATION_DAMAGE = 2;
 
-export function weaponLine(name: string, cls: ClassName, level: number, bonuses: StatBonuses, specialization: "melee" | "ranged" | null = null): WeaponLine {
+/** The best class Attack Bonus: multiclass characters use the most favourable (Classes v4). */
+export function bestAttackBonus(classes: ClassLevel[]): number {
+  return Math.max(...classes.map((c) => attackBonus(c.cls, c.level)));
+}
+
+export function weaponLine(name: string, base: number, bonuses: StatBonuses, specialization: "melee" | "ranged" | null = null): WeaponLine {
   const w = weaponByName(name);
   const ranged = isRangedWeapon(w);
-  const base = attackBonus(cls, level);
   const stat = ranged ? bonuses.rangedHit : bonuses.meleeHit;
   const spec = specialization === (ranged ? "ranged" : "melee") ? SPECIALIZATION_DAMAGE : 0;
   const dmgBonus = (ranged ? 0 : bonuses.damage) + spec;
@@ -121,9 +146,11 @@ export function weaponLine(name: string, cls: ClassName, level: number, bonuses:
   return { name, ranged, hitBonus: base + stat, base, stat, magic: 0, damage, type: w.type, range: w.range };
 }
 
-export function saves(race: string, cls: ClassName, level: number, bonuses: StatBonuses): Record<SaveKey, SaveLine> {
+/** Saves: multiclass characters use the most favourable (lowest) target of their classes (Classes v4). */
+export function saves(race: string, classes: ClassLevel[], bonuses: StatBonuses): Record<SaveKey, SaveLine> {
   const r = raceByName(race);
-  const targets = saveTargets(cls, level);
+  const all = classes.map((c) => saveTargets(c.cls, c.level));
+  const targets = Object.fromEntries(SAVE_KEYS.map((k) => [k, Math.min(...all.map((t) => t[k]))])) as Record<SaveKey, number>;
   const out = {} as Record<SaveKey, SaveLine>;
   for (const key of SAVE_KEYS) {
     const notes = r.situational.filter((s) => s.save === key).map((s) => s.text);
@@ -135,32 +162,57 @@ export function saves(race: string, cls: ClassName, level: number, bonuses: Stat
   return out;
 }
 
+export interface Caster {
+  cls: ClassName;
+  level: number;
+  spellAttack: number;
+  /** The INT part of the Wizard spell attack (0 for other classes). */
+  spellAttackStat: number;
+  potency: number;
+  potencyKind: "arcane" | "divine";
+  slots: number[];
+  cantrips: number;
+  wizardKnown: number | null;
+}
+
+export function casterFor(c: ClassLevel, scores: Record<Stat, number>, bonuses: StatBonuses): Caster | null {
+  const casting = decisions.spellcasting[c.cls as keyof typeof decisions.spellcasting];
+  if (!casting) return null;
+  const stat = casting.spellAttackStat === "INT" ? bonuses.spellAttack : 0;
+  const base = c.cls === "Wizard" ? classes.Wizard.spellAttack![c.level - 1]! : attackBonus(c.cls, c.level);
+  return {
+    cls: c.cls,
+    level: c.level,
+    spellAttack: base + stat,
+    spellAttackStat: stat,
+    potency: casting.potency === "arcane" ? bonuses.arcanePotency : bonuses.divinePotency,
+    potencyKind: casting.potency as "arcane" | "divine",
+    slots: spellSlots(c.cls, c.level),
+    cantrips: cantripsKnown(c.cls, c.level),
+    wizardKnown: c.cls === "Wizard" ? wizardSpellsKnown(c.level, scores.INT) : null,
+  };
+}
+
 export function deriveSheet(input: DeriveInput) {
-  const bonuses = statBonuses(input.scores, input.cls);
+  const bonuses = statBonuses(input.scores);
   const race = raceByName(input.race);
-  const casting = decisions.spellcasting[input.cls];
-  const c = classes[input.cls];
+  const names = input.classes.map((c) => c.cls);
+  const atk = bestAttackBonus(input.classes);
+  const allLevel1 = input.classes.every((c) => c.level === 1);
   return {
     bonuses,
-    hpMax: input.level === 1 ? level1Hp(input.cls, bonuses) : null,
-    hitDice: c.hp[input.level - 1]!,
-    attackBonus: attackBonus(input.cls, input.level),
+    /** The CON HP bonus columns this character uses, one per class. */
+    conHp: names.map((cls) => conHp(cls, bonuses)),
+    hpMax: allLevel1 ? level1Hp(names, bonuses) : null,
+    hitDice: input.classes.map((c) => ({ cls: c.cls, dice: classes[c.cls].hp[c.level - 1]! })),
+    attackBonus: atk,
     move: race.move,
-    ac: armourClass(input.cls, input.armour, input.shield, bonuses.ac),
-    weapons: input.weapons.map((w) => weaponLine(w, input.cls, input.level, bonuses, input.specialization ?? null)),
-    saves: saves(input.race, input.cls, input.level, bonuses),
+    ac: armourClass(names, input.armour, input.shield, bonuses.ac),
+    weapons: input.weapons.map((w) => weaponLine(w, atk, bonuses, names.includes("Fighter") ? (input.specialization ?? null) : null)),
+    saves: saves(input.race, input.classes, bonuses),
     generalSaveNotes: race.situational.filter((s) => s.save === null).map((s) => s.text),
-    classAbilities: abilitiesUpTo(input.cls, input.level).map((a) => a.text),
+    classAbilities: input.classes.flatMap((c) => abilitiesUpTo(c.cls, c.level).map((a) => ({ cls: c.cls, text: a.text }))),
     raceTraits: race.traits,
-    spellcasting: casting
-      ? {
-          spellAttack: (input.cls === "Wizard" ? c.spellAttack![input.level - 1]! : attackBonus(input.cls, input.level)) + (casting.spellAttackStat === "INT" ? bonuses.spellAttack : 0),
-          potency: casting.potency === "arcane" ? bonuses.arcanePotency : bonuses.divinePotency,
-          potencyKind: casting.potency,
-          slots: spellSlots(input.cls, input.level),
-          cantrips: cantripsKnown(input.cls, input.level),
-          wizardKnown: input.cls === "Wizard" ? wizardSpellsKnown(input.level, input.scores.INT) : null,
-        }
-      : null,
+    casters: input.classes.map((c) => casterFor(c, input.scores, bonuses)).filter((c): c is Caster => c !== null),
   };
 }

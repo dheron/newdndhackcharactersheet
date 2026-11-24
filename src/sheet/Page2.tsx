@@ -2,31 +2,32 @@
 // (design/wireframes/page2-<class>.dc.html) and docs/character-sheet-spec.md.
 // Wizards list their spellbook; other casters see their whole class list and tick what they prepare.
 import { spells, turnUndead } from "../rules";
-import type { Character } from "../model/character";
-import { slotTable, turnUndeadColumn, type SheetView } from "./derived";
+import { emptyCasting, type Character } from "../model/character";
+import type { Caster } from "../engine/derive";
+import { slotTable, turnUndeadColumn } from "./derived";
 import type { Update } from "./Page1";
 
 const sign = (n: number) => (n > 0 ? `+${n}` : `${n}`);
 const ordinal = (n: number) => `${n}${n === 1 ? "st" : n === 2 ? "nd" : n === 3 ? "rd" : "th"}`;
 
-export function Page2({ c, view, update }: { c: Character; view: SheetView; update: Update }) {
-  const casting = view.spellcasting;
-  if (!casting) return null;
-  const list = spells[c.cls]?.levels ?? {};
-  const slots = slotTable(c.cls, c.level).filter((s) => s.max > 0 && (list[String(s.spellLevel)]?.length ?? 0) > 0);
-  const isWizard = c.cls === "Wizard";
-  const setPlay = (patch: Partial<Character["play"]>) => update((ch) => ({ ...ch, play: { ...ch.play, ...patch } }));
-  const togglePrepared = (name: string) =>
-    setPlay({ prepared: c.play.prepared.includes(name) ? c.play.prepared.filter((p) => p !== name) : [...c.play.prepared, name] });
+export function Page2({ c, caster, update }: { c: Character; caster: Caster; update: Update }) {
+  const cls = caster.cls;
+  const list = spells[cls]?.levels ?? {};
+  const slots = slotTable(cls, caster.level).filter((s) => s.max > 0 && (list[String(s.spellLevel)]?.length ?? 0) > 0);
+  const isWizard = cls === "Wizard";
+  const mine = c.play.casting[cls] ?? emptyCasting();
+  const setCasting = (patch: Partial<typeof mine>) =>
+    update((ch) => ({ ...ch, play: { ...ch.play, casting: { ...ch.play.casting, [cls]: { ...(ch.play.casting[cls] ?? emptyCasting()), ...patch } } } }));
+  const togglePrepared = (name: string) => setCasting({ prepared: mine.prepared.includes(name) ? mine.prepared.filter((p) => p !== name) : [...mine.prepared, name] });
   const setSpent = (i: number, n: number) => {
-    const next = [...c.play.slotsSpent];
+    const next = [...mine.slotsSpent];
     next[i] = n;
-    setPlay({ slotsSpent: next });
+    setCasting({ slotsSpent: next });
   };
-  const attackTotal = casting.spellAttack + c.play.spellAttackMisc;
-  const statPart = isWizard ? view.bonuses.spellAttack : 0;
-  const tu = turnUndeadColumn(c.cls, c.level);
-  const showTurnUndead = c.cls === "Cleric" || c.cls === "Paladin";
+  const attackTotal = caster.spellAttack + mine.spellAttackMisc;
+  const statPart = caster.spellAttackStat;
+  const tu = turnUndeadColumn(cls, caster.level);
+  const showTurnUndead = cls === "Cleric" || cls === "Paladin";
 
   return (
     <div class="pg page2">
@@ -37,7 +38,7 @@ export function Page2({ c, view, update }: { c: Character; view: SheetView; upda
         </div>
         <div>
           <div class="l">Class and level</div>
-          <div class="b val">{`${c.cls} ${c.level}`}</div>
+          <div class="b val">{`${cls} ${caster.level}`}</div>
         </div>
         <div class="atk">
           <div>
@@ -47,7 +48,7 @@ export function Page2({ c, view, update }: { c: Character; view: SheetView; upda
           <div class="op">=</div>
           <div>
             <div class="l">Base</div>
-            <div class="b val">{sign(casting.spellAttack - statPart)}</div>
+            <div class="b val">{sign(caster.spellAttack - statPart)}</div>
           </div>
           {isWizard && (
             <>
@@ -66,30 +67,30 @@ export function Page2({ c, view, update }: { c: Character; view: SheetView; upda
               type="text"
               inputMode="numeric"
               aria-label="Spell attack misc"
-              value={c.play.spellAttackMisc ? String(c.play.spellAttackMisc) : ""}
-              onChange={(e) => setPlay({ spellAttackMisc: Number.parseInt((e.target as HTMLInputElement).value, 10) || 0 })}
+              value={mine.spellAttackMisc ? String(mine.spellAttackMisc) : ""}
+              onChange={(e) => setCasting({ spellAttackMisc: Number.parseInt((e.target as HTMLInputElement).value, 10) || 0 })}
             />
           </div>
         </div>
         <div>
-          <div class="l">{casting.potencyKind === "arcane" ? "Arcane potency" : "Divine potency"}</div>
-          <div class="b val">{sign(casting.potency)}</div>
+          <div class="l">{caster.potencyKind === "arcane" ? "Arcane potency" : "Divine potency"}</div>
+          <div class="b val">{sign(caster.potency)}</div>
         </div>
       </div>
 
       <div class="levels">
-        {casting.cantrips > 0 && (
+        {caster.cantrips > 0 && (
           <section class="lvl">
-            <div class="sh">Cantrips ({casting.cantrips})</div>
+            <div class="sh">Cantrips ({caster.cantrips})</div>
             <ul class="spells">
-              {c.cantrips.map((s) => (
+              {(c.cantrips[cls] ?? []).map((s) => (
                 <li key={s}>{s}</li>
               ))}
             </ul>
           </section>
         )}
         {slots.map(({ spellLevel, max, now }, i) => {
-          const spent = Math.min(c.play.slotsSpent[i] ?? 0, now);
+          const spent = Math.min(mine.slotsSpent[i] ?? 0, now);
           const names = isWizard ? c.knownSpells.filter((s) => list[String(spellLevel)]?.includes(s)) : (list[String(spellLevel)] ?? []);
           return (
             <section key={spellLevel} class={now === 0 ? "lvl locked" : "lvl"}>
@@ -108,7 +109,7 @@ export function Page2({ c, view, update }: { c: Character; view: SheetView; upda
                 {names.map((s) => (
                   <li key={s}>
                     <label>
-                      <input type="checkbox" aria-label={`${s} prepared`} checked={c.play.prepared.includes(s)} onChange={() => togglePrepared(s)} />
+                      <input type="checkbox" aria-label={`${s} prepared`} checked={mine.prepared.includes(s)} onChange={() => togglePrepared(s)} />
                       {s}
                     </label>
                   </li>
@@ -122,7 +123,7 @@ export function Page2({ c, view, update }: { c: Character; view: SheetView; upda
 
       {showTurnUndead && (
         <div class="turn">
-          <div class="sh left">Turn Undead{c.cls === "Paladin" ? " (two levels lower)" : ""}</div>
+          <div class="sh left">Turn Undead{cls === "Paladin" ? " (two levels lower)" : ""}</div>
           <table>
             <thead>
               <tr>
