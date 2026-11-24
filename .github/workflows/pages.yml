@@ -33,6 +33,7 @@ jobs:
           # The Google OAuth client ID for Drive sync (a public identifier, not a secret).
           # Set it in Settings, Secrets and variables, Actions, Variables. See docs/google-drive-setup.md.
           VITE_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
+          VITE_BUILD_ID: ${{ github.sha }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

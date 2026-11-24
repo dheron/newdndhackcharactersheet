@@ -171,6 +171,7 @@ export function Page2({ c, caster, castingOff, update }: { c: Character; caster:
         </div>
       </div>
 
+      <p class="spell-hint no-print">To read a spell, rest the pointer on it, or on a touch screen press and hold it.</p>
       {castingOff && (
         <div class="banner" role="status">
           No spellcasting: {castingOff}
