@@ -1,6 +1,6 @@
-// Saving and opening character files. In the desktop app this uses the native file
-// dialogs and the sheet then saves back to the same file as you play. In a plain browser
-// (npm run dev) it falls back to a download and a file picker, and saving is manual.
+// Exporting and importing character files anywhere the player chooses. The library of
+// characters the app keeps is in src/library.ts. In a plain browser (npm run dev) export is a
+// download and import is a file picker.
 import { fileNameFor, fromFileText, toFileText, type Character } from "./model/character";
 
 export const inTauri = () => typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
@@ -8,7 +8,7 @@ export const inTauri = () => typeof window !== "undefined" && "__TAURI_INTERNALS
 /** Where a character's file lives. Null in the browser, where files can only be downloaded. */
 export type FilePath = string | null;
 
-/** Asks where to save. Returns the path (desktop), the download name (browser), or undefined if cancelled. */
+/** Asks where to export. Returns the path (desktop), the download name (browser), or undefined if cancelled. */
 export async function saveCharacterFileAs(c: Character): Promise<{ path: FilePath; label: string } | undefined> {
   const text = toFileText(c);
   if (inTauri()) {
@@ -26,12 +26,6 @@ export async function saveCharacterFileAs(c: Character): Promise<{ path: FilePat
   a.click();
   URL.revokeObjectURL(url);
   return { path: null, label: a.download };
-}
-
-/** Saves over a file the player already chose (desktop only). */
-export async function writeCharacterFile(path: string, c: Character): Promise<void> {
-  const { writeTextFile } = await import("@tauri-apps/plugin-fs");
-  await writeTextFile(path, toFileText(c));
 }
 
 export async function openCharacterFile(): Promise<{ character: Character; path: FilePath } | null> {

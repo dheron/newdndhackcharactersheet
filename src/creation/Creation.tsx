@@ -5,7 +5,7 @@ import { rollTotal } from "../engine/dice";
 import { WEAPON_FILTERS, armourByName, armourChoosable, optionAvailable, optionsFor, weaponsFor, type Slot } from "../engine/equipment";
 import { decisions } from "../rules";
 import { classesLabel, multiclassOptions } from "../engine/multiclass";
-import { saveCharacterFileAs, type FilePath } from "../storage";
+import { saveCharacter } from "../library";
 import type { Character } from "../model/character";
 import {
   cantripCount,
@@ -53,7 +53,7 @@ const modsText = (mods: Partial<Record<Stat, number>>) =>
     .map(([k, v]) => `${sign(v!)} ${k}`)
     .join(", ");
 
-export function Creation({ onFinish }: { onFinish: (c: Character, path: FilePath) => void }) {
+export function Creation({ onFinish }: { onFinish: (c: Character) => void }) {
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [editing, setEditing] = useState<StepId | null>(null);
   const update = (patch: Partial<Draft> | ((d: Draft) => Draft)) => setDraft((d) => (typeof patch === "function" ? patch(d) : { ...d, ...patch }));
@@ -682,14 +682,13 @@ function SpellsStep({ draft, update }: StepProps) {
   );
 }
 
-function DoneStep({ draft, onNew, onFinish }: { draft: Draft; onNew: () => void; onFinish: (c: Character, path: FilePath) => void }) {
+function DoneStep({ draft, onNew, onFinish }: { draft: Draft; onNew: () => void; onFinish: (c: Character) => void }) {
   const [status, setStatus] = useState<string>("");
   const finish = async () => {
     try {
       const c = toCharacter(draft);
-      const saved = await saveCharacterFileAs(c);
-      if (!saved) return setStatus("Not saved. Choose where to save the character to open its sheet.");
-      onFinish(c, saved.path);
+      await saveCharacter(c);
+      onFinish(c);
     } catch (e) {
       setStatus(`Could not save: ${e instanceof Error ? e.message : String(e)}`);
     }
@@ -697,7 +696,7 @@ function DoneStep({ draft, onNew, onFinish }: { draft: Draft; onNew: () => void;
   return (
     <>
       <p class="hint">
-        {draft.name} is ready: {draft.race} {classesLabel(draft.classes)}, level 1. Save the character to a file, then play from the sheet.
+        {draft.name} is ready: {draft.race} {classesLabel(draft.classes)}, level 1. Save the character to your library and open the sheet to play.
       </p>
       <div class="actions">
         <button type="button" class="primary" onClick={finish}>

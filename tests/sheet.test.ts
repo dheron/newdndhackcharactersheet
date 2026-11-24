@@ -7,6 +7,7 @@ import { emptyDraft, toCharacter, withClass, experienceSlots, type Draft } from 
 import { fromFileText, initialPlay, toFileText, MELEE_ROWS, RANGED_ROWS } from "../src/model/character";
 import { alignmentShort, classAndLevel, equipBlocked, equippable, inventoryOf, isEquipped, sheetFor, slotTable, toggleEquip, turnUndeadColumn } from "../src/sheet/derived";
 import { canWear, cannotWearReason, restrictionsFor } from "../src/engine/equipment";
+import { copyOf, libraryFileName } from "../src/library";
 
 const rolls = (values: number[]): StatRoll[] =>
   STATS.map((stat, pick) => ({ stat, pick, method: "test", dice: [values[pick]!], kept: [values[pick]!], total: values[pick]! }) as StatRoll);
@@ -196,5 +197,21 @@ describe("rules report", () => {
       expect(row, r.name).toBeDefined();
       expect(row!.split("|").at(-2)!.trim(), r.name).toBe(multiclassOptions(r.name).map((c) => c.join("/")).join(", "));
     }
+  });
+});
+
+describe("character library", () => {
+  it("names each file after the character and the start of its id", () => {
+    const c = toCharacter(fighter());
+    expect(libraryFileName(c)).toBe(`Test ${c.id.slice(0, 8)}.character.json`);
+  });
+
+  it("copies a character with a new id and '(copy)' after the name", () => {
+    const c = toCharacter(fighter());
+    const copy = copyOf(c);
+    expect(copy.id).not.toBe(c.id);
+    expect(copy.name).toBe("Test (copy)");
+    expect(copy.play).toEqual(c.play);
+    expect(copy.play).not.toBe(c.play);
   });
 });

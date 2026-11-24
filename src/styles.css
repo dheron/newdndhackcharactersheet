@@ -311,3 +311,40 @@ button.primary {
     width: 100%;
   }
 }
+
+.library .actions.top {
+  margin: 0 0 12px;
+}
+
+.char-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.char-list li {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.char-open {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  min-width: 0;
+}
+
+.char-name {
+  font-weight: bold;
+}
+
+.char-meta {
+  color: var(--muted);
+  font-size: 0.85rem;
+}

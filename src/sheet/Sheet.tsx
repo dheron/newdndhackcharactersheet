@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import type { Character } from "../model/character";
-import { saveCharacterFileAs, writeCharacterFile, type FilePath } from "../storage";
+import { saveCharacterFileAs } from "../storage";
+import { saveCharacter } from "../library";
 import { printSheet } from "../print";
 import { sheetFor } from "./derived";
 import { Page1 } from "./Page1";
@@ -10,15 +11,16 @@ import "./sheet.css";
 const AUTOSAVE_MS = 600;
 
 /**
- * The playable sheet. In the desktop app every change is written back to the character's
- * file shortly after it is made. In a browser there is no file to write to, so the player saves.
+ * The playable sheet. Every change is saved to the character library shortly after it is made,
+ * and any change still waiting is saved when the sheet is closed.
  */
-export function Sheet({ initial, path: initialPath, onClose }: { initial: Character; path: FilePath; onClose: () => void }) {
+export function Sheet({ initial, onClose }: { initial: Character; onClose: () => void }) {
   const [c, setC] = useState(initial);
-  const [path, setPath] = useState<FilePath>(initialPath);
-  const [status, setStatus] = useState(initialPath ? "Saved" : "");
+  const [status, setStatus] = useState("Saved");
   const [dirty, setDirty] = useState(false);
   const timer = useRef<number | undefined>(undefined);
+  const latest = useRef(c);
+  latest.current = c;
   const view = useMemo(() => sheetFor(c), [c]);
 
   const update = (fn: (c: Character) => Character) => {
@@ -26,35 +28,34 @@ export function Sheet({ initial, path: initialPath, onClose }: { initial: Charac
     setDirty(true);
   };
 
+  const save = (ch: Character) =>
+    saveCharacter(ch)
+      .then(() => {
+        setDirty(false);
+        setStatus("Saved");
+      })
+      .catch((e) => setStatus(`Could not save: ${e instanceof Error ? e.message : String(e)}`));
+
   useEffect(() => {
-    if (!dirty || !path) return;
+    if (!dirty) return;
     setStatus("Saving...");
     window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => {
-      writeCharacterFile(path, c)
-        .then(() => {
-          setDirty(false);
-          setStatus("Saved");
-        })
-        .catch((e) => setStatus(`Could not save: ${e instanceof Error ? e.message : String(e)}`));
-    }, AUTOSAVE_MS);
+    timer.current = window.setTimeout(() => save(c), AUTOSAVE_MS);
     return () => window.clearTimeout(timer.current);
-  }, [c, dirty, path]);
+  }, [c, dirty]);
 
-  const saveAs = async () => {
+  const exportFile = async () => {
     try {
       const saved = await saveCharacterFileAs(c);
-      if (!saved) return;
-      setPath(saved.path);
-      setDirty(false);
-      setStatus(saved.path ? "Saved" : `Downloaded ${saved.label}`);
+      if (saved) setStatus(`Exported to ${saved.label}`);
     } catch (e) {
-      setStatus(`Could not save: ${e instanceof Error ? e.message : String(e)}`);
+      setStatus(`Could not export: ${e instanceof Error ? e.message : String(e)}`);
     }
   };
 
-  const close = () => {
-    if (dirty && !path && !window.confirm("This character has changes that are not saved. Close anyway?")) return;
+  const close = async () => {
+    window.clearTimeout(timer.current);
+    if (dirty) await save(latest.current);
     onClose();
   };
 
@@ -62,16 +63,14 @@ export function Sheet({ initial, path: initialPath, onClose }: { initial: Charac
     <div class="sheet-screen">
       <div class="toolbar">
         <button type="button" onClick={close}>
-          Close
+          Characters
         </button>
-        <span class="file" title={path ?? ""}>
-          {path ? path.split(/[\\/]/).pop() : "Not saved to a file"}
-        </span>
+        <span class="file">{c.name}</span>
         <span class="save-status" role="status">
-          {!path && dirty ? "Unsaved changes" : status}
+          {status}
         </span>
-        <button type="button" class={!path && dirty ? "primary" : ""} onClick={saveAs}>
-          {path ? "Save as" : "Save"}
+        <button type="button" onClick={exportFile}>
+          Export
         </button>
         <button type="button" onClick={() => printSheet().catch((e) => setStatus(`Could not print: ${e instanceof Error ? e.message : String(e)}`))}>
           Print

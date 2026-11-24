@@ -68,9 +68,20 @@ One page per casting class. Same structure for all:
 - Concentration is not a rule in this system.
 - Alignment is the basic 5e list (David).
 
+## Equipment in play
+
+- The inventory is one item per line. Armour, Shield and weapon lines have a tick box: tick to equip, untick to unequip. The armour and weapon dropdowns list what is in the inventory. Each weapon has one row however many the character carries.
+- Armour a character's classes do not allow cannot be equipped (creation and play). A Druid, single or multiclassed, wears only Padded, Leather, Hide and a Shield (David). Chain Mail and Banded Mail (and Scale Mail and Brigandine, Ranseur and Pike) are separate items.
+- Multiclass restrictions (Classes v4): the armour can be worn, and while it is, the affected abilities are greyed with the reason and a casting class's page 2 says "No spellcasting" (David).
+- XP and Current HP start blank; the player writes them.
+
+## Character library (phase 5)
+
+Characters are kept in a "Character Sheets" folder in Documents, one file each, saved as the player plays (David). The start screen lists them with Open, Duplicate and Delete, plus New character and Import a file. The sheet's Export saves a copy anywhere.
+
 ## Printing (phase 4)
 
-The Print button prints the same pages: page 1, then a page 2 for each casting class, one US Letter page each with the sheet's own 40px margin (printer margins off). The print dialog also saves a PDF. Page 2 follows each class's approved wireframe (columns, row heights, slot boxes, Turn Undead); `src/sheet/page2Layout.ts` holds those layouts. On paper, the Slots boxes the character has now are filled; spent slots and prepared spells print as currently ticked. Text the player typed prints on ruled lines.
+The Print button prints the same pages: page 1, then a page 2 for each casting class, one US Letter page each with the sheet's own 40px margin (printer margins off). The print dialog also saves a PDF. Page 2 follows each class's approved wireframe (columns, row heights, slot boxes, Turn Undead); `src/sheet/page2Layout.ts` holds those layouts. On paper, the Slots and Spent boxes print blank for the player to mark (David); prepared spells print as currently ticked. Text the player typed prints on ruled lines.
 
 ## On screen (phase 3)
 

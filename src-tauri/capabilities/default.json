@@ -1,13 +1,21 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Permissions for the main window. Character files are read and written only at paths the player picks in a file dialog.",
+  "description": "Permissions for the main window. The app reads and writes only its own 'Character Sheets' folder in Documents, plus files the player picks in an Import or Export dialog.",
   "windows": ["main"],
   "permissions": [
     "core:default",
     "dialog:allow-save",
     "dialog:allow-open",
     "fs:allow-write-text-file",
-    "fs:allow-read-text-file"
+    "fs:allow-read-text-file",
+    "fs:allow-read-dir",
+    "fs:allow-mkdir",
+    "fs:allow-remove",
+    "fs:allow-exists",
+    {
+      "identifier": "fs:scope",
+      "allow": [{ "path": "$DOCUMENT/Character Sheets" }, { "path": "$DOCUMENT/Character Sheets/**" }]
+    }
   ]
 }
