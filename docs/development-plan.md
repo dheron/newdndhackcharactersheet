@@ -54,4 +54,6 @@ David's decisions not yet in the docs are in `src/rules/data/decisions.json` and
 | 3 | The sheet on screen, page 1 and caster page 2, with play tracking (HP, slots, prepared spells, inventory, notes) | Plays a session from it |
 | 4 | Printing to US Letter and PDF, matching the approved wireframes | Prints the sheets |
 | 5 | Character list (open, duplicate, delete) and installers | |
-| Later | Levelling up; iPad and iPhone | |
+| 6 | Levelling up | Levels a character |
+| 7 | Web version (installable, offline) with the iPad layout, published on GitHub Pages; no native mobile apps (David) | Uses it on an iPad |
+| Later | Phone layout | |

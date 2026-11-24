@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Character sheet iPad page 1</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#fff}
+a{color:#111}a:hover{color:#444}
+.pg *{box-sizing:border-box}
+.pg > div{flex-shrink:0}
+.sh{background:#333;color:#fff;font:700 13px/28px Arial,Helvetica,sans-serif;letter-spacing:.06em;text-transform:uppercase;padding:0 8px;height:28px;white-space:nowrap;overflow:hidden;text-align:center;flex:none}
+.l{font:400 11px/14px Arial,Helvetica,sans-serif;color:#444;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-align:center}
+.b{border:1.5px solid #111;background:#fff;border-radius:4px}
+.ln{border-bottom:1px solid #777;height:34px;flex:none}
+.row{flex:1;border-bottom:1px solid #bbb;display:flex;align-items:center}
+.op{font:700 17px Arial,Helvetica,sans-serif;padding-top:18px;width:12px;text-align:center}
+.wt{display:grid;gap:4px;margin-top:4px}
+.wt .b{height:40px}
+.br{flex:1;border-bottom:1px solid #bbb;display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:5px}
+.bc{display:flex;flex-direction:column;align-items:center;min-width:50px}
+.bc .lw{font:400 11px/14px Arial,Helvetica,sans-serif;color:#444;white-space:nowrap;margin-bottom:2px}
+.bc .b{width:50px;height:34px}
+.sp{width:50px}
+.sv{flex:1;border-bottom:1px solid #bbb;display:flex;flex-direction:column;justify-content:center;gap:3px}
+.sg{display:grid;grid-template-columns:minmax(0,1fr) 34px 34px 34px;gap:4px;align-items:center;font:400 12px/14px Arial,Helvetica,sans-serif}
+.sg .b{height:36px}
+.nt{border-bottom:1px dotted #555;height:18px}
+</style>
+</helmet>
+<div class="pg" style="width:820px;height:1180px;box-sizing:border-box;padding:24px;display:flex;flex-direction:column;gap:12px;background:#fff;color:#111;font-family:Arial,Helvetica,sans-serif">
+
+<div style="border:1.5px solid #111;border-radius:4px;padding:6px 8px;display:grid;grid-template-columns:2.2fr 1.3fr 2.6fr 2fr 0.6fr 0.6fr 0.7fr;gap:6px">
+<div><div class="l">Name</div><div class="b" style="height:40px"></div></div>
+<div><div class="l">Race</div><div class="b" style="height:40px"></div></div>
+<div><div class="l">Class and level</div><div class="b" style="height:40px"></div></div>
+<div><div class="l">XP</div><div class="b" style="height:40px"></div></div>
+<div><div class="l">Align</div><div class="b" style="height:40px"></div></div>
+<div><div class="l">Move</div><div class="b" style="height:40px"></div></div>
+<div><div class="l">Atk Bns</div><div class="b" style="height:40px;border-width:3px"></div></div>
+</div>
+
+<div style="display:grid;grid-template-columns:84px 204px 84px minmax(0,1fr) 204px;gap:12px;height:380px">
+
+<div style="display:flex;flex-direction:column">
+<div class="sh" style="padding:0">Stats</div>
+<div class="row" style="gap:4px"><b style="width:32px;font-size:14px">STR</b><div class="b" style="width:46px;height:44px"></div></div>
+<div class="row" style="gap:4px"><b style="width:32px;font-size:14px">DEX</b><div class="b" style="width:46px;height:44px"></div></div>
+<div class="row" style="gap:4px"><b style="width:32px;font-size:14px">CON</b><div class="b" style="width:46px;height:44px"></div></div>
+<div class="row" style="gap:4px"><b style="width:32px;font-size:14px">INT</b><div class="b" style="width:46px;height:44px"></div></div>
+<div class="row" style="gap:4px"><b style="width:32px;font-size:14px">WIS</b><div class="b" style="width:46px;height:44px"></div></div>
+<div class="row" style="gap:4px"><b style="width:32px;font-size:14px">CHA</b><div class="b" style="width:46px;height:44px"></div></div>
+</div>
+
+<div style="display:flex;flex-direction:column">
+<div class="sh">Stat bonuses</div>
+<div class="br"><div class="bc"><div class="lw">Melee hit</div><div class="b"></div></div><div class="bc"><div class="lw">Damage</div><div class="b"></div></div><div class="sp"></div></div>
+<div class="br"><div class="bc"><div class="lw">Ranged hit</div><div class="b"></div></div><div class="bc"><div class="lw">AC</div><div class="b"></div></div><div class="bc"><div class="lw">Blast save</div><div class="b"></div></div></div>
+<div class="br"><div class="bc"><div class="lw">HP per hit die</div><div class="b"></div></div></div>
+<div class="br"><div class="bc"><div class="lw">Languages</div><div class="b"></div></div><div class="bc"><div class="lw">Spell attack</div><div class="b"></div></div><div class="bc"><div class="lw">Arcane potency</div><div class="b"></div></div></div>
+<div class="br"><div class="bc"><div class="lw">Divine potency</div><div class="b"></div></div><div class="bc"><div class="lw">Mind spell save</div><div class="b"></div></div><div class="sp"></div></div>
+<div class="br"></div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:5px">
+<div class="sh" style="padding:0">HP</div>
+<div><div class="l">Max</div><div class="b" style="height:44px"></div></div>
+<div><div class="l">Current</div><div class="b" style="height:60px;border-width:3px"></div></div>
+<div><div class="l">Temp HP</div><div class="b" style="height:44px"></div></div>
+<div><div class="l">Hit dice</div><div class="b" style="height:32px"></div><div class="b" style="height:32px;margin-top:3px"></div><div class="b" style="height:32px;margin-top:3px"></div></div>
+</div>
+
+<div style="display:flex;flex-direction:column;overflow:hidden">
+<div class="sh">Experiences</div>
+<div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div>
+</div>
+
+<div style="display:flex;flex-direction:column">
+<div class="sh">Saving throws</div>
+<div class="sg" style="padding:3px 0 1px"><div class="l" style="text-align:left">Type</div><div class="l">Total</div><div class="l">Base</div><div class="l">BNS</div></div>
+<div class="sv"><div class="sg"><div>Spell</div><div class="b" style="border-width:2.5px"></div><div class="b"></div><div class="b"></div></div><div class="nt"></div></div>
+<div class="sv"><div class="sg"><div>Blast / Barrage</div><div class="b" style="border-width:2.5px"></div><div class="b"></div><div class="b"></div></div><div class="nt"></div></div>
+<div class="sv"><div class="sg"><div>Petrification / Polymorph</div><div class="b" style="border-width:2.5px"></div><div class="b"></div><div class="b"></div></div><div class="nt"></div></div>
+<div class="sv"><div class="sg"><div>Magic Item</div><div class="b" style="border-width:2.5px"></div><div class="b"></div><div class="b"></div></div><div class="nt"></div></div>
+<div class="sv" style="border:0"><div class="sg"><div>Death / Paralyze</div><div class="b" style="border-width:2.5px"></div><div class="b"></div><div class="b"></div></div><div class="nt"></div></div>
+</div>
+</div>
+
+<div style="border:1.5px solid #111;border-radius:4px;padding:6px 8px;display:flex;align-items:flex-start;gap:6px">
+<div style="width:52px"><div class="l">AC</div><div class="b" style="height:40px;border-width:3px"></div></div>
+<div class="op">=</div>
+<div style="width:220px"><div class="l">Armour</div><div class="b" style="height:40px"></div></div>
+<div style="width:44px"><div class="l">AC</div><div class="b" style="height:40px"></div></div>
+<div class="op">+</div>
+<div style="width:44px"><div class="l">Shield</div><div class="b" style="height:40px"></div></div>
+<div class="op">+</div>
+<div style="width:44px"><div class="l">DEX</div><div class="b" style="height:40px"></div></div>
+<div class="op">+</div>
+<div style="width:44px"><div class="l">Misc</div><div class="b" style="height:40px"></div></div>
+<div style="flex:1;margin-left:8px"><div class="l">Note</div><div class="b" style="height:40px"></div></div>
+</div>
+
+<div>
+<div class="sh">Melee weapons</div>
+<div class="wt" style="grid-template-columns:minmax(0,1.3fr) 48px 40px 40px 40px 76px 34px minmax(0,1.6fr)">
+<div class="l">Name</div><div class="l">Hit Bns</div><div class="l">Base</div><div class="l">STR</div><div class="l">Mag</div><div class="l">Damage</div><div class="l">Type</div><div class="l">Note</div>
+<div class="b"></div><div class="b" style="border-width:2.5px"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div>
+<div class="b"></div><div class="b" style="border-width:2.5px"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div>
+<div class="b"></div><div class="b" style="border-width:2.5px"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div>
+<div class="b"></div><div class="b" style="border-width:2.5px"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div>
+</div>
+</div>
+
+<div>
+<div class="sh">Ranged weapons</div>
+<div class="wt" style="grid-template-columns:minmax(0,1.3fr) 80px 48px 40px 40px 40px 76px 34px minmax(0,1.3fr)">
+<div class="l">Name</div><div class="l">Range</div><div class="l">Hit Bns</div><div class="l">Base</div><div class="l">DEX</div><div class="l">Mag</div><div class="l">Damage</div><div class="l">Type</div><div class="l">Note</div>
+<div class="b"></div><div class="b"></div><div class="b" style="border-width:2.5px"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div>
+<div class="b"></div><div class="b"></div><div class="b" style="border-width:2.5px"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div>
+<div class="b"></div><div class="b"></div><div class="b" style="border-width:2.5px"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div>
+</div>
+</div>
+
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));column-gap:12px;flex:1;min-height:0;flex-shrink:1;align-content:start;overflow:hidden">
+<div class="sh">Abilities / Languages</div>
+<div class="sh" style="grid-column:span 2">Inventory / Notes</div>
+<div><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+<div><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+<div><div class="ln"></div><div class="ln"></div><div class="ln"></div><div class="ln"></div></div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":820,"height":1180}}'>
+class Component extends DCLogic {
+renderVals() { return {}; }
+}
+</script>
+</body>
+</html>

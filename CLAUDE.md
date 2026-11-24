@@ -55,6 +55,7 @@ Plan: [`docs/development-plan.md`](docs/development-plan.md).
 - `npm run check`: typecheck, tests and front end build. Run before every commit.
 - Rules data: `src/rules/data/*.json`, one file per source doc, each naming its source. `src/rules/index.ts` is the only way the app reads it. Spell lists are generated from `sources/spell-lists.txt`.
 - `npm run rules`: regenerates `spells.json` and `docs/rules-report.md` (every value next to its source, plus gaps and interpretations). Run after any data change; CI fails if they are stale.
+- Web version: the same build (`dist/`) published to GitHub Pages by `.github/workflows/pages.yml` on pushes to main. `public/sw.js` is the offline helper; `public/manifest.webmanifest` makes it installable.
 - `npx tauri build`: installers for the current OS. CI (`.github/workflows/ci.yml`) builds the macOS (universal) and Windows installers and attaches them to each run.
 - App icon: `app-icon.png` is a placeholder; regenerate sizes with `npx tauri icon app-icon.png`.
 
@@ -62,7 +63,7 @@ Plan: [`docs/development-plan.md`](docs/development-plan.md).
 
 1. Print page 1: approved (first draft).
 2. Print page 2 for spellcasters: approved for Wizard and Cleric; Druid, Bard, Paladin, Ranger drafted.
-3. iPad and phone versions: on hold until David asks (desktop first).
-4. App build: phase 0 (app skeleton and CI) done. Phase 1 (rules data and report) done and reviewed. Phase 2 (character creation) done. Phase 3 (sheet on screen with play tracking) and multiclass creation built. Phase 4 (printing) done. Phase 5 (character library, equipment in play, installers 0.2.0) built. Levelling up built, awaiting David's review.
+3. iPad layout: approved and built (web version). Phone layout: not designed yet.
+4. App build: phase 0 (app skeleton and CI) done. Phase 1 (rules data and report) done and reviewed. Phase 2 (character creation) done. Phase 3 (sheet on screen with play tracking) and multiclass creation built. Phase 4 (printing) done. Phase 5 (character library, equipment in play, installers 0.2.0) built. Levelling up built. Web version (GitHub Pages, installable, offline) with the iPad layout built, awaiting David's review.
 
 Open questions are listed at the end of the spec.

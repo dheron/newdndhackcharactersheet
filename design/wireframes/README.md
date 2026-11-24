@@ -6,3 +6,5 @@ They are Design Component files (`.dc.html`) and need the canvas runtime to rend
 
 - `page1-print.dc.html`: page 1, all classes, US Letter.
 - `page2-<class>.dc.html`: page 2 for each spellcasting class.
+- `ipad-page1.dc.html`: page 1 on iPad (approved). Same structure as print with bigger boxes and rows for touch.
+- `ipad-page2-cleric.dc.html`: page 2 on iPad, Cleric (approved). Other casters use their print column layout with the same iPad sizes.

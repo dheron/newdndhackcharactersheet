@@ -11,6 +11,28 @@ import { LevelUpPanel } from "./LevelUp";
 import { addXp, readyToLevel, undoLevelUp, xpWithBonus } from "../engine/levels";
 
 const AUTOSAVE_MS = 600;
+const PRINT_PAGE_WIDTH = 816;
+const TOUCH_PAGE_WIDTH = 820;
+
+/** The iPad layout is for touch screens. "?layout=ipad" or "?layout=desktop" in the address forces one. */
+function isTouchLayout(): boolean {
+  const forced = new URLSearchParams(window.location.search).get("layout");
+  if (forced === "ipad") return true;
+  if (forced === "desktop") return false;
+  return window.matchMedia?.("(pointer: coarse)").matches ?? false;
+}
+
+/** Scale the pages down to fit narrow windows, so the sheet never scrolls sideways. */
+function useFitZoom(pageWidth: number): number {
+  const fit = () => Math.min(1, (window.innerWidth - 16) / (pageWidth + 16));
+  const [zoom, setZoom] = useState(fit);
+  useEffect(() => {
+    const onResize = () => setZoom(fit());
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [pageWidth]);
+  return zoom;
+}
 
 /**
  * The playable sheet. Every change is saved to the character library shortly after it is made,
@@ -24,6 +46,8 @@ export function Sheet({ initial, onClose }: { initial: Character; onClose: () =>
   const latest = useRef(c);
   latest.current = c;
   const view = useMemo(() => sheetFor(c), [c]);
+  const touch = useMemo(isTouchLayout, []);
+  const zoom = useFitZoom(touch ? TOUCH_PAGE_WIDTH : PRINT_PAGE_WIDTH);
   const ready = readyToLevel(c);
   const [xpText, setXpText] = useState("");
   const [xpNote, setXpNote] = useState("");
@@ -66,7 +90,7 @@ export function Sheet({ initial, onClose }: { initial: Character; onClose: () =>
   };
 
   return (
-    <div class="sheet-screen">
+    <div class={touch ? "sheet-screen touch" : "sheet-screen"}>
       <div class="toolbar">
         <button type="button" onClick={close}>
           Characters
@@ -128,7 +152,7 @@ export function Sheet({ initial, onClose }: { initial: Character; onClose: () =>
           }}
         />
       )}
-      <div class="pages">
+      <div class="pages" style={zoom < 1 ? `zoom:${zoom}` : ""}>
         <Page1 c={c} view={view} update={update} />
         {view.casters.map((caster) => (
           <Page2 key={caster.cls} c={c} caster={caster} castingOff={view.castingOff[caster.cls]} update={update} />

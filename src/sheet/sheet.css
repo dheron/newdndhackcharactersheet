@@ -84,7 +84,7 @@
   flex-direction: column;
   align-items: center;
   gap: 24px;
-  padding: 24px 16px 48px;
+  padding: 24px 8px 48px;
   overflow-x: auto;
 }
 
@@ -973,6 +973,7 @@
 
   .pages {
     display: block;
+    zoom: 1 !important;
     padding: 0;
     gap: 0;
     overflow: visible;
@@ -1056,3 +1057,310 @@
   }
 }
 
+
+/*
+ * iPad layout (touch screens), from the approved iPad wireframes
+ * (design/wireframes/ipad-page1.dc.html, ipad-page2-cleric.dc.html): the print structure with
+ * bigger boxes, rows and tick boxes. Screen only; printing always uses the print layout.
+ * Inputs are 16px so iPad Safari does not zoom in when one is tapped.
+ */
+@media screen {
+  .touch .pg {
+    width: 820px;
+    padding: 24px;
+  }
+
+  .touch .pg.page1 {
+    min-height: 1180px;
+  }
+
+  .touch .pg.page2 {
+    min-height: 0;
+  }
+
+  .touch .pg .sh,
+  .touch .pg .bh {
+    font: 700 13px/28px Arial, Helvetica, sans-serif;
+    height: 28px;
+  }
+
+  .touch .pg .l,
+  .touch .pg .bc .lw {
+    font: 400 11px/14px Arial, Helvetica, sans-serif;
+  }
+
+  .touch .pg .b,
+  .touch .pg .bx {
+    border-radius: 4px;
+  }
+
+  .touch .pg .val,
+  .touch .pg .in {
+    height: 40px;
+    font-size: 16px;
+  }
+
+  .touch .pg .op {
+    font-size: 17px;
+    padding-top: 18px;
+    width: 12px;
+  }
+
+  .touch .pg .hdr {
+    border-radius: 4px;
+    grid-template-columns: 2.2fr 1.3fr 2.6fr 2fr 0.6fr 0.6fr 0.7fr;
+  }
+
+  .touch .pg .main {
+    grid-template-columns: 84px 204px 84px minmax(0, 1fr) 204px;
+    height: 380px;
+  }
+
+  .touch .pg .stat b {
+    width: 32px;
+    font-size: 14px;
+  }
+
+  .touch .pg .score {
+    width: 46px;
+    height: 44px;
+    font-size: 17px;
+  }
+
+  .touch .pg .br {
+    padding-bottom: 5px;
+  }
+
+  .touch .pg .bc {
+    min-width: 50px;
+  }
+
+  .touch .pg .bc .b,
+  .touch .pg .sp {
+    width: 50px;
+  }
+
+  .touch .pg .bc .b {
+    height: 34px;
+  }
+
+  .touch .pg .hp .max {
+    height: 44px;
+  }
+
+  .touch .pg .hp .current {
+    height: 60px;
+    border-width: 3px;
+    font-size: 24px;
+  }
+
+  .touch .pg .hp .temp {
+    height: 44px;
+  }
+
+  .touch .pg .hp .hd {
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .touch .pg .exp {
+    overflow-y: auto;
+  }
+
+  .touch .pg .ln,
+  .touch .pg input.in.ln {
+    height: 34px;
+    line-height: 33px;
+    font-size: 15px;
+  }
+
+  .touch .pg .ln-wrap input.in.ln {
+    font-size: 16px;
+  }
+
+  .touch .pg .sg {
+    grid-template-columns: minmax(0, 1fr) 34px 34px 34px;
+    font: 400 12px/14px Arial, Helvetica, sans-serif;
+  }
+
+  .touch .pg .sg .b {
+    height: 36px;
+    font-size: 15px;
+  }
+
+  .touch .pg .nt {
+    height: 18px;
+  }
+
+  .touch .pg .nt .in {
+    height: 17px;
+    font-size: 16px;
+  }
+
+  .touch .pg .acrow {
+    border-radius: 4px;
+  }
+
+  .touch .pg .acrow .val,
+  .touch .pg .acrow .in {
+    height: 40px;
+  }
+
+  .touch .pg .w40 {
+    width: 52px;
+  }
+
+  .touch .pg .w190 {
+    width: 220px;
+  }
+
+  .touch .pg .w36 {
+    width: 44px;
+  }
+
+  .touch .pg .wt .b {
+    height: 40px;
+    font-size: 13px;
+  }
+
+  .touch .pg .wt.melee {
+    grid-template-columns: minmax(0, 1.3fr) 48px 40px 40px 40px 76px 34px minmax(0, 1.6fr);
+  }
+
+  .touch .pg .wt.ranged {
+    grid-template-columns: minmax(0, 1.3fr) 80px 48px 40px 40px 40px 76px 34px minmax(0, 1.3fr);
+  }
+
+  .touch .pg .abilities {
+    font-size: 13px;
+    line-height: 17px;
+  }
+
+  .touch .pg .inv-row {
+    height: 34px;
+  }
+
+  .touch .pg .inv-row input.in.ln {
+    height: 33px;
+  }
+
+  .touch .pg .inv-row .ck,
+  .touch .pg .inv-row .ck-pad {
+    width: 18px;
+    height: 18px;
+  }
+
+  .touch .pg .known-langs {
+    font-size: 15px;
+    line-height: 34px;
+    background-image: repeating-linear-gradient(transparent, transparent 33px, #777 33px, #777 34px);
+  }
+
+  .touch .pg textarea.area {
+    font: 400 16px/34px Arial, Helvetica, sans-serif;
+    background-image: repeating-linear-gradient(transparent, transparent 33px, #777 33px, #777 34px);
+  }
+
+  /* Page 2 */
+  .touch .pg .hdr2 {
+    border-radius: 4px;
+  }
+
+  .touch .pg .hdr2 .atk > div:not(.op) {
+    width: 44px;
+  }
+
+  .touch .pg .hdr2 .atk > div:first-child {
+    width: 56px;
+  }
+
+  .touch .pg .hdr2 > .pot {
+    width: 100px;
+  }
+
+  .touch .pg .lcol {
+    gap: 10px;
+  }
+
+  .touch .pg .bx {
+    overflow: hidden;
+  }
+
+  .touch .pg .sb2,
+  .touch .pg .sb1 {
+    height: auto;
+    padding: 3px 8px;
+    gap: 3px;
+    font-size: 10px;
+  }
+
+  .touch .pg .sb1 {
+    flex-wrap: wrap;
+  }
+
+  .touch .pg .sbr .t {
+    width: 36px;
+  }
+
+  .touch .pg .sq,
+  .touch .pg .sq-check,
+  .touch .pg .ck,
+  .touch .pg .rw.book .ck {
+    width: 18px;
+    height: 18px;
+    border-width: 1.5px;
+    border-radius: 3px;
+  }
+
+  .touch .pg .rw {
+    height: 28px !important;
+    gap: 8px;
+    padding: 0 8px;
+    font-size: 13px;
+  }
+
+  .touch .pg .rw.book {
+    height: 34px !important;
+  }
+
+  .touch .pg .rw.book .nm {
+    height: 33px;
+    line-height: 33px;
+  }
+
+  .touch .pg .wl {
+    height: 36px;
+    padding: 0 8px;
+  }
+
+  .touch .pg .wl .nm {
+    height: 34px;
+    line-height: 34px;
+    font-size: 15px;
+  }
+
+  .touch .pg .tu {
+    font-size: 13px;
+  }
+
+  .touch .pg .tu th {
+    font-size: 12px;
+    height: 28px;
+  }
+
+  .touch .pg .tu td,
+  .touch .pg .tu tbody th {
+    height: 28px;
+    line-height: 28px;
+  }
+
+  .touch .pg .note {
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  .touch .pg .add {
+    min-height: 34px;
+    font-size: 16px;
+  }
+}

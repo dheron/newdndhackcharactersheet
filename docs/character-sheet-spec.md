@@ -89,6 +89,12 @@ One page per casting class. Same structure for all:
 
 Characters are kept in a "Character Sheets" folder in Documents, one file each, saved as the player plays (David). The start screen lists them with Open, Duplicate and Delete, plus New character and Import a file. The sheet's Export saves a copy anywhere.
 
+## iPad and the web version
+
+- On touch screens the sheet uses the approved iPad layout (`design/wireframes/ipad-page1.dc.html`, `ipad-page2-cleric.dc.html`): the print structure with 40px boxes, 28px headers, 34px lines and 18px tick boxes. Desktop keeps the print-sized layout; printing always uses the print layout. Pages scale down to fit narrower windows. `?layout=ipad` or `?layout=desktop` in the address forces one.
+- The web version (David: no native iPad or iPhone apps) is the same app in a browser. It can be added to the home screen, works offline once loaded, and keeps characters in that browser on that device; Export and Import move them between devices. It is published with GitHub Pages.
+- The phone layout is not designed yet; on a phone the iPad layout is scaled to fit.
+
 ## Printing (phase 4)
 
 The Print button prints the same pages: page 1, then a page 2 for each casting class, one US Letter page each with the sheet's own 40px margin (printer margins off). The print dialog also saves a PDF. Page 2 follows each class's approved wireframe (columns, row heights, slot boxes, Turn Undead); `src/sheet/page2Layout.ts` holds those layouts. On paper, the Slots and Spent boxes print blank for the player to mark (David); prepared spells print as currently ticked. Text the player typed prints on ruled lines.

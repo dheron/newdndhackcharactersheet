@@ -87,7 +87,7 @@ function CharacterList({ onOpen, onNew }: { onOpen: (c: Character) => void; onNe
       <p class="hint">
         {inTauri()
           ? `Characters are kept in the "${LIBRARY_FOLDER}" folder in your Documents and save as you play.`
-          : "In the browser, characters are kept in this browser's storage (development only)."}
+          : "Characters are kept in this browser on this device. Use Export on a sheet to back one up or move it to another device, and Import a file to bring it in."}
       </p>
       {error && (
         <p class="status" role="alert">
