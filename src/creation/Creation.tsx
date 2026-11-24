@@ -365,7 +365,7 @@ function ExperiencesStep({ draft, update }: StepProps) {
   return (
     <>
       <p class="hint">
-        Each Experience gives +2 to a roll-under check when the DM agrees it applies. Choose {free}: {left} left.
+        Choose {free}: {left} left.
       </p>
       {fixed.length > 0 && (
         <>
