@@ -15,7 +15,7 @@
     { "name": "Light Crossbow", "category": "Simple", "cost": 35, "type": "P", "damage": "1d8", "range": "80/320", "traits": ["Two-Handed", "Loading"] },
     { "name": "Javelin", "category": "Simple", "cost": 0.5, "type": "P", "damage": "1d6", "range": "30/120", "traits": ["Thrown"] },
     { "name": "Sling", "category": "Simple", "cost": 0.1, "type": "B", "damage": "1d4", "range": "30/120", "traits": [] },
-    { "name": "Dart", "category": "Simple", "cost": 0.05, "type": null, "damage": "1d4", "range": "20/60", "traits": ["Thrown"] },
+    { "name": "Dart", "category": "Simple", "cost": 0.05, "type": "P", "typeSource": "David (decisions.json); blank in the sheet", "damage": "1d4", "range": "20/60", "traits": ["Thrown"] },
     { "name": "Battle Axe", "category": "Martial", "cost": 5, "type": "S", "damage": "1d8/1d10", "range": null, "traits": ["Versatile"] },
     { "name": "Lance", "category": "Martial", "cost": 15, "type": "P", "damage": "1d12", "range": null, "traits": [] },
     { "name": "Morning Star", "category": "Martial", "cost": 10, "type": "B", "damage": "1d8", "range": null, "traits": [] },

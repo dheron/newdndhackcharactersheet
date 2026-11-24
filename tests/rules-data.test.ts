@@ -184,6 +184,7 @@ describe("equipment", () => {
     expect(weapons.find((w) => w.name === "Long Sword")?.damage).toBe("1d8/1d10");
     expect(weapons.find((w) => w.name === "Club")?.damage).toBe("1d6");
     expect(weapons.find((w) => w.name === "Great Axe")?.cost).toBe(50);
+    expect(weapons.find((w) => w.name === "Dart")?.type).toBe("P");
     expect(weapons.find((w) => w.name === "Long Bow")?.range).toBe("150/600");
     expect(armour.find((a) => a.name === "Plate")?.baseAC).toBe(18);
     expect(armour.find((a) => a.name === "Chain / Banded Mail")?.strReq).toBe(13);

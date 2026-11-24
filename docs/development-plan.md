@@ -15,7 +15,7 @@ Purpose order: character creation first, then the sheet, then printing. iPad and
 | 2. Ability scores | Pick a stat, then roll for it. Dice by pick order: 7d6, 6d6, 5d6, 4d6 keep top 3, then 3d6, then 2d6 twice keep higher. Racial modifiers apply after rolling, then each score is held to 6 to 18. Show the dice, expected result and a short text warning when a positive racial bonus may be wasted at 18. Desktop: hover previews, click confirms. Touch: tap selects, tap again confirms. | Original app |
 | 3. Class | Pick a class. Multiclass combinations are offered by race; each class gets its own sheet. | Classes v4 |
 | 4. Experiences | Fixed Experiences for the class, free picks up to the class count, plus racial bonus Experiences. Pick from the list or write your own. | Classes v4, Races, Experiences |
-| 5. Equipment | Choose Choice One and Choice Two from the class's Starting Equipment options. Where an option names a category ("Two-Handed Martial Melee", "any Druid weapon"), pick the weapon from the Weapons sheet. | Weapons and Armour |
+| 5. Equipment | Choose Choice One and Choice Two from the class's Starting Equipment options. Where an option names a category ("Two-Handed Martial Melee", "any Druid weapon"), pick the weapon from the Weapons sheet. Armour above the character's STR requirement cannot be chosen. Roll 2d6 starting gold. | Weapons and Armour, David's decisions |
 | 6. Spells (casters) | Pick cantrips (counts in Classes v4). Wizards also pick their known spells: as many as their INT Languages at 1st level, +1 per level up. Other casters prepare from their full list. | Classes v4, Ability Score Tables v4, Spell Books |
 | 7. Sheet | The app works out everything below, shows the approved sheet, saves the character and can print it. | All |
 
@@ -29,12 +29,12 @@ Completed steps collapse into summary cards above the current step; clicking one
 - Ranged: Hit Bns = class Attack Bonus + DEX ranged hit + magic; damage = weapon die.
 - Saves: class targets from Saving Throws; DEX bonus on Blast / Barrage; WIS bonus only against spells that attack the mind; racial situational bonuses on the note lines.
 
-## Proposed defaults (David to confirm)
+## Decisions and interpretations
 
-1. Starting money: none. Starting Equipment options cover gear, and treasure counts as XP.
-2. Armour Strength requirement: warn, do not block.
-3. Name differences between the Starting Equipment options and the tables are matched ("Chain Mail" = "Chain / Banded Mail", "Light Cross" = "Light Crossbow", "Longsword" = "Long Sword", "Shortsword" = "Short Sword", "Learther" = "Leather").
-4. Missing values (currently Dart damage type) show as blank and are listed in the rules report.
+David's decisions not yet in the docs are in `src/rules/data/decisions.json` and listed in `docs/rules-report.md` (starting gold 2d6 gp; armour Strength requirements enforced at creation; Wizard known spells of any level they can cast; spell attack and potency per class; Dart type P).
+
+1. Name differences between the Starting Equipment options and the tables are matched ("Chain Mail" = "Chain / Banded Mail", "Light Cross" = "Light Crossbow", "Longsword" = "Long Sword", "Shortsword" = "Short Sword", "Learther" = "Leather").
+2. Any value missing from a doc shows as blank and is listed in the rules report.
 
 ## Technology
 

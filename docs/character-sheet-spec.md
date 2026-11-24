@@ -56,7 +56,8 @@ One page per casting class. Same structure for all:
 - Cantrips exist for Wizard, Cleric, Druid and Bard only (counts in the Classes doc).
 - Preparing spells works like 5e. Spellbook size is not capped.
 - Wizard spells known: INT Languages at 1st level, +1 spell on each level up (Classes v4).
-- Cleric, Bard, Ranger and Paladin spell attack uses the class Attack Bonus from the levelling chart.
+- Cleric, Druid, Bard, Ranger and Paladin spell attack uses the class Attack Bonus from the levelling chart. Potency: Wizard and Bard arcane (INT); Cleric, Druid, Paladin and Ranger divine (WIS).
+- Starting gold is 2d6 gp. Armour Strength requirements are enforced during creation.
 - Ability score generation, level 1 HP and the AC and attack formulas follow David's original app (see `docs/development-plan.md`).
 - WIS bonus applies only to saves against spells that attack the mind; it is not a general Spell save bonus.
 - Racial save bonuses that apply only to some effects (for example +2 vs poison) are written on the save note lines.
@@ -65,7 +66,5 @@ One page per casting class. Same structure for all:
 
 ## Open questions
 
-1. Druid spell attack and the potency used by Druid, Bard, Paladin and Ranger were assumed (see table above). Confirm.
-2. Save row order on page 1 (Spell first) is the reverse of the Saving Throws doc priority order. Confirm this is intended.
-3. Alignment and Move are on page 1 at David's request but have no rules in the docs yet.
-4. Dart has no damage type in the Weapons and Armour sheet.
+1. Save row order on page 1 (Spell first) is the reverse of the Saving Throws doc priority order. Confirm this is intended.
+2. Alignment and Move are on page 1 at David's request but have no rules in the docs yet.

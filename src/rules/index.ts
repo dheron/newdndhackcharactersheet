@@ -10,6 +10,7 @@ import equipmentData from "./data/equipment.json";
 import spellData from "./data/spells.json";
 import turnUndeadData from "./data/turn-undead.json";
 import multiclassData from "./data/multiclass.json";
+import decisionData from "./data/decisions.json";
 
 export const STATS = ["STR", "DEX", "CON", "INT", "WIS", "CHA"] as const;
 export type Stat = (typeof STATS)[number];
@@ -57,6 +58,7 @@ export interface Weapon {
   damage: string | null;
   range: string | null;
   traits: string[];
+  typeSource?: string;
 }
 
 export interface Armour {
@@ -80,6 +82,12 @@ export const SOURCES = {
   equipment: equipmentData.source,
   turnUndead: turnUndeadData.source,
   multiclass: multiclassData.source,
+  decisions: decisionData.source,
+};
+
+/** Rules David decided in chat that are not yet in the Drive docs. */
+export const decisions = decisionData as typeof decisionData & {
+  spellcasting: Partial<Record<ClassName, { spellAttackBase: string; spellAttackStat: Stat | null; potency: "arcane" | "divine" }>>;
 };
 
 export const classes = classData.classes as Record<ClassName, ClassRules>;

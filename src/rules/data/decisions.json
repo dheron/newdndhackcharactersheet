@@ -1,0 +1,19 @@
+{
+  "source": "David, in chat (not yet in the Drive docs)",
+  "note": "Rules David decided in conversation. Move each into the matching Drive doc when convenient; the doc then wins.",
+  "dartDamageType": "P",
+  "startingGold": { "dice": "2d6", "unit": "gp" },
+  "armourStrengthRequirement": "Enforced during character creation: armour with a Str Req above the character's STR cannot be chosen.",
+  "wizardKnownSpellLevels": "A Wizard's known spells can be of any spell level they can cast (any level they have slots for).",
+  "spellcasting": {
+    "Wizard": { "spellAttackBase": "Wizard Spell Atk column", "spellAttackStat": "INT", "potency": "arcane" },
+    "Cleric": { "spellAttackBase": "class Attack Bonus", "spellAttackStat": null, "potency": "divine" },
+    "Druid": { "spellAttackBase": "class Attack Bonus", "spellAttackStat": null, "potency": "divine" },
+    "Bard": { "spellAttackBase": "class Attack Bonus", "spellAttackStat": null, "potency": "arcane" },
+    "Paladin": { "spellAttackBase": "class Attack Bonus", "spellAttackStat": null, "potency": "divine" },
+    "Ranger": { "spellAttackBase": "class Attack Bonus", "spellAttackStat": null, "potency": "divine" }
+  },
+  "multiclass": "Each class of a multiclass character uses its own sheet.",
+  "preparing": "Spells are prepared like 5e: mark spells prepared, spend slots separately.",
+  "cantripClasses": ["Wizard", "Cleric", "Druid", "Bard"]
+}
