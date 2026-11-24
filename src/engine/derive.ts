@@ -142,6 +142,7 @@ export function deriveSheet(input: DeriveInput) {
     hpMax: input.level === 1 ? level1Hp(input.cls, bonuses) : null,
     hitDice: c.hp[input.level - 1]!,
     attackBonus: attackBonus(input.cls, input.level),
+    move: race.move,
     ac: armourClass(input.cls, input.armour, input.shield, bonuses.ac),
     weapons: input.weapons.map((w) => weaponLine(w, input.cls, input.level, bonuses, input.specialization ?? null)),
     saves: saves(input.race, input.cls, input.level, bonuses),

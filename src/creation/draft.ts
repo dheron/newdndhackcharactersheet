@@ -22,6 +22,8 @@ export interface Draft {
   name: string;
   race: string | null;
   raceChoices: Stat[];
+  /** Set when the player presses Next on the race step, so they can read the race details first. */
+  raceConfirmed: boolean;
   rolls: StatRoll[];
   cls: ClassName | null;
   specialization: "melee" | "ranged" | null;
@@ -39,6 +41,7 @@ export const emptyDraft = (): Draft => ({
   name: "",
   race: null,
   raceChoices: [],
+  raceConfirmed: false,
   rolls: [],
   cls: null,
   specialization: null,
@@ -141,10 +144,15 @@ export function stepsFor(d: Draft): StepId[] {
   return ["race", "stats", "class", "experiences", "equipment", ...(isCaster(d.cls) ? (["spells"] as StepId[]) : []), "done"];
 }
 
+/** Name and race filled in; the Next button is enabled. */
+export function raceReady(d: Draft): boolean {
+  return d.name.trim() !== "" && d.race !== null && (!needsRaceChoices(d) || d.raceChoices.length === 2);
+}
+
 export function stepComplete(d: Draft, step: StepId): boolean {
   switch (step) {
     case "race":
-      return d.name.trim() !== "" && d.race !== null && (!needsRaceChoices(d) || d.raceChoices.length === 2);
+      return raceReady(d) && d.raceConfirmed;
     case "stats":
       return d.rolls.length === STATS.length;
     case "class":

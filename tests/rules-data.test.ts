@@ -219,3 +219,9 @@ describe("spells", () => {
     }
   });
 });
+
+describe("race movement (Races doc)", () => {
+  it("is 25 ft for Dwarves, Gnomes and Halflings, 30 ft for the rest", () => {
+    for (const r of races) expect(r.move, r.name).toBe(/^(Dwarf|Gnome|Halfling)/.test(r.name) ? 25 : 30);
+  });
+});

@@ -41,6 +41,8 @@ export interface ClassRules {
 export interface RaceRules {
   name: string;
   modifiers: Partial<Record<Stat, number>>;
+  /** Movement in feet. */
+  move: number;
   chooseTwo?: boolean;
   traits: string[];
   saveBonus: Partial<Record<SaveKey, number>>;

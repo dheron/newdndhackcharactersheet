@@ -1,10 +1,11 @@
 {
   "source": "Races (1mOugghME6PHrir0T-gvva6MyXfOSbPCV1ZAxtaixT30)",
-  "note": "modifiers apply after rolling. chooseTwo races pick two different stats for +1 each. traits copy the doc text, including the text shared by all subraces. saveBonus applies to every save of that type; situational bonuses are shown as notes. bonusExperiences are added to the class count; bonusExperienceChoices are free picks.",
+  "note": "modifiers apply after rolling. chooseTwo races pick two different stats for +1 each. traits copy the doc text, including the text shared by all subraces. saveBonus applies to every save of that type; situational bonuses are shown as notes. bonusExperiences are added to the class count; bonusExperienceChoices are free picks. move is in feet.",
   "races": [
     {
       "name": "Dwarf (Duergar)",
       "modifiers": { "CON": 1, "WIS": 1, "CHA": -2 },
+      "move": 25,
       "traits": [
         "Dwarves have darkvision to 60 feet.",
         "+2 on saves against poison and +2 on Magic Item saves against magic items.",
@@ -18,6 +19,7 @@
     {
       "name": "Dwarf (Hill)",
       "modifiers": { "CON": 1, "WIS": 1, "CHA": -1 },
+      "move": 25,
       "traits": [
         "Dwarves have darkvision to 60 feet.",
         "+2 on saves against poison and +2 on Magic Item saves against magic items.",
@@ -30,6 +32,7 @@
     {
       "name": "Dwarf (Mountain)",
       "modifiers": { "STR": 1, "CON": 1, "CHA": -1 },
+      "move": 25,
       "traits": [
         "Dwarves have darkvision to 60 feet.",
         "+2 on saves against poison and +2 on Magic Item saves against magic items.",
@@ -42,6 +45,7 @@
     {
       "name": "Dragonborn",
       "modifiers": { "STR": 1, "DEX": -1, "CHA": 1 },
+      "move": 30,
       "traits": [
         "Breath weapon: a 15-foot cone of fire, once per short or long rest, targets make a Blast/Barrage save. Damage scales with level, 2d6 at 1st-5th, 3d6 at 6th-10th, 4d6 at 11th-15th, 5d6 at 16th-20th."
       ],
@@ -52,6 +56,7 @@
     {
       "name": "Elf (Drow)",
       "modifiers": { "DEX": 2, "CON": -1, "INT": 1, "CHA": -2 },
+      "move": 30,
       "traits": [
         "Elves are immune to magical sleep and charm.",
         "They are able to use Long Swords and Long Bows regardless of class.",
@@ -67,6 +72,7 @@
     {
       "name": "Elf (High)",
       "modifiers": { "DEX": 1, "CON": -1, "INT": 1 },
+      "move": 30,
       "traits": [
         "Elves are immune to magical sleep and charm.",
         "They are able to use Long Swords and Long Bows regardless of class.",
@@ -79,6 +85,7 @@
     {
       "name": "Elf (Wood)",
       "modifiers": { "DEX": 1, "CON": -1, "WIS": 1 },
+      "move": 30,
       "traits": [
         "Elves are immune to magical sleep and charm.",
         "They are able to use Long Swords and Long Bows regardless of class.",
@@ -92,6 +99,7 @@
     {
       "name": "Firbolg",
       "modifiers": { "STR": 1, "DEX": -1, "WIS": 1 },
+      "move": 30,
       "traits": [
         "Firbolg Magic grants Detect Magic and Disguise Self, each once per day from 1st level.",
         "Powerful Build counts them as one size larger for carrying, pushing, and dragging."
@@ -103,6 +111,7 @@
     {
       "name": "Gnome (Deep)",
       "modifiers": { "DEX": 1, "INT": -1, "WIS": 1, "CHA": -2 },
+      "move": 25,
       "traits": [
         "Gnomes have darkvision to 60 feet (120 for Deep Gnomes) and +2 on Spell saves against illusions.",
         "Darkvision to 120 feet.",
@@ -115,6 +124,7 @@
     {
       "name": "Gnome (Forest)",
       "modifiers": { "STR": -1, "DEX": 1, "INT": -1, "WIS": 1 },
+      "move": 25,
       "traits": [
         "Gnomes have darkvision to 60 feet (120 for Deep Gnomes) and +2 on Spell saves against illusions.",
         "Speaks with small animals."
@@ -126,6 +136,7 @@
     {
       "name": "Gnome (Rock)",
       "modifiers": { "DEX": 1, "INT": 1, "WIS": -1 },
+      "move": 25,
       "traits": [
         "Gnomes have darkvision to 60 feet (120 for Deep Gnomes) and +2 on Spell saves against illusions.",
         "+2 on saves vs Magic Items and on Blast/Barrage saves against mechanical traps."
@@ -140,6 +151,7 @@
     {
       "name": "Goliath",
       "modifiers": { "STR": 2, "DEX": -1, "CON": 1, "CHA": -1 },
+      "move": 30,
       "traits": [
         "Mountain Born +2 saves vs Cold.",
         "Gains bonus Experience in Mountain Survival."
@@ -151,6 +163,7 @@
     {
       "name": "Half-Elf",
       "modifiers": {},
+      "move": 30,
       "chooseTwo": true,
       "traits": [
         "+1 to any two ability scores.",
@@ -165,6 +178,7 @@
     {
       "name": "Halfling (Lightfoot)",
       "modifiers": { "STR": -1, "DEX": 1, "CHA": 1 },
+      "move": 25,
       "traits": [
         "+2 on saves against poison/fear, +2 on saves vs Magic Item.",
         "Lucky: reroll a natural 1 on any attack roll, or saving throw. Reroll a natural 20 on any ability check"
@@ -176,6 +190,7 @@
     {
       "name": "Halfling (Stout)",
       "modifiers": { "STR": -1, "DEX": 1, "CON": 1 },
+      "move": 25,
       "traits": [
         "+2 on saves against poison/fear, +2 on saves vs Magic Item.",
         "They gain +2 on saves against poison."
@@ -187,6 +202,7 @@
     {
       "name": "Human",
       "modifiers": {},
+      "move": 30,
       "chooseTwo": true,
       "traits": [
         "+1 to any two ability scores, plus one bonus Experience.",
@@ -201,6 +217,7 @@
     {
       "name": "Tiefling",
       "modifiers": { "INT": 1, "CHA": 1, "WIS": -1 },
+      "move": 30,
       "traits": [
         "Darkvision to 60 feet and +2 to saves vs fire."
       ],

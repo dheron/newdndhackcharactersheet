@@ -18,6 +18,7 @@ import {
   knownSpellCount,
   modifiers,
   needsRaceChoices,
+  raceReady,
   scores,
   slotsWithKeys,
   spellList,
@@ -145,6 +146,7 @@ function RaceStep({ draft, update }: StepProps) {
           ))}
         </select>
       </label>
+      {race && <p>Move {race.move} ft</p>}
       {race && (
         <ul class="traits">
           {race.traits.map((t) => (
@@ -173,6 +175,13 @@ function RaceStep({ draft, update }: StepProps) {
             })}
           </div>
         </fieldset>
+      )}
+      {!draft.raceConfirmed && (
+        <div class="actions">
+          <button type="button" class="primary" disabled={!raceReady(draft)} onClick={() => update({ raceConfirmed: true })}>
+            Next
+          </button>
+        </div>
       )}
     </>
   );
@@ -607,6 +616,8 @@ function DoneStep({ draft, onNew, onExit }: { draft: Draft; onNew: () => void; o
           {sheet.ac.total} = {equipment.armour ?? "no armour"} {sheet.ac.base} + DEX {sign(sheet.ac.dex)}
           {sheet.ac.shield ? ` + Shield ${sheet.ac.shield}` : ""}
         </dd>
+        <dt>Move</dt>
+        <dd>{sheet.move} ft</dd>
         <dt>Attack bonus</dt>
         <dd>{sign(sheet.attackBonus)}</dd>
         <dt>Weapons</dt>

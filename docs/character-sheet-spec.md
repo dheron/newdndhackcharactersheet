@@ -67,4 +67,4 @@ One page per casting class. Same structure for all:
 ## Open questions
 
 1. Save row order on page 1 (Spell first) is the reverse of the Saving Throws doc priority order. Confirm this is intended.
-2. Alignment and Move are on page 1 at David's request but have no rules in the docs yet.
+2. Alignment is on page 1 at David's request but has no rules in the docs yet. (Move now comes from the Races doc.)

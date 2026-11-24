@@ -22,17 +22,20 @@ import { fromFileText, toFileText } from "../src/model/character";
 const rolls = (values: number[]): StatRoll[] =>
   STATS.map((stat, pick) => ({ stat, pick, method: "test", dice: [values[pick]!], kept: [values[pick]!], total: values[pick]! }) as StatRoll);
 
-const base = (patch: Partial<Draft> = {}): Draft => ({ ...emptyDraft(), name: "Test", race: "Dwarf (Mountain)", rolls: rolls([16, 12, 15, 10, 13, 8]), ...patch });
+const base = (patch: Partial<Draft> = {}): Draft => ({ ...emptyDraft(), name: "Test", race: "Dwarf (Mountain)", raceConfirmed: true, rolls: rolls([16, 12, 15, 10, 13, 8]), ...patch });
 
 describe("creation steps", () => {
   it("starts at name and race and moves on as steps complete", () => {
     expect(currentStep(emptyDraft())).toBe("race");
-    expect(currentStep({ ...emptyDraft(), name: "A", race: "Dwarf (Mountain)" })).toBe("stats");
+    const filled = { ...emptyDraft(), name: "A", race: "Dwarf (Mountain)" };
+    expect(currentStep(filled)).toBe("race");
+    expect(currentStep({ ...filled, raceConfirmed: true })).toBe("stats");
     expect(currentStep(base())).toBe("class");
   });
 
   it("needs two stat picks for Human", () => {
     const d = { ...base(), race: "Human" };
+    expect(stepComplete({ ...d, raceConfirmed: false, raceChoices: ["STR", "CON"] as Stat[] }, "race")).toBe(false);
     expect(raceByName("Human").chooseTwo).toBe(true);
     expect(stepComplete(d, "race")).toBe(false);
     expect(stepComplete({ ...d, raceChoices: ["STR", "CON"] as Stat[] }, "race")).toBe(true);

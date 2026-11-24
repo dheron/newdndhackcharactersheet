@@ -135,10 +135,11 @@ out();
 out(`Source: ${races.source}`);
 out();
 table(
-  ["Race", "Modifiers", "Always-on save bonus", "Situational save notes", "Bonus Experiences", "Traits"],
+  ["Race", "Modifiers", "Move", "Always-on save bonus", "Situational save notes", "Bonus Experiences", "Traits"],
   races.races.map((r) => [
     r.name,
     r.chooseTwo ? "+1 to any two" : Object.entries(r.modifiers).map(([k, v]) => `${sign(v)} ${k}`).join(", "),
+    `${r.move} ft`,
     Object.entries(r.saveBonus).map(([k, v]) => `${k} ${sign(v)}`).join(", ") || " ",
     r.situational.map((s) => `${s.save ?? "any"}: ${s.text}`).join("; ") || " ",
     [...r.bonusExperiences, ...(r.bonusExperienceChoices ? [`${r.bonusExperienceChoices} of choice`] : [])].join(", ") || " ",
