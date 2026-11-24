@@ -392,3 +392,19 @@ button.primary {
   -webkit-user-select: none;
   user-select: none;
 }
+
+.drive {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin: 0 0 12px;
+}
+
+.drive span {
+  flex: 1;
+  min-width: 200px;
+}

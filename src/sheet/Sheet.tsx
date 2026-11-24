@@ -60,9 +60,9 @@ export function Sheet({ initial, onClose }: { initial: Character; onClose: () =>
 
   const save = (ch: Character) =>
     saveCharacter(ch)
-      .then(() => {
+      .then((driveResult) => {
         setDirty(false);
-        setStatus("Saved");
+        setStatus(driveResult === "saved" ? "Saved, and to Google Drive" : driveResult === "later" ? "Saved on this device; Google Drive catches up at the next Sync" : "Saved");
       })
       .catch((e) => setStatus(`Could not save: ${e instanceof Error ? e.message : String(e)}`));
 

@@ -105,7 +105,8 @@ Characters are kept in a "Character Sheets" folder in Documents, one file each, 
 ## iPad and the web version
 
 - On touch screens the sheet uses the approved iPad layout (`design/wireframes/ipad-page1.dc.html`, `ipad-page2-cleric.dc.html`): the print structure with 40px boxes, 28px headers, 34px lines and 18px tick boxes. Desktop keeps the print-sized layout; printing always uses the print layout. Pages scale down to fit narrower windows. `?layout=ipad` or `?layout=desktop` in the address forces one.
-- The web version (David: no native iPad or iPhone apps) is the same app in a browser. It can be added to the home screen, works offline once loaded, and keeps characters in that browser on that device; Export and Import move them between devices. It is published with GitHub Pages.
+- The web version (David: no native iPad or iPhone apps) is the same app in a browser. It can be added to the home screen, works offline once loaded, and keeps characters in that browser on that device. It is published with GitHub Pages.
+- Saving on the web (David: Google Drive and a local option): **Connect Google Drive** syncs every character with a "Character Sheets" folder in the player's Drive (newer copy wins; deletions follow; setup in `docs/google-drive-setup.md`). Locally, **Back up all characters** saves one file with every character, a sheet's **Export** saves one, and **Import** brings either back; on iPad these open the share sheet (Save to Files, iCloud Drive, AirDrop).
 - The phone layout is not designed yet; on a phone the iPad layout is scaled to fit.
 
 ## Printing (phase 4)

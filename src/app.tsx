@@ -2,8 +2,9 @@ import { useEffect, useState } from "preact/hooks";
 import { Creation } from "./creation/Creation";
 import type { Character } from "./model/character";
 import { Sheet } from "./sheet/Sheet";
-import { LIBRARY_FOLDER, deleteCharacter, duplicateCharacter, importCharacter, listCharacters, loadCharacter, type CharacterSummary } from "./library";
-import { inTauri } from "./storage";
+import { LIBRARY_FOLDER, backupText, deleteCharacter, duplicateCharacter, importCharacters, listCharacters, loadCharacter, syncWithDrive, type CharacterSummary } from "./library";
+import { inTauri, saveTextAs } from "./storage";
+import * as drive from "./sync/drive";
 import { SpellInfoProvider } from "./spells/SpellInfo";
 import { APP_VERSION } from "./version";
 
@@ -50,6 +51,28 @@ function CharacterList({ onOpen, onNew }: { onOpen: (c: Character) => void; onNe
   const [list, setList] = useState<CharacterSummary[] | null>(null);
   const [unreadable, setUnreadable] = useState<string[]>([]);
   const [error, setError] = useState("");
+  const [note, setNote] = useState("");
+  const [connected, setConnected] = useState(drive.driveConnected());
+  const [syncing, setSyncing] = useState(false);
+  const [driveNote, setDriveNote] = useState("");
+
+  /** Syncs with Google Drive. Interactive (a tap) may open Google sign-in; otherwise it uses this visit's sign-in only. */
+  const sync = async (interactive: boolean) => {
+    setSyncing(true);
+    setError("");
+    try {
+      const r = await syncWithDrive(interactive);
+      setConnected(true);
+      const changes = r.uploaded + r.downloaded + r.deleted;
+      setDriveNote(changes ? `synced (${r.downloaded} in, ${r.uploaded} out${r.deleted ? `, ${r.deleted} deleted` : ""})` : "up to date");
+      await refresh();
+    } catch (e) {
+      if (e instanceof drive.NeedsSignIn) setDriveNote("tap Sync now to sign in again");
+      else setError(`Google Drive: ${message(e)}`);
+    } finally {
+      setSyncing(false);
+    }
+  };
 
   const refresh = () =>
     listCharacters()
@@ -64,10 +87,13 @@ function CharacterList({ onOpen, onNew }: { onOpen: (c: Character) => void; onNe
 
   useEffect(() => {
     refresh();
+    // Catch up with Drive when the list opens, if already signed in during this visit.
+    if (drive.driveAvailable() && drive.driveConnected()) sync(false);
   }, []);
 
   const run = async (fn: () => Promise<unknown>) => {
     setError("");
+    setNote("");
     try {
       await fn();
     } catch (e) {
@@ -85,19 +111,67 @@ function CharacterList({ onOpen, onNew }: { onOpen: (c: Character) => void; onNe
           type="button"
           onClick={() =>
             run(async () => {
-              const c = await importCharacter();
-              if (c) onOpen(c);
+              const brought = await importCharacters();
+              if (brought.length === 1) return onOpen(brought[0]!);
+              setNote(brought.length ? `Brought in ${brought.length} characters.` : "Nothing new to bring in: those characters are already here and up to date.");
+              await refresh();
             })
           }
         >
-          Import a file
+          Import
+        </button>
+        <button
+          type="button"
+          onClick={() =>
+            run(async () => {
+              const saved = await saveTextAs(`Characters backup ${new Date().toISOString().slice(0, 10)}.json`, await backupText());
+              if (saved) setNote(`Backed up every character to ${saved.label}.`);
+            })
+          }
+        >
+          Back up all characters
         </button>
       </div>
       <p class="hint">
         {inTauri()
           ? `Characters are kept in the "${LIBRARY_FOLDER}" folder in your Documents and save as you play.`
-          : "Characters are kept in this browser on this device. Use Export on a sheet to back one up or move it to another device, and Import a file to bring it in."}
+          : "Characters are kept in this browser on this device and save as you play. Back up all characters (or Export one from its sheet) to save a file you can keep or move to another device; Import brings files back in."}
       </p>
+      {drive.driveAvailable() && (
+        <div class="drive">
+          {connected ? (
+            <>
+              <span>Google Drive: {syncing ? "syncing..." : driveNote || "connected"}</span>
+              <button type="button" disabled={syncing} onClick={() => sync(true)}>
+                Sync now
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!window.confirm("Stop syncing with Google Drive on this device? Characters stay here and in your Drive.")) return;
+                  drive.disconnectDrive();
+                  setConnected(false);
+                  setDriveNote("");
+                }}
+              >
+                Disconnect
+              </button>
+            </>
+          ) : (
+            <>
+              <span>Keep your characters in Google Drive and use them on every device.</span>
+              <button type="button" class="primary" onClick={() => sync(true)}>
+                Connect Google Drive
+              </button>
+            </>
+          )}
+        </div>
+      )}
+      {note && (
+        <p class="status" role="status">
+          {note}
+        </p>
+      )}
       {error && (
         <p class="status" role="alert">
           {error}

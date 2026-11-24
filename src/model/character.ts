@@ -85,6 +85,8 @@ export interface Character {
   format: typeof CHARACTER_FORMAT;
   id: string;
   createdAt: string;
+  /** When this copy was last saved (used to pick the newer copy when syncing). Missing in older files. */
+  updatedAt?: string;
   name: string;
   race: string;
   /** The two stats picked for +1 by Human and Half-Elf. */
@@ -245,4 +247,18 @@ export function fileNameFor(c: Character): string {
 export function parseItem(line: string): { count: number; name: string } {
   const m = /^\s*(\d+)\s*x\s+(.+?)\s*$/i.exec(line);
   return m ? { count: Number(m[1]), name: m[2]! } : { count: 1, name: line.trim() };
+}
+
+/** A backup file with several characters ("Back up all characters"). */
+export const BACKUP_FORMAT = "character-sheet-backup";
+
+export function toBackupText(characters: Character[]): string {
+  return JSON.stringify({ format: BACKUP_FORMAT, version: 1, savedAt: new Date().toISOString(), characters }, null, 2) + "\n";
+}
+
+/** Reads a character file or a backup file: returns every character in it. */
+export function charactersFromText(text: string): Character[] {
+  const data = JSON.parse(text) as { format?: unknown; characters?: unknown[] };
+  if (data.format === BACKUP_FORMAT && Array.isArray(data.characters)) return data.characters.map((c) => fromFileText(JSON.stringify(c)));
+  return [fromFileText(text)];
 }

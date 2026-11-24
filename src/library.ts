@@ -1,9 +1,12 @@
 // The character library. In the desktop app every character is a file in the "Character Sheets"
-// folder in Documents, saved as the player plays (David). In a plain browser (npm run dev) the
-// characters live in the browser's own storage instead, for development only.
-import { fileNameFor, fromFileText, newId, toFileText, type Character } from "./model/character";
+// folder in Documents, saved as the player plays (David). In the web version the characters live
+// in the browser's storage on that device, and, once connected, are synced with a "Character
+// Sheets" folder in the player's Google Drive (src/sync).
+import { charactersFromText, fileNameFor, fromFileText, newId, toBackupText, toFileText, type Character } from "./model/character";
+import { planSync } from "./sync/merge";
+import * as drive from "./sync/drive";
 import { classAndLevel } from "./sheet/derived";
-import { inTauri, openCharacterFile } from "./storage";
+import { inTauri, openTextFile } from "./storage";
 
 export const LIBRARY_FOLDER = "Character Sheets";
 const BROWSER_PREFIX = "character-sheets:";
@@ -46,9 +49,8 @@ export async function listCharacters(): Promise<{ characters: CharacterSummary[]
 
 async function readAll(): Promise<{ key: string; text: string }[]> {
   if (!inTauri()) {
-    return Object.keys(localStorage)
-      .filter((k) => k.startsWith(BROWSER_PREFIX))
-      .map((k) => ({ key: k, text: localStorage.getItem(k) ?? "" }));
+    const keys = Array.from({ length: localStorage.length }, (_, i) => localStorage.key(i)).filter((k): k is string => k?.startsWith(BROWSER_PREFIX) ?? false);
+    return keys.map((k) => ({ key: k, text: localStorage.getItem(k) ?? "" }));
   }
   const { mod, opts } = await fs();
   const entries = await mod.readDir(LIBRARY_FOLDER, opts);
@@ -76,7 +78,8 @@ export async function loadCharacter(id: string): Promise<Character> {
   return fromFileText(await mod.readTextFile(`${LIBRARY_FOLDER}/${key}`, opts));
 }
 
-export async function saveCharacter(c: Character): Promise<void> {
+/** Writes a character's file as it is (keeping its save time). */
+async function writeLocal(c: Character): Promise<void> {
   if (!inTauri()) {
     localStorage.setItem(BROWSER_PREFIX + c.id, toFileText(c));
     return;
@@ -85,7 +88,80 @@ export async function saveCharacter(c: Character): Promise<void> {
   await mod.writeTextFile(`${LIBRARY_FOLDER}/${libraryFileName(c)}`, toFileText(c), opts);
 }
 
+export type DriveResult = "off" | "saved" | "later";
+
+/**
+ * Saves a character on this device, stamped with the time, and to Google Drive when the web
+ * version is connected and signed in. "later": Drive will catch up at the next sync.
+ */
+export async function saveCharacter(c: Character): Promise<DriveResult> {
+  const stamped = { ...c, updatedAt: new Date().toISOString() };
+  await writeLocal(stamped);
+  if (!drive.driveAvailable() || !drive.driveConnected()) return "off";
+  try {
+    await pushToDrive(stamped);
+    return "saved";
+  } catch {
+    return "later";
+  }
+}
+
+// Which Drive file holds each character on this device's last sync.
+const FILES_KEY = "drive:files";
+const fileIds = () => JSON.parse(localStorage.getItem(FILES_KEY) ?? "{}") as Record<string, string>;
+const setFileIds = (m: Record<string, string>) => localStorage.setItem(FILES_KEY, JSON.stringify(m));
+
+async function pushToDrive(c: Character): Promise<void> {
+  const ids = fileIds();
+  ids[c.id] = await drive.upload({ id: c.id, name: libraryFileName(c), updatedAt: c.updatedAt ?? "" }, toFileText(c), ids[c.id]);
+  setFileIds(ids);
+  const synced = drive.syncedIds();
+  synced.add(c.id);
+  drive.setSyncedIds(synced);
+}
+
+/** Brings this device and Google Drive up to date with each other. `interactive` may open Google sign-in. */
+export async function syncWithDrive(interactive: boolean): Promise<{ uploaded: number; downloaded: number; deleted: number }> {
+  if (interactive) await drive.connectDrive();
+  const remote = await drive.listRemote(interactive);
+  const local: Character[] = [];
+  for (const { text } of await readAll()) {
+    try {
+      local.push(fromFileText(text));
+    } catch {
+      // Unreadable files are listed on the start screen and left alone.
+    }
+  }
+  const plan = planSync(
+    local.map((c) => ({ id: c.id, updatedAt: c.updatedAt ?? "" })),
+    remote,
+    drive.syncedIds(),
+    drive.deletedIds(),
+  );
+  const ids = Object.fromEntries(remote.map((r) => [r.id, r.fileId]));
+  for (const id of plan.upload) {
+    const c = local.find((x) => x.id === id)!;
+    ids[id] = await drive.upload({ id, name: libraryFileName(c), updatedAt: c.updatedAt ?? "" }, toFileText(c), ids[id]);
+  }
+  for (const r of plan.download) await writeLocal(fromFileText(await drive.download(r.fileId)));
+  for (const id of plan.deleteLocal) await removeLocal(id);
+  for (const r of plan.deleteRemote) {
+    await drive.remove(r.fileId);
+    delete ids[r.id];
+  }
+  setFileIds(ids);
+  drive.setSyncedIds(new Set(Object.keys(ids)));
+  drive.setDeletedIds(new Set());
+  return { uploaded: plan.upload.length, downloaded: plan.download.length, deleted: plan.deleteLocal.length + plan.deleteRemote.length };
+}
+
 export async function deleteCharacter(id: string): Promise<void> {
+  await removeLocal(id);
+  drive.noteDeleted(id);
+  if (drive.driveConnected()) await syncWithDrive(false).catch(() => undefined);
+}
+
+async function removeLocal(id: string): Promise<void> {
   const key = await keyFor(id);
   if (!key) return;
   if (!inTauri()) {
@@ -107,11 +183,36 @@ export async function duplicateCharacter(id: string): Promise<Character> {
   return copy;
 }
 
-/** Brings a character file from anywhere into the library. A character already there is added as a copy. */
-export async function importCharacter(): Promise<Character | null> {
-  const opened = await openCharacterFile();
-  if (!opened) return null;
-  const c = (await keyFor(opened.character.id)) ? copyOf(opened.character, opened.character.name) : opened.character;
-  await saveCharacter(c);
-  return c;
+/**
+ * Brings characters from a file anywhere into the library: one character file, or a backup of
+ * several. A character already here is replaced by the file's copy only if the file's is newer.
+ */
+export async function importCharacters(): Promise<Character[]> {
+  const text = await openTextFile();
+  if (text === null) return [];
+  const incoming = charactersFromText(text);
+  const brought: Character[] = [];
+  for (const c of incoming) {
+    const key = await keyFor(c.id);
+    if (key) {
+      const here = await loadCharacter(c.id);
+      if ((c.updatedAt ?? "") <= (here.updatedAt ?? "")) continue;
+    }
+    await saveCharacter(c);
+    brought.push(c);
+  }
+  return brought;
+}
+
+/** Every character in one backup file ("Back up all characters"). */
+export async function backupText(): Promise<string> {
+  const all: Character[] = [];
+  for (const { text } of await readAll()) {
+    try {
+      all.push(fromFileText(text));
+    } catch {
+      // Skip files that are not characters.
+    }
+  }
+  return toBackupText(all);
 }
