@@ -1,13 +1,13 @@
-// What the Experiences step offers (Expanded Experiences doc, David): the DnD core skills first,
-// then examples. The examples start as the doc's Default Examples plus a few random picks from the
-// full list; Randomize replaces them with a random mix drawn evenly from Sections 1 to 4.
+// What the Experiences step offers (Expanded Experiences doc, David): at first the DnD core skills,
+// then the doc's Default Examples, then a few random picks from the full list. Randomize replaces
+// the whole list with a random mix drawn evenly from Sections 1 to 4.
 import { expandedExperiences } from "../rules";
 import { defaultRng, type Rng } from "../engine/dice";
 
 /** Extra random picks shown after the Default Examples when the step opens. */
 export const EXTRA_EXAMPLES = 5;
-/** Randomize draws this many from each section. */
-export const PER_SECTION = 5;
+/** Randomize draws this many from each section (the whole list is replaced, David). */
+export const PER_SECTION = 9;
 
 const norm = (s: string) => s.trim().toLowerCase();
 

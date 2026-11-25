@@ -5,3 +5,8 @@
   ➜  Network: use --host to expose
 5:05:01 AM [vite] (client) hmr update /src/creation/Creation.tsx
 5:05:12 AM [vite] (client) hmr update /src/creation/Creation.tsx
+5:05:41 AM [vite] (client) hmr update /src/creation/Creation.tsx
+5:05:41 AM [vite] (client) hmr update /src/creation/Creation.tsx
+5:05:42 AM [vite] (client) page reload src/rules/data/spells.json
+5:05:42 AM [vite] (client) page reload src/rules/data/spell-texts.json
+5:05:42 AM [vite] (client) page reload src/rules/data/expanded-experiences.json

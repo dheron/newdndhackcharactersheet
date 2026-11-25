@@ -615,7 +615,7 @@ Source: Experiences (18hBsCFV3PQC8Mjufchcp0iFHwNlqpXYsuq8FNg1uI_M)
 
 ### Expanded Experiences
 
-Source: Expanded Experiences (12JgZ4ylpu_9M7fsrITbyPUEhrZg8bB5oI0lHoK48D_Q). Character creation offers the core skills first, then the Default Examples plus 5 random entries; Randomize replaces the examples with 5 random entries from each of Sections 1 to 4. Section 4 phrases are shown without the words in brackets (David).
+Source: Expanded Experiences (12JgZ4ylpu_9M7fsrITbyPUEhrZg8bB5oI0lHoK48D_Q). Character creation offers the core skills first, then the Default Examples plus 5 random entries; Randomize replaces the whole list with 9 random entries from each of Sections 1 to 4. Section 4 phrases are shown without the words in brackets (David).
 
 - **DnD Core Skills** (17): Athletics, Acrobatics, Sleight of Hand, Stealth, Arcana, History, Nature, Religion, Animal Handling, Insight, Medicine, Perception, Survival, Deception, Intimidation, Performance, Persuasion
 - **Default Examples** (15): Wrestler, Born in the Saddle, Hedge Wizardry, Local Legends, Bully, Plague Nurse, Silver Tongue, Drinking Contests, Knot Tying, Juggling, Bounty Hunter, Undertaker, Nothing to Lose, Every Lock Has a Key, Fortune Favours the Bold

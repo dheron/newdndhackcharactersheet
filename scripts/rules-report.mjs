@@ -183,7 +183,7 @@ out(`- Player-written examples (illustrative): ${exps.playerWrittenExamples.join
 out();
 out("### Expanded Experiences");
 out();
-out(`Source: ${expanded.source}. Character creation offers the core skills first, then the Default Examples plus ${5} random entries; Randomize replaces the examples with 5 random entries from each of Sections 1 to 4. Section 4 phrases are shown without the words in brackets (David).`);
+out(`Source: ${expanded.source}. Character creation offers the core skills first, then the Default Examples plus ${5} random entries; Randomize replaces the whole list with 9 random entries from each of Sections 1 to 4. Section 4 phrases are shown without the words in brackets (David).`);
 out();
 out(`- **DnD Core Skills** (${expanded.coreSkills.length}): ${expanded.coreSkills.join(", ")}`);
 out(`- **Default Examples** (${expanded.defaultExamples.length}): ${expanded.defaultExamples.join(", ")}`);

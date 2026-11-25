@@ -445,11 +445,9 @@ function ExperiencesStep({ draft, update }: StepProps) {
           : d,
     );
   const nExpertise = expertiseCount(draft);
-  // Core skills first, then examples: the Default Examples plus a few random entries, or a random
-  // mix from every section after Randomize (Expanded Experiences doc).
-  const core = coreSkillOptions(fixed);
-  const [examples, setExamples] = useState(() => startingExamples(fixed));
-  const listed = [...core, ...examples];
+  // At first: core skills, the Default Examples, then a few random entries. Randomize replaces the
+  // whole list with a random mix from every section (Expanded Experiences doc).
+  const [listed, setListed] = useState(() => [...coreSkillOptions(fixed), ...startingExamples(fixed)]);
   const customs = draft.experiences.filter((e) => !listed.includes(e));
   const chip = (e: string) => {
     const on = draft.experiences.includes(e);
@@ -496,7 +494,7 @@ function ExperiencesStep({ draft, update }: StepProps) {
       )}
       <div class="heading-row">
         <h3>Choose from the list</h3>
-        <button type="button" onClick={() => setExamples(randomExamples(fixed))}>
+        <button type="button" onClick={() => setListed(randomExamples(fixed))}>
           Randomize
         </button>
       </div>
