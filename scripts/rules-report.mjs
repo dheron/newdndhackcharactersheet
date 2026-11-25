@@ -13,6 +13,7 @@ const spells = load("spells");
 const turn = load("turn-undead");
 const multi = load("multiclass");
 const decisions = load("decisions");
+const expanded = load("expanded-experiences");
 const spellTexts = load("spell-texts");
 
 const lines = [];
@@ -177,8 +178,19 @@ out("## Experiences");
 out();
 out(`Source: ${exps.source}`);
 out();
-out(`- Starting list: ${exps.startingList.join(", ")}`);
+out(`- Starting list: ${exps.startingList.join(", ")} (character creation now uses the Expanded Experiences doc below).`);
 out(`- Player-written examples (illustrative): ${exps.playerWrittenExamples.join(", ")}`);
+out();
+out("### Expanded Experiences");
+out();
+out(`Source: ${expanded.source}. Character creation offers the core skills first, then the Default Examples plus ${5} random entries; Randomize replaces the examples with 5 random entries from each of Sections 1 to 4. Section 4 phrases are shown without the words in brackets (David).`);
+out();
+out(`- **DnD Core Skills** (${expanded.coreSkills.length}): ${expanded.coreSkills.join(", ")}`);
+out(`- **Default Examples** (${expanded.defaultExamples.length}): ${expanded.defaultExamples.join(", ")}`);
+for (const sec of expanded.sections) {
+  out(`- **Section ${sec.number}: ${sec.title}** (${sec.groups.reduce((t, g) => t + g.items.length, 0)})`);
+  for (const g of sec.groups) out(`  - ${g.title}: ${g.items.join(", ")}`);
+}
 out();
 
 // Equipment

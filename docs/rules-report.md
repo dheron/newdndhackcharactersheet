@@ -610,8 +610,62 @@ Source: Races (1mOugghME6PHrir0T-gvva6MyXfOSbPCV1ZAxtaixT30)
 
 Source: Experiences (18hBsCFV3PQC8Mjufchcp0iFHwNlqpXYsuq8FNg1uI_M)
 
-- Starting list: Acrobatics, Animal Handling, Arcana, Athletics, Deception, History, Insight, Intimidation, Investigation, Medicine, Nature, Perception, Performance, Persuasion, Religion, Sleight of Hand, Stealth, Survival
+- Starting list: Acrobatics, Animal Handling, Arcana, Athletics, Deception, History, Insight, Intimidation, Investigation, Medicine, Nature, Perception, Performance, Persuasion, Religion, Sleight of Hand, Stealth, Survival (character creation now uses the Expanded Experiences doc below).
 - Player-written examples (illustrative): Blacksmith, Sailor, Streetwise, Alchemist, Farmer, Soldier, Gambler, Forger, Hunter's Guide, Court Etiquette
+
+### Expanded Experiences
+
+Source: Expanded Experiences (12JgZ4ylpu_9M7fsrITbyPUEhrZg8bB5oI0lHoK48D_Q). Character creation offers the core skills first, then the Default Examples plus 5 random entries; Randomize replaces the examples with 5 random entries from each of Sections 1 to 4. Section 4 phrases are shown without the words in brackets (David).
+
+- **DnD Core Skills** (17): Athletics, Acrobatics, Sleight of Hand, Stealth, Arcana, History, Nature, Religion, Animal Handling, Insight, Medicine, Perception, Survival, Deception, Intimidation, Performance, Persuasion
+- **Default Examples** (15): Wrestler, Born in the Saddle, Hedge Wizardry, Local Legends, Bully, Plague Nurse, Silver Tongue, Drinking Contests, Knot Tying, Juggling, Bounty Hunter, Undertaker, Nothing to Lose, Every Lock Has a Key, Fortune Favours the Bold
+- **Section 1: Core Experiences** (100)
+  - Balance, agility and body control: Tumbler, Nimble Footwork, Rooftop Runner, Tightrope Walker, Quick Reflexes, Contortionist
+  - Working with beasts: Hound Master, Horse Trainer, Falconer, Stable Hand, Born in the Saddle
+  - Magical knowledge: Spell Lore, Magic Studies, Enchantment Lore, Rune Reader, Hedge Wizardry, Scholar of the Planes, Apprenticed to a Mage
+  - Raw physical effort: Strong Back, Wrestler, Climber, Swimmer, Long-Distance Runner, Hard Labour
+  - Lying and false fronts: Straight-Faced Liar, Con Artist, Disguise Artist, Fast Talker
+  - Knowledge of the past: Antiquarian, Student of Old Wars, Ruin Scholar, Local Legends
+  - Reading people: Judge of Character, Face Reader, Good Listener, Counsellor, Gut Feeling About People
+  - Frightening and pressuring others: Menacing Presence, Hard Stare, Enforcer, Interrogator, Bully
+  - Solving mysteries and finding clues: Detective, Sleuth, Puzzle Solver, Archive Researcher, Deductive Reasoning, Code Breaker
+  - Healing the hurt and sick: Healer, Field Medic, Bonesetter, Herbalist, Midwife, Plague Nurse, Treats Poisons
+  - Wild places, plants and weather: Woodcraft, Herb Lore, Weather Wise, Beast Lore, Forest Lore, Mountain Lore, Reads the Seasons
+  - Noticing and watching: Sharp Senses, Keen Eyes, Sharp Ears, Lookout, Sentry, Eye for Detail, Good Nose
+  - Entertaining a crowd: Minstrel, Storyteller, Stage Actor, Showman, Singer, Crowd Pleaser
+  - Winning people over: Silver Tongue, Diplomat, Negotiator, Honest Face, Charmer, Orator, Peacemaker
+  - Faith, gods and the spirit world: Raised in a Temple, Scripture Reader, Rites and Rituals, Grave Rites
+  - Quick and clever hands: Light Fingers, Pickpocket, Deft Hands, Stage Magician, Card Sharp
+  - Moving unseen and unheard: Sneak, Prowler, Hiding in Plain Sight
+  - Wilderness living and travel: Pathfinder, Forager, Tracker, Hardy Traveller, Lives Off the Land, Hunter's Instinct
+- **Section 2: Specific** (195)
+  - Climbing, running and rough movement: Rope Climbing, Cliff Climbing, Rooftop Running, Tumbling, Balancing, Long Distance Running, Sprinting, Jumping Gaps, Falling Safely, Swimming, Diving, Holding Breath, Escaping Bonds, Contortion, Riding Bareback
+  - Strength and endurance: Wrestling, Grappling, Brawling, Marching All Day, Cold Water Endurance, Heat Endurance, Going Without Sleep, Going Without Food, Drinking Contests
+  - Watching, listening and noticing: Spotting Ambushes, Keen Ears, Eagle Eyes, Searching Rooms, Finding Hidden Doors, Noticing Small Details, Judging Distance, Reading Body Language, Spotting Forgeries, Reading a Crowd, Remembering Faces, Tasting for Poison, Night Watch, Following Clues
+  - Talking and dealing with people: Haggling, Bluffing, Flattery, Charming, Menacing Stares, Interrogation, Talking Fast, Soothing Tempers, Public Speaking, Rousing Speeches, Bribery, Cold Reading Strangers, Courtly Manners, Tavern Banter, Gossip, Impersonating Officials, Disguise, Mimicking Accents, Diplomatic Protocol, Apologizing Gracefully, Giving Orders
+  - Lore and learning: Ancient Ruins, Old Wars, Heraldry, Royal Bloodlines, Local Legends, Dragon Lore, Undead Lore, Devil Lore, Fey Lore, Giant Lore, Goblin Customs, Dwarven Clans, Elven Songs, Spell Lore, Magical Theory, Rune Reading, Wards and Glyphs, Cult Symbols, Temple Rites, Hymns and Prayers, Funeral Customs, Saints and Martyrs, Planar Lore, Star Charts, Trade Routes, Coinage and Currency, Local Law, Map Reading, Dead Languages, Deciphering Codes, Folklore, Superstitions, Monster Weaknesses, Poison Lore, Herb Lore, Fungus Lore, Tide Tables
+  - Outdoors and travel: Tracking, Foraging, Fishing, Trapping Small Game, Skinning and Butchering, Making Fire in the Rain, Finding Fresh Water, Building Shelter, Navigating by Stars, Swamp Crossing, Desert Travel, Snow Travel, Cave Exploring, Reading Terrain, Scouting Ahead, Covering Tracks, Sailing Small Boats, Driving Wagons
+  - Animals: Horse Whispering, Riding, Training Hounds, Falconry, Reading Animal Moods, Animal Calls, Herding, Breaking Horses, Tending Livestock, Befriending Strays
+  - Healing: Bandaging Wounds, Setting Bones, Stitching Wounds, Treating Fever, Treating Poison, Herbal Poultices, Treating Burns, Midwifery, Field Surgery, Diagnosing Illness, Easing Pain, Tending the Dying, Pulling Teeth, Telling the Dead from the Dying
+  - Sneaking and thievery: Sneaking, Hiding in Shadows, Moving Silently, Pickpocketing, Palming Small Objects, Lock Picking, Disabling Traps, Setting Traps, Shadowing a Target, Slipping Through Crowds, Cutting Purses, Concealing Weapons, Breaking and Entering, Casing a Building, Escaping Pursuit, Blending Into a Crowd, Forging Documents, Card Tricks, Cheating at Dice
+  - Craft and hands: Knot Tying, Rope Work, Whittling, Wood Carving, Sharpening Blades, Mending Armour, Patching Leather, Fletching, Carpentry, Masonry, Smithing, Brewing, Cooking Over a Fire, Candle Making, Tanning, Appraising Jewellery, Gem Cutting, Mapmaking, Repairing Wagons, Repairing Clockwork, Appraising Goods, Picking Apart Mechanisms, Making Poisons, Mixing Potions, Lamp and Torch Making
+  - Music and showmanship: Singing, Lute Playing, Drumming, Juggling, Storytelling, Acting, Dancing, Mimicry, Fire Eating, Street Theatre, Reciting Epics, Dice and Card Games, Gambling Odds
+- **Section 3: Background or Profession** (152)
+  - Fighting trades: Soldier, Mercenary, Town Guard, Caravan Guard, Bodyguard, Gladiator, Pit Fighter, Duelist, Militia Sergeant, Siege Engineer, Scout, Cavalry Rider, Marine, Bounty Hunter, Watchman, Arena Champion, Quartermaster, Battlefield Medic, Executioner, Veteran of the Border Wars
+  - Shadow trades: Thief, Burglar, Cutpurse, Smuggler, Spy, Assassin, Fence, Con Artist, Highwayman, Pirate, Gang Member, Street Urchin, Informant, Forger, Poacher, Tomb Robber, Gambler, Escaped Convict, Prison Guard
+  - Trades and crafts: Blacksmith, Armourer, Weaponsmith, Bowyer, Carpenter, Mason, Stonecutter, Miner, Tanner, Cartwright, Brewer, Baker, Butcher, Cook, Innkeeper, Merchant, Caravan Trader, Shipwright, Jeweller, Glassblower, Potter, Weaver, Tailor, Locksmith, Clockmaker, Chandler, Rope Maker, Dockworker
+  - Wilds and sea: Hunter, Trapper, Fisher, Forester, Woodcutter, Shepherd, Farmer, Horse Breeder, Beekeeper, Guide, Nomad, Fur Trader, Sailor, Ship's Captain, Navigator, River Boatman, Whaler, Islander, Mountain Herder
+  - Learning and faith: Scholar, Sage, Scribe, Librarian, Archivist, Alchemist, Apothecary, Physician, Surgeon, Midwife, Priest, Acolyte, Monk, Pilgrim, Hedge Wizard, Apprentice Mage, Astronomer, Cartographer, Teacher, Lawyer, Clerk, Inquisitor, Former Cultist, Grave Digger, Undertaker
+  - Court and society: Noble, Outcast Noble, Courtier, Diplomat, Herald, Steward, Servant, Page, Squire, Magistrate, Tax Collector, Guild Member, Guild Master, Exile, Matchmaker, Bard, Minstrel, Actor, Jester, Dancer, Street Performer, Entertainer
+  - Roads, cities and odd jobs: Caravan Driver, Messenger, Courier, Explorer, Prospector, Treasure Hunter, Ratcatcher, Lamplighter, Sewer Worker, Chimney Sweep, Stablehand, Beggar, Orphan, Refugee, War Orphan, Escaped Slave, Itinerant Preacher, Ferryman, Toll Keeper
+- **Section 4: Short Phrases** (75)
+  - Grit: I've Had Worse, Get Up Again, Dig In, Last One Standing, Nothing to Lose, Born in the Gutter, Hard Winters Taught Me, Pain Is Information, Never Turn Your Back
+  - Cunning: Always Have an Exit, Trust the Plan, There's Always a Back Door, Measure Twice, Everyone Has a Price, Read the Room, Smile and Nod, Never Show Your Hand, A Little Bird Told Me, I Know a Guy, You Owe Me One, Trust, But Verify, Follow the Money, Cheat to Win, Talk My Way Out, One Last Job, Expect the Worst
+  - Loyalty and heart: Leave No One Behind, Family Comes First, My Word Is My Bond, Honour the Dead, Lead from the Front, Keep Them Calm, Kind Words Cost Nothing, Pay It Forward, Open Door, Friends in Every Port
+  - Wits and learning: Read the Fine Print, Everything Has a Pattern, Question Everything, I Read About This Once, The Old Ways, Seen It Before, Learn by Doing, Make It Work, Waste Not, Curiosity Pays, Every Lock Has a Key
+  - Swagger and nerve: Fortune Favours the Bold, Look Them in the Eye, Make an Entrance, Smooth as Silk, Never Let Them See You Sweat, Wing It, No Plan Survives, Louder Is Better, Stand Tall
+  - Wild and strange places: The Land Provides, Listen to the Wind, Fear the Quiet, Hearth and Home, The Road Is Long, Light Sleeper, Old Superstitions, Haunted Past, Don't Wake the Dead, Salt and Iron, Never Lost
+  - Dark humor and hard luck: Dark Humour Helps, Hope for the Best, Trouble Follows Me, Old Scars, Old Stories, Rotten Luck, Fool Me Once, Been Here Before, It's Always the Quiet Ones
 
 ## Weapons and Armour
 

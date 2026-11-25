@@ -5,7 +5,7 @@ import {
   abilitiesUpTo,
   cantripsKnown,
   classes as classRules,
-  experiences as experienceData,
+  expandedExperiences,
   raceByName,
   spells,
   spellSlots,
@@ -108,10 +108,10 @@ export function experienceSlotsFor(classNames: ClassName[], raceName: string): {
   return { fixed, free: Math.max(0, classFree + (race.bonusExperienceChoices ?? 0)) };
 }
 
-/** The starting list, minus anything the character already has. */
+/** The core skills and default examples (Expanded Experiences doc), minus anything the character already has. */
 export function experienceChoices(d: Draft): string[] {
   const fixed = new Set(experienceSlots(d).fixed.map(norm));
-  return experienceData.startingList.filter((e) => !fixed.has(norm(e)));
+  return [...expandedExperiences.coreSkills, ...expandedExperiences.defaultExamples].filter((e) => !fixed.has(norm(e)));
 }
 
 /** Thief Expertise picks at 1st level: two for each "Expertise" ability (Classes v4). */

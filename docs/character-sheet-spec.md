@@ -84,6 +84,10 @@ One page per casting class. Same structure for all:
 - On the spell page, resting the pointer on a spell (desktop) or pressing and holding it (iPad) shows a card with its level, school, duration and text. A tap still ticks it as prepared.
 - When picking spells (creation, level up, Magical Secrets) each spell shows its level and the same card.
 
+## Experiences at creation
+
+From the Expanded Experiences doc (David): the DnD core skills first, then the Default Examples plus a few random entries from the full list. **Randomize** replaces the examples with 5 random entries from each of Sections 1 to 4. Section 4 phrases show only the phrase, not the words in brackets. The player can still write their own. Picks stay picked when the examples change.
+
 ## Coins and buying
 
 - The top of the Inventory column has Platinum, Gold, Silver and Copper. Starting gold goes in Gold.

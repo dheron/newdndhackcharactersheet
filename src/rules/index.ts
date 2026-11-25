@@ -6,6 +6,7 @@ import classData from "./data/classes.json";
 import raceData from "./data/races.json";
 import saveData from "./data/saving-throws.json";
 import experienceData from "./data/experiences.json";
+import expandedExperienceData from "./data/expanded-experiences.json";
 import equipmentData from "./data/equipment.json";
 import spellData from "./data/spells.json";
 import turnUndeadData from "./data/turn-undead.json";
@@ -82,6 +83,7 @@ export const SOURCES = {
   races: raceData.source,
   savingThrows: saveData.source,
   experiences: experienceData.source,
+  expandedExperiences: expandedExperienceData.source,
   equipment: equipmentData.source,
   turnUndead: turnUndeadData.source,
   multiclass: multiclassData.source,
@@ -100,6 +102,14 @@ export const weapons = equipmentData.weapons as Weapon[];
 export const armour = equipmentData.armour as Armour[];
 export const startingOptions = equipmentData.startingOptions.classes as Record<ClassName, { choiceOne: string[]; choiceTwo: string[] }>;
 export const experiences = experienceData;
+
+/** The Expanded Experiences doc: DnD core skills, default examples, and Sections 1 to 4. */
+export const expandedExperiences = expandedExperienceData as {
+  source: string;
+  coreSkills: string[];
+  defaultExamples: string[];
+  sections: { number: number; title: string; groups: { title: string; items: string[] }[] }[];
+};
 export const spells = spellData.classes as Partial<Record<ClassName, { source: string; levels: Record<string, string[]> }>>;
 export const turnUndead = turnUndeadData;
 export const multiclass = multiclassData;

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { STATS, classes, experiences, raceByName, type ClassName, type Stat } from "../src/rules";
+import { STATS, classes, expandedExperiences, raceByName, type ClassName, type Stat } from "../src/rules";
 import type { StatRoll } from "../src/engine/abilities";
 import { deriveSheet } from "../src/engine/derive";
 import {
@@ -90,7 +90,7 @@ describe("experiences", () => {
     const d = withClass(base(), "Wizard");
     const fixed = experienceSlots(d).fixed.map((e) => e.toLowerCase());
     expect(experienceChoices(d).some((e) => fixed.includes(e.toLowerCase()))).toBe(false);
-    expect(experienceChoices(d).length).toBeLessThanOrEqual(experiences.startingList.length);
+    expect(experienceChoices(d).length).toBeLessThanOrEqual(expandedExperiences.coreSkills.length + expandedExperiences.defaultExamples.length);
   });
 });
 

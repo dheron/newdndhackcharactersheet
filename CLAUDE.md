@@ -23,7 +23,8 @@ Project folder: `1p1r75V5ebopMRWvEFa_mRU6wO_asvqVv`
 | Ability Score Tables v4 | `12Z-sJECWgoBKFgWoIo3S7c3JgT_EjOBl5LQZU8VOHT0` | Every stat bonus, scores 3 to 24 |
 | Saving Throws | `1h3buCjn4JH9Bp9pPQyw2JjjgVDxA4GILATAHaqAUlA8` | Five categories, priority, per-class targets by level |
 | Races (detailed) | `1mOugghME6PHrir0T-gvva6MyXfOSbPCV1ZAxtaixT30` | Current race doc. An older summary "Races" doc (`1-XDWCxJtBoo8wYkNZSJ6EyQO8xrwKaxlc_IT5Fq0XZU`) is superseded |
-| Experiences | `18hBsCFV3PQC8Mjufchcp0iFHwNlqpXYsuq8FNg1uI_M` | Experience rules and starting list |
+| Experiences | `18hBsCFV3PQC8Mjufchcp0iFHwNlqpXYsuq8FNg1uI_M` | Experience rules |
+| Expanded Experiences | `12JgZ4ylpu_9M7fsrITbyPUEhrZg8bB5oI0lHoK48D_Q` | Core skills, default examples and Sections 1 to 4 offered at character creation (exported to `sources/expanded-experiences.md`) |
 | Ability Score Math | `1rDjJv-9zHyKNqqC2tWuxPKFoko5cSfeABJBV72Xirm0` | XP curve working sheet (not stat generation) |
 
 Spell books folder: `1jzcVhqFq2wWfIoKf708woF2WlbKaRmQT`
@@ -53,7 +54,7 @@ Plan: [`docs/development-plan.md`](docs/development-plan.md).
 - `npm run dev`: front end in a browser at http://localhost:1420.
 - `npx tauri dev`: the desktop app with live reload.
 - `npm run check`: typecheck, tests and front end build. Run before every commit.
-- Rules data: `src/rules/data/*.json`, one file per source doc, each naming its source. `src/rules/index.ts` is the only way the app reads it. Spell lists are generated from `sources/spell-lists.txt`; spell texts from `sources/spell-compendium.md` (the Spell Compendium exported from Google Docs as Markdown; re-export it after the doc changes).
+- Rules data: `src/rules/data/*.json`, one file per source doc, each naming its source. `src/rules/index.ts` is the only way the app reads it. Spell lists are generated from `sources/spell-lists.txt`; spell texts from `sources/spell-compendium.md` and Experiences from `sources/expanded-experiences.md` (the docs exported from Google Docs as Markdown; re-export after a doc changes).
 - `npm run rules`: regenerates `spells.json` and `docs/rules-report.md` (every value next to its source, plus gaps and interpretations). Run after any data change; CI fails if they are stale.
 - Web version: the same build (`dist/`) published to GitHub Pages by `.github/workflows/pages.yml` on pushes to the default branch. `public/sw.js` is the offline helper; `public/manifest.webmanifest` makes it installable. Google Drive sync uses the client ID in `src/sync/drive.ts` (`docs/google-drive-setup.md`).
 - `npx tauri build`: installers for the current OS. CI (`.github/workflows/ci.yml`) builds the macOS (universal) and Windows installers and attaches them to each run.

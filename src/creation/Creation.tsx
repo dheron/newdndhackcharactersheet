@@ -6,6 +6,7 @@ import { WEAPON_FILTERS, armourByName, armourChoosable, optionAvailable, options
 import { decisions } from "../rules";
 import { classesLabel, multiclassOptions } from "../engine/multiclass";
 import { SpellChip } from "../spells/SpellInfo";
+import { coreSkillOptions, randomExamples, startingExamples } from "./experienceOptions";
 import { saveCharacter } from "../library";
 import type { Character } from "../model/character";
 import {
@@ -15,7 +16,6 @@ import {
   currentStep,
   emptyDraft,
   equipmentFor,
-  experienceChoices,
   experienceSlots,
   expertiseChoices,
   expertiseCount,
@@ -445,8 +445,20 @@ function ExperiencesStep({ draft, update }: StepProps) {
           : d,
     );
   const nExpertise = expertiseCount(draft);
-  const listed = experienceChoices(draft);
+  // Core skills first, then examples: the Default Examples plus a few random entries, or a random
+  // mix from every section after Randomize (Expanded Experiences doc).
+  const core = coreSkillOptions(fixed);
+  const [examples, setExamples] = useState(() => startingExamples(fixed));
+  const listed = [...core, ...examples];
   const customs = draft.experiences.filter((e) => !listed.includes(e));
+  const chip = (e: string) => {
+    const on = draft.experiences.includes(e);
+    return (
+      <button key={e} type="button" class={on ? "chip on" : "chip"} aria-pressed={on} disabled={!on && left <= 0} onClick={() => toggle(e)}>
+        {e}
+      </button>
+    );
+  };
   const addCustom = () => {
     const value = custom.trim();
     if (!value || left <= 0 || draft.experiences.some((e) => e.toLowerCase() === value.toLowerCase()) || fixed.some((e) => e.toLowerCase() === value.toLowerCase())) return;
@@ -456,7 +468,7 @@ function ExperiencesStep({ draft, update }: StepProps) {
   return (
     <>
       <p class="hint">
-        Choose {free}: {left} left.
+        Choose {free}: {left} left. Pick from the lists or write your own.
       </p>
       {fixed.length > 0 && (
         <>
@@ -470,17 +482,27 @@ function ExperiencesStep({ draft, update }: StepProps) {
           </div>
         </>
       )}
-      <h3>Choose from the list</h3>
-      <div class="chips">
-        {listed.map((e) => {
-          const on = draft.experiences.includes(e);
-          return (
-            <button key={e} type="button" class={on ? "chip on" : "chip"} aria-pressed={on} disabled={!on && left <= 0} onClick={() => toggle(e)}>
-              {e}
-            </button>
-          );
-        })}
+      {customs.length > 0 && (
+        <>
+          <h3>Your picks</h3>
+          <div class="chips">
+            {customs.map((e) => (
+              <button key={e} type="button" class="chip on" onClick={() => toggle(e)} aria-label={`Remove ${e}`}>
+                {e} (remove)
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+      <h3>Core skills</h3>
+      <div class="chips">{core.map(chip)}</div>
+      <div class="heading-row">
+        <h3>Examples</h3>
+        <button type="button" onClick={() => setExamples(randomExamples(fixed))}>
+          Randomize
+        </button>
       </div>
+      <div class="chips">{examples.map(chip)}</div>
       <h3>Or write your own</h3>
       <div class="inline">
         <input type="text" value={custom} placeholder="For example Sailor" onInput={(e) => setCustom((e.target as HTMLInputElement).value)} onKeyDown={(e) => e.key === "Enter" && addCustom()} />
@@ -488,15 +510,6 @@ function ExperiencesStep({ draft, update }: StepProps) {
           Add
         </button>
       </div>
-      {customs.length > 0 && (
-        <div class="chips">
-          {customs.map((e) => (
-            <button key={e} type="button" class="chip on" onClick={() => toggle(e)} aria-label={`Remove ${e}`}>
-              {e} (remove)
-            </button>
-          ))}
-        </div>
-      )}
       {nExpertise > 0 && (
         <>
           <h3>
