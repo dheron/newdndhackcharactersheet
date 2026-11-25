@@ -5,7 +5,7 @@ import { createContext, type ComponentChildren, type JSX } from "preact";
 import { useContext, useEffect, useRef, useState } from "preact/hooks";
 import { spellTexts } from "../rules";
 
-type Shown = { name: string; rect: DOMRect } | null;
+type Shown = { name: string; el: Element } | null;
 const Ctx = createContext<{ show: (name: string, el: Element) => void; hide: () => void }>({ show: () => undefined, hide: () => undefined });
 
 const HOVER_MS = 250;
@@ -50,33 +50,40 @@ export function SpellCard({ name }: { name: string }) {
 
 export function SpellInfoProvider({ children }: { children: ComponentChildren }) {
   const [shown, setShown] = useState<Shown>(null);
+  const [, setTick] = useState(0);
   const api = useRef({
-    show: (name: string, el: Element) => setShown({ name, rect: el.getBoundingClientRect() }),
+    show: (name: string, el: Element) => setShown({ name, el }),
     hide: () => setShown(null),
   }).current;
 
-  // A tap anywhere, a scroll or Escape closes the card.
+  // The card stays until the pointer leaves the spell (desktop), or a tap elsewhere or Escape.
+  // Scrolling moves it with its spell rather than closing it.
   useEffect(() => {
     if (!shown) return;
     const close = () => setShown(null);
+    const follow = () => (shown.el.isConnected ? setTick((n) => n + 1) : close());
     const key = (e: KeyboardEvent) => e.key === "Escape" && close();
-    window.addEventListener("scroll", close, true);
+    const tap = (e: PointerEvent) => e.pointerType !== "mouse" && close();
+    window.addEventListener("scroll", follow, true);
+    window.addEventListener("resize", follow);
     window.addEventListener("keydown", key);
-    const t = window.setTimeout(() => window.addEventListener("pointerdown", close), 0);
+    const t = window.setTimeout(() => window.addEventListener("pointerdown", tap), 0);
     return () => {
-      window.removeEventListener("scroll", close, true);
+      window.removeEventListener("scroll", follow, true);
+      window.removeEventListener("resize", follow);
       window.removeEventListener("keydown", key);
-      window.removeEventListener("pointerdown", close);
+      window.removeEventListener("pointerdown", tap);
       window.clearTimeout(t);
     };
   }, [shown]);
 
   let style = "";
   if (shown) {
+    const rect = shown.el.getBoundingClientRect();
     const w = Math.min(360, window.innerWidth - 16);
-    const right = shown.rect.right + 8;
-    const left = right + w <= window.innerWidth - 8 ? right : Math.max(8, shown.rect.left - w - 8);
-    const top = Math.min(Math.max(8, shown.rect.top - 8), Math.max(8, window.innerHeight - 320));
+    const right = rect.right + 8;
+    const left = right + w <= window.innerWidth - 8 ? right : Math.max(8, rect.left - w - 8);
+    const top = Math.min(Math.max(8, rect.top - 8), Math.max(8, window.innerHeight - 320));
     style = `left:${left}px;top:${top}px;width:${w}px`;
   }
   return (
