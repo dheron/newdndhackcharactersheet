@@ -86,7 +86,7 @@ One page per casting class. Same structure for all:
 
 ## Experiences at creation
 
-From the Expanded Experiences doc (David): the DnD core skills first, then the Default Examples plus a few random entries from the full list. **Randomize** replaces the examples with 5 random entries from each of Sections 1 to 4. Section 4 phrases show only the phrase, not the words in brackets. The player can still write their own. Picks stay picked when the examples change.
+From the Expanded Experiences doc (David): one list, with the DnD core skills first, then the Default Examples plus a few random entries from the full list (no separate headings for core skills and examples). **Randomize** replaces the examples with 5 random entries from each of Sections 1 to 4. Section 4 phrases show only the phrase, not the words in brackets. The player can still write their own. Picks stay picked when the examples change.
 
 ## Coins and buying
 

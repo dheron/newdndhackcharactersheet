@@ -468,7 +468,7 @@ function ExperiencesStep({ draft, update }: StepProps) {
   return (
     <>
       <p class="hint">
-        Choose {free}: {left} left. Pick from the lists or write your own.
+        Choose {free}: {left} left. Pick from the list or write your own.
       </p>
       {fixed.length > 0 && (
         <>
@@ -494,15 +494,13 @@ function ExperiencesStep({ draft, update }: StepProps) {
           </div>
         </>
       )}
-      <h3>Core skills</h3>
-      <div class="chips">{core.map(chip)}</div>
       <div class="heading-row">
-        <h3>Examples</h3>
+        <h3>Choose from the list</h3>
         <button type="button" onClick={() => setExamples(randomExamples(fixed))}>
           Randomize
         </button>
       </div>
-      <div class="chips">{examples.map(chip)}</div>
+      <div class="chips">{listed.map(chip)}</div>
       <h3>Or write your own</h3>
       <div class="inline">
         <input type="text" value={custom} placeholder="For example Sailor" onInput={(e) => setCustom((e.target as HTMLInputElement).value)} onKeyDown={(e) => e.key === "Enter" && addCustom()} />

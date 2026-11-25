@@ -3,3 +3,5 @@
 
   ➜  Local:   http://localhost:1420/
   ➜  Network: use --host to expose
+5:05:01 AM [vite] (client) hmr update /src/creation/Creation.tsx
+5:05:12 AM [vite] (client) hmr update /src/creation/Creation.tsx
